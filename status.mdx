@@ -1,0 +1,62 @@
+---
+title: Status
+description: An honest read on what is live, what is early, and what is deliberately deferred.
+---
+
+surfcall is early and we keep the status honest. Here is exactly what is real.
+
+## What is live (V1 — comprehension)
+
+The comprehension path is **live end-to-end against one real, painful API** — the
+TxODDS World Cup API:
+
+- ingest → catalog → question-shaped tools → access (a two-token on-chain subscribe) →
+  first-call-correct request → real data, proven on **Solana mainnet**
+- a **$0 recorded mode** that runs the entire path offline, no subscription, no keys
+- **31+ tests passing**
+- a falsifiable first-call-correct scorecard (retrieval top-1 / top-5 + request
+  well-formedness)
+
+The engine is **API-agnostic by construction**: ingest, catalog, tools, and the caller
+are not TxODDS-specific. As a worked example of that, the repo also ingests a **second
+public API** (a public peg-state API) unilaterally with a no-auth session and scores
+first-call-correctness on representative tasks — including correctly *refusing* to fire
+an auth-gated operation on a public read.
+
+## What is true about scope today
+
+<Warning>
+Ingest is **OpenAPI 3.x today.** surfcall does not yet ingest arbitrary human-only docs,
+and it does **not** claim to "work on any API." It makes a *known* OpenAPI surface
+agent-usable, proven deeply on one API and demonstrated on a second.
+</Warning>
+
+surfcall is a **comprehension and consumption** layer. It does **not**:
+
+- verify, score, or vouch for the **data** an API returns (that's a separate, later
+  concern)
+- act as a payment rail or settlement layer (it composes on top of those)
+- act as a marketplace or registry (it composes on top of those too)
+
+## What is deliberately deferred
+
+| Tier | Scope | State |
+|---|---|---|
+| **V1 — comprehension** | one painful API: ingest → first-call-correct tools → access → direct call. Lexical catalog, no vectors, no DB. | **live** |
+| **V2 — multi-API + correctness path** | many APIs; a feedback/correctness path; vectorized catalog when scale demands it | **not live** |
+| **V3 — trust / verification** | "is this the right call, is this response sane" | **deferred on purpose** |
+
+Vector search is intentionally absent in V1 — at tens of endpoints, lexical search is
+more accurate and far simpler. It becomes relevant only at multi-API / large-API scale.
+
+## The honest caveat
+
+What is real is a **working comprehension path on one genuinely painful API**, and a
+clean, API-agnostic engine behind it. That is the claim — no more. As scope grows, this
+page will say so plainly.
+
+## Operational note
+
+During testing, payment integration runs in **stub** mode by default. The on-chain
+subscribe is **founder-run only**: the tooling simulates (no spend) and a human
+broadcasts. surfcall never signs or broadcasts a mainnet transaction on its own.

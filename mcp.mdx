@@ -1,0 +1,83 @@
+---
+title: The MCP surface
+description: What an agent installs — a framework-agnostic MCP surface over any ingested API, plus a synthetic search_capabilities tool for intent-to-endpoint discovery.
+---
+
+surfcall exposes an ingested API to an agent through the **Model Context Protocol
+(MCP)**. The surface is framework-agnostic and fully testable: it's a thin view over
+the client with two methods — `list_tools` and `call_tool`.
+
+## What the agent sees
+
+The surface lists every usable, question-shaped tool for the API **plus one synthetic
+tool**, `search_capabilities`, so the agent can go from plain-language intent to the
+right endpoint and then call it.
+
+```json
+{
+  "name": "search_capabilities",
+  "description": "Find which endpoint/tool fits a natural-language intent. Returns ranked tool names you can then call.",
+  "inputSchema": {
+    "type": "object",
+    "properties": {
+      "query": { "type": "string", "description": "What you want to do, in plain language." }
+    },
+    "required": ["query"]
+  }
+}
+```
+
+Each real tool is listed with only `name`, `description`, and `inputSchema` — auth
+plumbing and invocation metadata stay internal. Operations the current
+[session](/access-and-auth) can't satisfy are not listed at all.
+
+## The agent loop
+
+<Steps>
+  <Step title="Discover">
+    Call `search_capabilities` with the goal in plain language → ranked tool names.
+  </Step>
+  <Step title="Inspect">
+    Read the question-shaped `description` and `inputSchema` of the top tool.
+  </Step>
+  <Step title="Call">
+    Call the tool by name with the inputs. surfcall builds the correct request,
+    injects auth, and returns the result.
+  </Step>
+</Steps>
+
+## Using it in code
+
+`McpSurface` wraps an `AgentApiClient` and is testable without any MCP SDK installed:
+
+```python
+from surfcall.client import AgentApiClient
+from surfcall.mcp_server import McpSurface
+
+surface = McpSurface(AgentApiClient(spec), mode="recorded")
+
+surface.list_tools()                          # search_capabilities + the API's tools
+surface.call_tool("search_capabilities", {"query": "live odds for a fixture"})
+surface.call_tool("get_odds_snapshot_fixtureId", {"fixtureId": 123})
+```
+
+## Running a real stdio server
+
+For a live MCP server, `serve_stdio` wraps the surface with the `mcp` SDK. It is
+import-guarded, so the surface and its tests work without the SDK installed.
+
+```bash
+uv add mcp
+```
+
+```python
+from surfcall.mcp_server import serve_stdio
+
+serve_stdio("path/to/openapi.yaml", base_url="https://...", mode="recorded")
+```
+
+<Note>
+The MCP server is **thin transport**. All comprehension logic lives in the engine; the
+server just parses input, calls the package, and formats output. Run it in `recorded`
+mode for a $0 surface, or `live` once a session is in place.
+</Note>

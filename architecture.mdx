@@ -1,0 +1,100 @@
+---
+title: Architecture
+description: surfcall is a control plane, not a data plane. The invariants, the module map, and the single API-agnostic seam.
+---
+
+surfcall is a **control plane, not a data plane.** It holds the API's *surface*, the
+generated tool defs, and *correctness metadata* — and never the data flowing through.
+That single invariant is what makes the rest of the design coherent.
+
+## The flow
+
+```mermaid
+flowchart TD
+    A["AI agent<br/>(has a goal, no API docs)"] -->|"what can this API do for X?"| TOOL
+
+    subgraph SC["surfcall — comprehension layer (control plane)"]
+        direction TB
+        ING[("ingest<br/>OpenAPI — the surface only")]
+        CAT["catalog<br/>intent → endpoint"]
+        TOOL["tools<br/>question-shaped, auth hidden"]
+        ACC["access<br/>session handshake"]
+        ING --> CAT --> TOOL --> ACC
+    end
+
+    ACC -->|"injects auth"| CALL
+    A -->|"calls the real API directly"| CALL["the real API<br/>(data plane — surfcall never stores it)"]
+    CALL -->|"data"| A
+```
+
+The agent calls the real API **directly** for data. surfcall injects credentials and
+stays out of the data path.
+
+## Invariants
+
+<CardGroup cols={2}>
+  <Card title="Control plane, never data plane" icon="shield-halved">
+    Stores the API surface, tool defs, and correctness metadata only — never response
+    payloads, user data, or secrets.
+  </Card>
+  <Card title="The engine is API-agnostic" icon="plug">
+    Everything API-specific reduces to data (the spec) plus one adapter seam,
+    `Session.auth_headers()`. Adding an API doesn't touch ingest/catalog/tools/caller.
+  </Card>
+  <Card title="One code path, two modes" icon="code-branch">
+    `recorded` and `live` differ only at the transport edge. The free offline
+    simulation comes first; live smoke is the final check.
+  </Card>
+  <Card title="Auth is invisible to the agent" icon="eye-slash">
+    Tool defs never expose auth headers. The agent describes intent; surfcall injects
+    credentials at call time.
+  </Card>
+</CardGroup>
+
+## Module map
+
+The comprehension logic is the product and lives in the package; the MCP server, the
+client, and the scripts are thin transport.
+
+| Module | Responsibility |
+|---|---|
+| `surfcall/ingest.py` | OpenAPI 3.x → normalized `Operation` / `Param` (`$ref` resolution, cycle/depth guarded) |
+| `surfcall/catalog.py` | Lexical capability search (intent → endpoint) |
+| `surfcall/tools.py` | `Operation` → question-shaped agent tool defs (**auth hidden**) |
+| `surfcall/caller.py` | tool + args → correct `PreparedRequest` (stdlib `urllib`) |
+| `surfcall/access.py` | `Session.auth_headers()` — the engine/adapter seam; two-token session |
+| `surfcall/sample.py` | deterministic schema → example (powers $0 recorded mode) |
+| `surfcall/client.py` | `AgentApiClient` — `search` / `list_tools` / `prepare` / `call` |
+| `surfcall/mcp_server.py` | `McpSurface` — the agent-facing MCP surface |
+| `surfcall/validator.py` | replay + first-call-correct check + JSONL outcome log (metadata only) |
+| `surfcall/evaluate.py` | task-based first-call-correct scorecard (top-1 / top-5 / well-formed) |
+| `surfcall/demo.py` | `run()` (recorded, $0) + `live_demo()` |
+
+## The one seam that matters
+
+Adding a new API should not require touching ingest, catalog, tools, or the caller. The
+only API-specific code is, at most, an auth adapter — an object that implements:
+
+```python
+def auth_headers(self) -> dict[str, str]: ...
+```
+
+A public API uses the built-in no-auth adapter (returns `{}`); a paywalled API supplies
+a session that returns its tokens. See [Access & auth](/access-and-auth).
+
+## Outcome logging (control-plane safe)
+
+The validator and the evaluation harness append **outcome metadata only** — tool name,
+rank, ok/reason — to a JSONL log. They never write response payloads. Turning that
+metadata into a richer, multi-API correctness signal is V2 work and is **not live
+today**; see [Status](/status).
+
+## Security posture
+
+- Ingested spec/doc content is treated as **untrusted input**.
+- URLs are validated before fetching (no SSRF — private/loopback/link-local ranges and
+  non-http schemes blocked).
+- Secrets come from the environment/session and are never logged or persisted; errors
+  redact tokens before they're raised.
+- Stdlib-first networking (`urllib`); minimal dependencies, so the engine ports
+  anywhere.

@@ -1,0 +1,96 @@
+---
+title: Access & auth
+description: The whole engine/adapter seam is one function — Session.auth_headers(). How surfcall handles auth and paywalls invisibly to the agent.
+---
+
+Auth is invisible to the agent. The agent describes intent; surfcall injects
+credentials at call time. The entire engine/adapter seam is **one function**:
+
+```python
+class AuthSession(Protocol):
+    def auth_headers(self) -> dict[str, str]: ...
+```
+
+Any object with `auth_headers() -> dict[str, str]` is a valid session. A paywalled API
+returns its tokens; a public API returns an empty dict. This is the design that keeps
+the engine **API-agnostic** — adding an API is data (the spec) plus, at most, this one
+adapter.
+
+## Sessions you get out of the box
+
+<CardGroup cols={3}>
+  <Card title="Session" icon="key">
+    A two-token authenticated session (JWT + API token). Returned by the access
+    handshake.
+  </Card>
+  <Card title="NoAuthSession" icon="lock-open">
+    For public, no-auth APIs — `auth_headers()` returns an empty dict.
+  </Card>
+  <Card title="stub_session" icon="flask">
+    A non-live session for recorded demos: auth headers are present but not real.
+  </Card>
+</CardGroup>
+
+## How auth gating works
+
+When a session returns an **empty** auth-header dict, surfcall treats it as "this
+session can't satisfy auth-gated operations" and **hides those operations from the
+agent** — it could only mis-call them. A session *with* auth surfaces everything,
+unchanged. If an auth-gated tool is forced anyway, `prepare()` raises a typed error
+rather than firing a request that can't succeed.
+
+```python
+from surfcall.access import public_session
+from surfcall.client import AgentApiClient
+
+client = AgentApiClient(spec, session=public_session())
+client.list_tools()          # auth-gated operations are not in this list
+client.prepare("some_auth_only_op", {})   # raises CallError — correctly refused
+```
+
+## The two-token handshake (worked example)
+
+The live reference integration (the TxODDS World Cup API) uses a flow the agent never
+has to learn. surfcall encodes it so the agent only ever describes intent:
+
+```
+guest JWT  →  on-chain subscribe (txSig)  →  sign(txSig:leagues:jwt)  →  activate  →  apiToken
+```
+
+producing a two-token session:
+
+```
+Authorization: Bearer <session JWT>     (httpAuth)
+X-Api-Token:   <long-lived apiToken>    (apiKeyAuth)
+```
+
+Transport and signer are **injected**, so the whole flow is unit-testable with no
+network and no keys:
+
+```python
+from surfcall.access import establish_session
+
+session = establish_session(base_url, tx_sig, leagues, signer=my_signer)
+session.auth_headers()
+# {"Authorization": "Bearer ...", "X-Api-Token": "..."}
+```
+
+## The on-chain step
+
+The `subscribe` transaction itself is a wallet-signing, network-specific step that
+lives outside the access layer (in `scripts/`). The access layer takes the resulting
+`txSig` plus a signer and finishes the session.
+
+<Warning>
+**Mainnet boundary.** The subscribe transaction is **founder-run only**. The tooling
+*simulates* by default (no spend) and hands over the exact command; a human broadcasts
+it. surfcall does not sign or broadcast mainnet transactions on its own.
+</Warning>
+
+## What surfcall never does with credentials
+
+- It never exposes auth headers in the agent-facing tool definitions.
+- It never logs tokens or keys — secrets are redacted before any error is raised.
+- It never stores secrets; they are read from the session/environment at call time.
+
+See [Architecture](/architecture) for how this fits the control-plane model.

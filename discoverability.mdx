@@ -1,0 +1,61 @@
+---
+title: Agent discoverability
+description: surfcall exists to make an API discoverable to agents — question-shaped tools, intent-to-endpoint search, hidden auth, and an llms.txt for the API itself.
+---
+
+surfcall's whole reason to exist is **discoverability for agents**. A human can read
+docs, infer the right call, and guess at parameters. An agent shouldn't have to. These
+are the mechanisms that make an ingested API discoverable.
+
+## Intent, not endpoints
+
+An agent describes *what it wants* — not which path to hit. The catalog turns that
+intent into a ranked list of candidate operations, and the `search_capabilities` tool
+on the [MCP surface](/mcp) exposes it directly:
+
+```python
+client.search("what fixtures are coming up?")
+# → [{ "name": ..., "summary": ..., "path": ..., "method": ... }, ...]
+```
+
+## Question-shaped descriptions
+
+Every tool's description is written as the question it answers, with required and
+optional inputs called out. The agent picks the right tool from the description alone —
+no API docs in front of it. See [How comprehension works](/comprehension).
+
+## Auth is out of the way
+
+Auth headers never appear in the agent-facing tool input, and operations the current
+session can't authenticate are hidden entirely. The agent's surface is exactly the set
+of calls it can actually make — nothing it would only fail at. See
+[Access & auth](/access-and-auth).
+
+## Only the calls that will work
+
+When a [session](/access-and-auth) can't satisfy an operation's auth, that operation is
+removed from `list_tools()` and `search()`. Discoverability means surfacing the *usable*
+surface, not the whole spec — an agent should never discover a call it can't complete.
+
+## An llms.txt for the API
+
+surfcall can emit an agent/human-readable capability map grouped by tag — the
+machine-facing equivalent of a table of contents for the API:
+
+```python
+print(client.catalog.describe())
+# ## fixtures
+# - GET /api/fixtures/snapshot — upcoming fixtures
+# ## odds
+# - GET /api/odds/snapshot/{fixtureId} — live odds for a fixture
+```
+
+This docs site itself ships an [`llms.txt`](/llms.txt) — a discoverability map for
+these docs, in the same spirit. If you're an agent, start there.
+
+## Honest scope
+
+Discoverability is real today on an ingested **OpenAPI 3.x** surface. surfcall does not
+crawl arbitrary human-only docs yet, does not auto-discover APIs across the internet,
+and does not verify the data an API returns. It makes a *known* API surface
+agent-usable. See [Status](/status).

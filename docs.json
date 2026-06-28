@@ -1,0 +1,66 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "surfcall",
+  "description": "The API comprehension layer for AI agents. Point it at an API's surface and it generates question-shaped, first-call-correct agent tools, handles auth invisibly, and lets the agent call the real API directly.",
+  "colors": {
+    "primary": "#9945FF",
+    "light": "#C77DFF",
+    "dark": "#6F2DBD"
+  },
+  "favicon": "/favicon.png",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "concepts"
+            ]
+          },
+          {
+            "group": "How it works",
+            "pages": [
+              "comprehension",
+              "recorded-mode",
+              "access-and-auth"
+            ]
+          },
+          {
+            "group": "For AI agents",
+            "pages": [
+              "mcp",
+              "discoverability"
+            ]
+          },
+          {
+            "group": "Reference",
+            "pages": [
+              "architecture",
+              "status"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "navbar": {
+    "primary": {
+      "type": "github",
+      "href": "https://github.com/GeckoVision/surfcall"
+    }
+  },
+  "footer": {
+    "socials": {
+      "x": "https://x.com/ernanibritto"
+    }
+  }
+}

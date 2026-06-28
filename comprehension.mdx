@@ -1,0 +1,108 @@
+---
+title: How comprehension works
+description: Ingest, catalog, and the question-shaped tool generator — the path from an OpenAPI surface to first-call-correct agent tools, tied to the real engine.
+---
+
+Comprehension is the product. It is the path from a raw API surface to tools an agent
+calls correctly the first time. Three stages, each a small focused module.
+
+## 1. Ingest the surface
+
+surfcall parses an **OpenAPI 3.x** document (YAML or JSON) into a normalized list of
+operations. It resolves local `$ref`s with **cycle and depth guards** — on a cycle or
+when the depth cap is hit, the `$ref` is left in place rather than expanded, so callers
+still get a usable (if shallow) schema. Path-level parameters are merged into each
+operation's own parameters.
+
+Each `Operation` carries: method, path, `operation_id`, summary, description, tags,
+parameters, request body, responses, and security. Each `Param` carries: name,
+location, required, schema, description.
+
+<Note>
+Ingest reads the **surface only** — method, path, params, request/response schemas.
+It never reads or stores response data. The ingestor is stdlib + PyYAML by design, so
+it runs anywhere with zero heavy dependencies.
+</Note>
+
+Ingested spec content is treated as **untrusted input**, and any URL fetched to load a
+remote spec is validated first.
+
+## 2. Catalog — intent to endpoint
+
+The catalog lets an agent go from a natural-language goal to the right endpoint. It
+scores each operation by lexical overlap between the query and the operation's surface
+text — summary, description, path, tags, and id — with **summary matches weighted
+double** (it's the most intent-bearing field). Results are ranked and returned.
+
+```python
+catalog.search("get live odds for a fixture", limit=5)
+# → ranked CatalogEntry list, highest score first
+```
+
+It can also group capabilities by tag and emit a human/agent-readable capability map.
+This is **lexical, not vector** search: at tens of endpoints it is more accurate and
+far simpler than vector RAG. Vectorization is a deliberately deferred multi-API / large-API
+concern, not part of V1.
+
+## 3. Comprehend — the question-shaped tool
+
+Each operation becomes an MCP-compatible tool definition: a name, a **question-shaped
+description**, and a JSON-Schema input. Two decisions make this more than a raw OpenAPI
+dump:
+
+**Hide the plumbing.** Auth headers (`Authorization`, `X-Api-Token`, and similar) are
+stripped from the agent-facing input. The agent reasons only about decision-relevant
+inputs; the [access layer](/access-and-auth) injects credentials at call time.
+
+**Carry invocation metadata.** The tool keeps an internal `_invoke` block — method,
+path, and the location of each parameter — so the caller can build the real HTTP
+request without re-parsing the spec.
+
+A generated tool looks like:
+
+```json
+{
+  "name": "get_odds_snapshot_fixtureId",
+  "description": "Live odds snapshot for a fixture. Required: fixtureId.",
+  "inputSchema": {
+    "type": "object",
+    "properties": { "fixtureId": { "type": "integer" } },
+    "required": ["fixtureId"]
+  },
+  "requires_auth": true,
+  "auth_schemes": ["apiKeyAuth", "httpAuth"]
+}
+```
+
+`requires_auth` is true only when *every* way to call the operation needs auth (an
+OpenAPI `security` requirement of `{}` means "no-auth is also acceptable", which keeps
+it optional). The client uses `requires_auth` + the session to **hide operations a
+no-auth session could never satisfy**, so the agent never wastes a call on them.
+
+## 4. Build the correct request
+
+When the agent calls a tool, the caller places each argument by its location, injects
+the hidden auth headers, and assembles the request. Crucially, it **catches the silent
+first-call failure** — for example a missing required path parameter raises a typed
+`CallError` instead of firing a malformed request the agent can't diagnose.
+
+## Measuring first-call-correct
+
+surfcall ships a falsifiable scorecard. Given a client and a list of
+`{goal, expect_op, args}` tasks, it measures whether the comprehension layer retrieves
+the right operation (top-1 / top-5) and builds a well-formed request for it — recorded
+and offline, recording **only outcome metadata** (tool, rank, ok/reason), never
+payloads.
+
+```python
+from surfcall.evaluate import evaluate_tasks
+
+card = evaluate_tasks(client, tasks)
+print(card["top1_rate"], card["top5_rate"], card["well_formed_rate"])
+```
+
+This is the same harness used to score a **second public API** end-to-end (see the
+`scripts/pegana_eval.py` worked example in the repo, which ingests a public peg-state
+API with a no-auth session and scores first-call-correctness, including correctly
+**refusing** to fire an auth-gated operation on a public read). It's evidence the
+engine is API-agnostic, not a claim that surfcall one-shots every API.

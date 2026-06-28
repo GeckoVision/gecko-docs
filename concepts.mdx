@@ -1,0 +1,81 @@
+---
+title: Concepts
+description: The vocabulary behind surfcall — surface, operation, question-shaped tool, session, and the two run modes.
+---
+
+A small, precise vocabulary runs through the whole system. Learn these and the rest of
+the docs read cleanly.
+
+## Surface
+
+The *surface* of an API is everything that describes how to call it: methods, paths,
+parameters, request/response **schemas**, auth schemes. It is **not** the data the API
+returns. surfcall ingests the surface and nothing more — this is the basis of the
+[control-plane](/architecture) promise.
+
+## Operation
+
+A single callable endpoint, normalized from the spec into a typed record: method,
+path, `operation_id`, summary/description, tags, parameters, request body, responses,
+and security. Local `$ref`s are resolved (with cycle and depth guards) so each
+operation is self-contained.
+
+## Parameter
+
+A normalized input to an operation, carrying its `name`, `location`
+(`path` / `query` / `header` / `cookie`), whether it's `required`, and its schema. The
+location is what lets the caller place each agent-supplied value in the right spot.
+
+## Catalog
+
+The "find the right endpoint" layer. It does lexical search over each operation's
+surface text (summary, description, path, tags, id), with summary matches weighted
+highest. At the scale of tens of endpoints this is more accurate and far simpler than
+vector search — vectorization is a deliberately deferred multi-API concern.
+
+## Question-shaped tool
+
+The comprehension payload: an operation rendered as an agent-reasonable tool
+definition — a name, a question-shaped description, and a JSON-Schema input. Two
+decisions separate it from a raw OpenAPI dump:
+
+- **Auth is hidden.** Authorization-style headers are removed from the agent-facing
+  input. The agent only sees decision-relevant inputs.
+- **Invocation metadata travels with the tool.** The method, path, and per-parameter
+  locations ride along so the caller can build a real request without re-parsing the
+  spec.
+
+Each tool also carries `requires_auth` and the `auth_schemes` it references, so a
+session with no credentials can hide operations it could never satisfy.
+
+## Session
+
+The access/auth seam. Any object with `auth_headers() -> dict[str, str]` is a valid
+session. A paywalled API returns its tokens; a public API returns an empty dict. The
+agent never sees these headers — surfcall injects them at call time. See
+[Access & auth](/access-and-auth).
+
+## Caller
+
+Turns a question-shaped tool plus the agent's arguments into a correct HTTP request:
+it places each value in the right location (path / query / header), injects the hidden
+auth headers, and **catches the failure the agent can't see** — like a missing
+required path parameter — instead of firing a malformed call.
+
+## Modes: recorded vs live
+
+surfcall runs one code path in two modes:
+
+| Mode | Network | Cost | What you get |
+|---|---|---|---|
+| `recorded` | none | $0 | response synthesized from the response schema — falsifiable offline |
+| `live` | yes | per the API | the real upstream response |
+
+They differ **only at the transport edge**. See [Recorded mode](/recorded-mode).
+
+## First-call-correct
+
+The bar surfcall holds itself to: given a natural-language goal, retrieve the right
+operation and build a **well-formed** request for it on the first try — no trial calls,
+no malformed requests the agent can't diagnose. A built-in evaluation scores retrieval
+(top-1 / top-5) and request well-formedness against a task set.
