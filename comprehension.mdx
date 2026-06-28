@@ -8,7 +8,7 @@ calls correctly the first time. Three stages, each a small focused module.
 
 ## 1. Ingest the surface
 
-surfcall parses an **OpenAPI 3.x** document (YAML or JSON) into a normalized list of
+Gecko parses an **OpenAPI 3.x** document (YAML or JSON) into a normalized list of
 operations. It resolves local `$ref`s with **cycle and depth guards** — on a cycle or
 when the depth cap is hit, the `$ref` is left in place rather than expanded, so callers
 still get a usable (if shallow) schema. Path-level parameters are merged into each
@@ -88,7 +88,7 @@ first-call failure** — for example a missing required path parameter raises a 
 
 ## Measuring first-call-correct
 
-surfcall ships a falsifiable scorecard. Given a client and a list of
+Gecko ships a falsifiable scorecard. Given a client and a list of
 `{goal, expect_op, args}` tasks, it measures whether the comprehension layer retrieves
 the right operation (top-1 / top-5) and builds a well-formed request for it — recorded
 and offline, recording **only outcome metadata** (tool, rank, ok/reason), never
@@ -105,4 +105,4 @@ This is the same harness used to score a **second public API** end-to-end (see t
 `scripts/pegana_eval.py` worked example in the repo, which ingests a public peg-state
 API with a no-auth session and scores first-call-correctness, including correctly
 **refusing** to fire an auth-gated operation on a public read). It's evidence the
-engine is API-agnostic, not a claim that surfcall one-shots every API.
+engine is API-agnostic, not a claim that Gecko one-shots every API.

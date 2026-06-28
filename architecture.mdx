@@ -1,9 +1,9 @@
 ---
 title: Architecture
-description: surfcall is a control plane, not a data plane. The invariants, the module map, and the single API-agnostic seam.
+description: Gecko is a control plane, not a data plane. The invariants, the module map, and the single API-agnostic seam.
 ---
 
-surfcall is a **control plane, not a data plane.** It holds the API's *surface*, the
+Gecko is a **control plane, not a data plane.** It holds the API's *surface*, the
 generated tool defs, and *correctness metadata* — and never the data flowing through.
 That single invariant is what makes the rest of the design coherent.
 
@@ -13,7 +13,7 @@ That single invariant is what makes the rest of the design coherent.
 flowchart TD
     A["AI agent<br/>(has a goal, no API docs)"] -->|"what can this API do for X?"| TOOL
 
-    subgraph SC["surfcall — comprehension layer (control plane)"]
+    subgraph SC["Gecko — comprehension layer (control plane)"]
         direction TB
         ING[("ingest<br/>OpenAPI — the surface only")]
         CAT["catalog<br/>intent → endpoint"]
@@ -23,11 +23,11 @@ flowchart TD
     end
 
     ACC -->|"injects auth"| CALL
-    A -->|"calls the real API directly"| CALL["the real API<br/>(data plane — surfcall never stores it)"]
+    A -->|"calls the real API directly"| CALL["the real API<br/>(data plane — Gecko never stores it)"]
     CALL -->|"data"| A
 ```
 
-The agent calls the real API **directly** for data. surfcall injects credentials and
+The agent calls the real API **directly** for data. Gecko injects credentials and
 stays out of the data path.
 
 ## Invariants
@@ -46,7 +46,7 @@ stays out of the data path.
     simulation comes first; live smoke is the final check.
   </Card>
   <Card title="Auth is invisible to the agent" icon="eye-slash">
-    Tool defs never expose auth headers. The agent describes intent; surfcall injects
+    Tool defs never expose auth headers. The agent describes intent; Gecko injects
     credentials at call time.
   </Card>
 </CardGroup>

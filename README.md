@@ -1,15 +1,15 @@
-# surfcall-docs
+# gecko-docs
 
-The public documentation site for **surfcall** — the API comprehension layer for AI
-agents. Built with [Mintlify](https://mintlify.com).
+The public documentation site for **Gecko** — the API comprehension layer for agents.
+Built with [Mintlify](https://mintlify.com).
 
-This repo is **docs only**. The product engine lives in the `surfcall` repo; these
-pages describe it and must stay accurate to it.
+This repo is **docs only**. The product engine lives in the `surfcall` repo (the
+engine keeps its codename); these pages describe it and must stay accurate to it.
 
 ## Structure
 
 ```
-surfcall-docs/
+gecko-docs/
 ├── docs.json            # Mintlify config: theme, colors, navigation
 ├── llms.txt             # agent-discoverability map for this site
 ├── introduction.mdx     # Get Started
@@ -44,9 +44,9 @@ the port, and `mint broken-links` to validate internal links before publishing.
 ## Deploy
 
 Mintlify deploys from the connected Git repo: install the Mintlify GitHub App on this
-repository, and every push to the production branch triggers an automatic build and
-deploy. There is no separate build step — `docs.json` plus the MDX pages are the
-source of truth.
+repository, and every push to the production branch — `main` — triggers an automatic
+build and deploy. There is no separate build step — `docs.json` plus the MDX pages are
+the source of truth.
 
 ## Assets still needed
 
@@ -69,8 +69,9 @@ tab to `navigation.tabs` in `docs.json`:
 
 ## Editing principles
 
-- **Honest status first.** Match the surfcall README's tone — state what is live (the
-  comprehension path on one real API) and what is not (multi-API, data verification).
+- **Honest status first.** Match the `surfcall` engine repo README's tone — state what
+  is live (the comprehension path on one real API) and what is not (multi-API, data
+  verification).
 - **Lead with the $0 recorded path.** A reader must be able to see it work with no key
   and no subscription.
 - **Every command must run as written.** If something needs a key or a subscribe, say

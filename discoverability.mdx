@@ -1,9 +1,9 @@
 ---
 title: Agent discoverability
-description: surfcall exists to make an API discoverable to agents — question-shaped tools, intent-to-endpoint search, hidden auth, and an llms.txt for the API itself.
+description: Gecko exists to make an API discoverable to agents — question-shaped tools, intent-to-endpoint search, hidden auth, and an llms.txt for the API itself.
 ---
 
-surfcall's whole reason to exist is **discoverability for agents**. A human can read
+Gecko's whole reason to exist is **discoverability for agents**. A human can read
 docs, infer the right call, and guess at parameters. An agent shouldn't have to. These
 are the mechanisms that make an ingested API discoverable.
 
@@ -39,7 +39,7 @@ surface, not the whole spec — an agent should never discover a call it can't c
 
 ## An llms.txt for the API
 
-surfcall can emit an agent/human-readable capability map grouped by tag — the
+Gecko can emit an agent/human-readable capability map grouped by tag — the
 machine-facing equivalent of a table of contents for the API:
 
 ```python
@@ -55,7 +55,7 @@ these docs, in the same spirit. If you're an agent, start there.
 
 ## Honest scope
 
-Discoverability is real today on an ingested **OpenAPI 3.x** surface. surfcall does not
+Discoverability is real today on an ingested **OpenAPI 3.x** surface. Gecko does not
 crawl arbitrary human-only docs yet, does not auto-discover APIs across the internet,
 and does not verify the data an API returns. It makes a *known* API surface
 agent-usable. See [Status](/status).

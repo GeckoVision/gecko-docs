@@ -1,32 +1,38 @@
 ---
 title: Introduction
-description: surfcall is the API comprehension layer for AI agents — point it at an API and the agent finds the right call, makes it correctly the first time, and runs.
+description: Gecko is the API comprehension layer for agents — point it at an API and the agent finds the right call, makes it correctly the first time, and runs.
 ---
 
-## What surfcall is
+## What Gecko is
 
-Docs and endpoints are built for humans. **surfcall is the layer that translates an
-API's surface for agents.** Point an agent at an API — even one behind human-shaped
-docs and a paywall — and it finds the right call, makes it correctly the first time,
-and runs. No client to hand-write, no guessing whether the agent is calling it right.
+Docs and endpoints are built for humans. **Gecko is the API comprehension layer for
+agents — the layer that translates an API's surface for agents.** Point an agent at an
+API — even one behind human-shaped docs and a paywall — and it finds the right call,
+makes it correctly the first time, and runs. No client to hand-write, no guessing
+whether the agent is calling it right.
+
+<Note>
+Gecko's engine is the open-source `surfcall` package — the brand is Gecko, the Python
+package and repo you'll see in code samples below are named `surfcall`.
+</Note>
 
 Today a builder reads the docs, hand-writes a client, and **still can't tell if the
-agent is calling the API correctly.** surfcall removes that step. It ingests an API's
+agent is calling the API correctly.** Gecko removes that step. It ingests an API's
 *surface* (OpenAPI today), turns it into question-shaped, first-call-correct agent
 tools, drives the access/auth handshake, and lets the agent call the **real API
 directly** for data.
 
-## Where surfcall sits — three verbs, three layers
+## Where Gecko sits — three verbs, three layers
 
-There are three distinct jobs in the agentic economy. surfcall does exactly one.
+There are three distinct jobs in the agentic economy. Gecko does exactly one.
 
 | Layer | What it does | Examples |
 |---|---|---|
 | APIs get **PAID** | billing / settlement rail | x402, payment rails |
 | skills get **DISTRIBUTED** | marketplace / discovery | skill marketplaces |
-| **APIs get USED** | **comprehension / consumption** | **surfcall** |
+| **APIs get USED** | **comprehension / consumption** | **Gecko** |
 
-surfcall **composes on top of** x402 / MCP / payment catalogs — it *consumes* them as
+Gecko **composes on top of** x402 / MCP / payment catalogs — it *consumes* them as
 input. It is **not** a payment rail and **not** a marketplace. It is the layer that
 makes an API actually *usable* by an agent.
 
@@ -50,14 +56,14 @@ makes an API actually *usable* by an agent.
     function: `Session.auth_headers()`.
   </Step>
   <Step title="Call">
-    The agent calls the real API directly; surfcall injects credentials and stays out
+    The agent calls the real API directly; Gecko injects credentials and stays out
     of the data path.
   </Step>
 </Steps>
 
 ## Control plane, never data plane
 
-surfcall holds the API's *surface*, the generated tool defs, and *correctness
+Gecko holds the API's *surface*, the generated tool defs, and *correctness
 metadata*. It **never** stores response payloads, user data, or secrets. That
 invariant is what lets it ingest an API's surface unilaterally — and it is a hard
 boundary, not a setting.
@@ -68,7 +74,7 @@ boundary, not a setting.
 V1 — the comprehension path — is **live end-to-end against one real, painful API**
 (the TxODDS World Cup API, on Solana mainnet, 31+ tests passing), with a **$0
 recorded mode** that runs the whole path offline. Ingest is **OpenAPI 3.x today**.
-The multi-API correctness work is **V2 and not yet live**. surfcall does **not**
+The multi-API correctness work is **V2 and not yet live**. Gecko does **not**
 claim to work on *any* API yet, and it does **not** verify or vouch for the data an
 API returns. See [Status](/status) for the full picture.
 </Warning>
@@ -86,6 +92,6 @@ API returns. See [Status](/status) for the full picture.
     Ingest, catalog, and the question-shaped tool generator, tied to the real code.
   </Card>
   <Card title="For AI agents" icon="robot" href="/mcp">
-    The MCP surface an agent installs, and how surfcall makes an API discoverable.
+    The MCP surface an agent installs, and how Gecko makes an API discoverable.
   </Card>
 </CardGroup>

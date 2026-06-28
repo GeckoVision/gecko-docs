@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: The vocabulary behind surfcall — surface, operation, question-shaped tool, session, and the two run modes.
+description: The vocabulary behind Gecko — surface, operation, question-shaped tool, session, and the two run modes.
 ---
 
 A small, precise vocabulary runs through the whole system. Learn these and the rest of
@@ -10,7 +10,7 @@ the docs read cleanly.
 
 The *surface* of an API is everything that describes how to call it: methods, paths,
 parameters, request/response **schemas**, auth schemes. It is **not** the data the API
-returns. surfcall ingests the surface and nothing more — this is the basis of the
+returns. Gecko ingests the surface and nothing more — this is the basis of the
 [control-plane](/architecture) promise.
 
 ## Operation
@@ -52,7 +52,7 @@ session with no credentials can hide operations it could never satisfy.
 
 The access/auth seam. Any object with `auth_headers() -> dict[str, str]` is a valid
 session. A paywalled API returns its tokens; a public API returns an empty dict. The
-agent never sees these headers — surfcall injects them at call time. See
+agent never sees these headers — Gecko injects them at call time. See
 [Access & auth](/access-and-auth).
 
 ## Caller
@@ -64,7 +64,7 @@ required path parameter — instead of firing a malformed call.
 
 ## Modes: recorded vs live
 
-surfcall runs one code path in two modes:
+Gecko runs one code path in two modes:
 
 | Mode | Network | Cost | What you get |
 |---|---|---|---|
@@ -75,7 +75,7 @@ They differ **only at the transport edge**. See [Recorded mode](/recorded-mode).
 
 ## First-call-correct
 
-The bar surfcall holds itself to: given a natural-language goal, retrieve the right
+The bar Gecko holds itself to: given a natural-language goal, retrieve the right
 operation and build a **well-formed** request for it on the first try — no trial calls,
 no malformed requests the agent can't diagnose. A built-in evaluation scores retrieval
 (top-1 / top-5) and request well-formedness against a task set.

@@ -1,9 +1,9 @@
 ---
 title: Access & auth
-description: The whole engine/adapter seam is one function — Session.auth_headers(). How surfcall handles auth and paywalls invisibly to the agent.
+description: The whole engine/adapter seam is one function — Session.auth_headers(). How Gecko handles auth and paywalls invisibly to the agent.
 ---
 
-Auth is invisible to the agent. The agent describes intent; surfcall injects
+Auth is invisible to the agent. The agent describes intent; Gecko injects
 credentials at call time. The entire engine/adapter seam is **one function**:
 
 ```python
@@ -33,7 +33,7 @@ adapter.
 
 ## How auth gating works
 
-When a session returns an **empty** auth-header dict, surfcall treats it as "this
+When a session returns an **empty** auth-header dict, Gecko treats it as "this
 session can't satisfy auth-gated operations" and **hides those operations from the
 agent** — it could only mis-call them. A session *with* auth surfaces everything,
 unchanged. If an auth-gated tool is forced anyway, `prepare()` raises a typed error
@@ -51,7 +51,7 @@ client.prepare("some_auth_only_op", {})   # raises CallError — correctly refus
 ## The two-token handshake (worked example)
 
 The live reference integration (the TxODDS World Cup API) uses a flow the agent never
-has to learn. surfcall encodes it so the agent only ever describes intent:
+has to learn. Gecko encodes it so the agent only ever describes intent:
 
 ```
 guest JWT  →  on-chain subscribe (txSig)  →  sign(txSig:leagues:jwt)  →  activate  →  apiToken
@@ -84,10 +84,10 @@ lives outside the access layer (in `scripts/`). The access layer takes the resul
 <Warning>
 **Mainnet boundary.** The subscribe transaction is **founder-run only**. The tooling
 *simulates* by default (no spend) and hands over the exact command; a human broadcasts
-it. surfcall does not sign or broadcast mainnet transactions on its own.
+it. Gecko does not sign or broadcast mainnet transactions on its own.
 </Warning>
 
-## What surfcall never does with credentials
+## What Gecko never does with credentials
 
 - It never exposes auth headers in the agent-facing tool definitions.
 - It never logs tokens or keys — secrets are redacted before any error is raised.

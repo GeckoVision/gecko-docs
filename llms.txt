@@ -1,6 +1,6 @@
-# surfcall
+# Gecko
 
-> surfcall is the API comprehension layer for AI agents. Point it at an API's
+> Gecko is the API comprehension layer for agents. Point it at an API's
 > surface (OpenAPI 3.x today) and it generates question-shaped, first-call-correct
 > agent tools, handles auth and paywalls invisibly, and lets the agent call the real
 > API directly for data. It is a control plane — it stores the API surface, the tool
@@ -8,10 +8,14 @@
 > It composes on top of payment rails (x402) and protocols (MCP); it is not itself a
 > rail or a marketplace.
 
-When an agent should reach for surfcall: you have a goal that needs an external API,
+Gecko's engine is the open-source `surfcall` package — the brand is Gecko; the Python
+package, repo (`GeckoVision/surfcall`), and CLI you'll see in code samples are named
+`surfcall`.
+
+When an agent should reach for Gecko: you have a goal that needs an external API,
 you don't have hand-written integration code, and you can't tell whether you'd be
 calling the API correctly — especially for long-tail, messy, or paywalled APIs.
-surfcall turns "I want X" into the right endpoint and a well-formed first call.
+Gecko turns "I want X" into the right endpoint and a well-formed first call.
 
 Honest scope: V1 (comprehension) is live end-to-end on one real, painful API (the
 TxODDS World Cup API, Solana mainnet, 31+ tests), with a $0 recorded mode that runs
@@ -20,7 +24,7 @@ verify the data an API returns. Multi-API correctness work is V2 and not yet liv
 
 ## Start here
 
-- [Introduction](/introduction): what surfcall is, the three verbs (APIs get USED), and the one-path overview.
+- [Introduction](/introduction): what Gecko is, the three verbs (APIs get USED), and the one-path overview.
 - [Quickstart](/quickstart): run the $0 recorded demo and the programmatic client — no keys, no spend.
 - [Concepts](/concepts): surface, operation, question-shaped tool, session, recorded vs live, first-call-correct.
 

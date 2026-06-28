@@ -3,7 +3,7 @@ title: Recorded mode ($0)
 description: One code path, two modes. Recorded mode synthesizes responses from the spec so you can prove the comprehension offline, for free, before going live.
 ---
 
-surfcall runs **one code path in two modes**. `recorded` and `live` differ *only at
+Gecko runs **one code path in two modes**. `recorded` and `live` differ *only at
 the transport edge* — same discovery, same tool selection, same request building. The
 only difference is where the response comes from.
 
@@ -27,7 +27,7 @@ request**. It does not prove the upstream returns that exact data — for that, 
 
 ## How the sample is built
 
-For each operation, surfcall finds the success response schema (`200` / `201` /
+For each operation, Gecko finds the success response schema (`200` / `201` /
 `default`, JSON content) and synthesizes a minimal valid instance from it. The
 generator is **deterministic** — the same schema always yields the same sample — and
 walks the schema sensibly:
@@ -39,7 +39,7 @@ walks the schema sensibly:
   `date-time` string), with a bounded recursion depth
 
 This is what powers the `$0` demo: many real specs ship almost no response examples, so
-to demo and validate without live calls, surfcall synthesizes from the schema.
+to demo and validate without live calls, Gecko synthesizes from the schema.
 
 ## Running it
 

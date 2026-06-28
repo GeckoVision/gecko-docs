@@ -1,8 +1,8 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "surfcall",
-  "description": "The API comprehension layer for AI agents. Point it at an API's surface and it generates question-shaped, first-call-correct agent tools, handles auth invisibly, and lets the agent call the real API directly.",
+  "name": "Gecko",
+  "description": "Gecko — the API comprehension layer for agents. Point it at an API's surface and it generates question-shaped, first-call-correct agent tools, handles auth invisibly, and lets the agent call the real API directly.",
   "colors": {
     "primary": "#9945FF",
     "light": "#C77DFF",
