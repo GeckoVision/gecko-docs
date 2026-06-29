@@ -51,8 +51,8 @@ plumbing and invocation metadata stay internal. Operations the current
 `McpSurface` wraps an `AgentApiClient` and is testable without any MCP SDK installed:
 
 ```python
-from surfcall.client import AgentApiClient
-from surfcall.mcp_server import McpSurface
+from gecko.client import AgentApiClient
+from gecko.mcp_server import McpSurface
 
 surface = McpSurface(AgentApiClient(spec), mode="recorded")
 
@@ -71,7 +71,7 @@ uv add mcp
 ```
 
 ```python
-from surfcall.mcp_server import serve_stdio
+from gecko.mcp_server import serve_stdio
 
 serve_stdio("path/to/openapi.yaml", base_url="https://...", mode="recorded")
 ```

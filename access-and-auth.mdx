@@ -40,8 +40,8 @@ unchanged. If an auth-gated tool is forced anyway, `prepare()` raises a typed er
 rather than firing a request that can't succeed.
 
 ```python
-from surfcall.access import public_session
-from surfcall.client import AgentApiClient
+from gecko.access import public_session
+from gecko.client import AgentApiClient
 
 client = AgentApiClient(spec, session=public_session())
 client.list_tools()          # auth-gated operations are not in this list
@@ -68,7 +68,7 @@ Transport and signer are **injected**, so the whole flow is unit-testable with n
 network and no keys:
 
 ```python
-from surfcall.access import establish_session
+from gecko.access import establish_session
 
 session = establish_session(base_url, tx_sig, leagues, signer=my_signer)
 session.auth_headers()

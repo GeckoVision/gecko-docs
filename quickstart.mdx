@@ -16,10 +16,10 @@ before going live.
 ## Run the $0 recorded demo
 
 ```bash
-git clone https://github.com/GeckoVision/surfcall
-cd surfcall && uv sync
-uv run pytest                       # 31+ passing
-uv run python -m surfcall.demo      # E2E: goal → discover → correct call → data (recorded, $0)
+git clone https://github.com/GeckoVision/gecko-surf
+cd gecko-surf && uv sync
+uv run pytest                       # 130+ passing
+uv run python -m gecko.demo      # E2E: goal → discover → correct call → data (recorded, $0)
 ```
 
 The demo takes natural-language goals (e.g. *"get the latest live odds for a football
@@ -39,7 +39,7 @@ returned that exact data.
 OpenAPI document, search for a capability, and call it.
 
 ```python
-from surfcall.client import AgentApiClient
+from gecko.client import AgentApiClient
 
 # A spec path/URL or a parsed dict. With no session, a stub session is used,
 # so auth-gated operations are still surfaced in recorded mode.
@@ -63,8 +63,8 @@ The engine is API-agnostic — adding an API is data (the spec) plus, at most, o
 auth adapter. For a public, no-auth API, pass a `public_session()`:
 
 ```python
-from surfcall.access import public_session
-from surfcall.client import AgentApiClient
+from gecko.access import public_session
+from gecko.client import AgentApiClient
 
 client = AgentApiClient("path/to/openapi.json", session=public_session())
 print(len(client.list_tools()), "tools surfaced to the agent")
@@ -79,7 +79,7 @@ Recorded mode needs nothing. For live data you pass a real `Session`; the call u
 the **same code path**, differing only at the transport edge:
 
 ```python
-from surfcall.client import AgentApiClient
+from gecko.client import AgentApiClient
 
 client = AgentApiClient(spec, base_url="https://...", session=my_session)
 client.call(tool_name, args, mode="live")   # same path as recorded

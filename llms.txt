@@ -8,9 +8,9 @@
 > It composes on top of payment rails (x402) and protocols (MCP); it is not itself a
 > rail or a marketplace.
 
-Gecko's engine is the open-source `surfcall` package — the brand is Gecko; the Python
-package, repo (`GeckoVision/surfcall`), and CLI you'll see in code samples are named
-`surfcall`.
+Gecko's engine is the open-source `Gecko` package — the brand is Gecko; the Python
+package, repo (`GeckoVision/gecko-surf`), and CLI you'll see in code samples are named
+`Gecko`.
 
 When an agent should reach for Gecko: you have a goal that needs an external API,
 you don't have hand-written integration code, and you can't tell whether you'd be
@@ -18,7 +18,7 @@ calling the API correctly — especially for long-tail, messy, or paywalled APIs
 Gecko turns "I want X" into the right endpoint and a well-formed first call.
 
 Honest scope: V1 (comprehension) is live end-to-end on one real, painful API (the
-TxODDS World Cup API, Solana mainnet, 31+ tests), with a $0 recorded mode that runs
+TxODDS World Cup API, Solana mainnet, 130+ tests), with a $0 recorded mode that runs
 offline. Ingest is OpenAPI 3.x today; it does not yet work on "any" API and does not
 verify the data an API returns. Multi-API correctness work is V2 and not yet live.
 

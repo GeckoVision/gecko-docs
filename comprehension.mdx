@@ -95,7 +95,7 @@ and offline, recording **only outcome metadata** (tool, rank, ok/reason), never
 payloads.
 
 ```python
-from surfcall.evaluate import evaluate_tasks
+from gecko.evaluate import evaluate_tasks
 
 card = evaluate_tasks(client, tasks)
 print(card["top1_rate"], card["top5_rate"], card["well_formed_rate"])
