@@ -1,0 +1,66 @@
+---
+title: Stay correct
+description: What happens when the upstream API changes — content-addressed surfaces, the regenerable-tool model, and the corpus tripwire. The watcher is V2.
+---
+
+It's Saturday. Nobody shipped anything. Your agent is down anyway — upstream renamed a
+field, moved a path, tightened an enum, and your hand-written client knew none of it. It
+keeps sending the old shape; the API keeps returning 422; the agent keeps confidently
+retrying a call that can no longer succeed.
+
+A hand-written client is a **frozen snapshot of an API that doesn't hold still.** Every
+rename is a manual diff a human has to notice, read, and re-code. Multiply by the Nth
+painful API and "keep the integrations correct" becomes a standing on-call burden.
+
+## Why the generated-tool model changes the failure mode
+
+Your agent never calls a hand-written client through Gecko — it calls **tools generated
+from the spec.** Tool generation is a *pure function of the surface*: same spec in, same
+tools out. If the source of truth moves, the tools move with it — you re-comprehend the
+surface instead of hand-editing a client.
+
+Gecko knows which surface a tool came from, down to the revision:
+
+```
+surface_rev = sha256(canonicalized spec)[:12]
+```
+
+Same spec → same `surface_rev`; any edit bumps it. It's a content fingerprint stamped on
+the cached comprehension and on **every** correctness record in the corpus.
+
+![Editing one field flips surface_rev and regenerates the affected tool](/images/surfacerev.gif)
+
+<Warning>
+The loop below is **designed; the watcher, the op-level diff, and the alert are V2 and
+not yet shipped.** What *is* shipped: content-addressed surfaces, comprehension as a pure
+function of the spec, and the control-plane correctness corpus + validator replay. We
+won't pretend the cron job exists — the architecture just makes it a small addition, not
+a rewrite.
+</Warning>
+
+## The stay-correct loop
+
+<Steps>
+  <Step title="Notice — V2">Poll the spec URL, take a provider webhook, or re-scrape the docs.</Step>
+  <Step title="Re-fingerprint — shipped">Recompute `surface_rev`. Unchanged? Nothing happened, stop.</Step>
+  <Step title="Re-ingest — shipped">Run the same comprehension engine on the new spec.</Step>
+  <Step title="Diff — V2">Old `surface_rev` vs new: what params were added, removed, renamed, retyped; what endpoints moved.</Step>
+  <Step title="Regenerate + flag — regen shipped, report V2">Emit the new tool defs and a human-readable changelog of what moved.</Step>
+</Steps>
+
+## The corpus is your early-warning system
+
+There's a second drift signal that doesn't need the spec to change — because providers
+don't always tell you. Every call your agent makes through Gecko logs a
+**control-plane-only** outcome: status class, error class, first-call-correct or not, and
+the `surface_rev` it ran against — **never** the response body, a param value, or a token
+(the writer is a fail-closed allowlist). When a tool that was first-call-correct for ten
+thousand calls starts returning `422` / `404` under the same `surface_rev`, the corpus
+tells you *something moved* before a human files a bug.
+
+## In one line
+
+A hand-written client makes *you* the diffing engine: read the changelog, edit the code,
+hope you caught everything before Saturday. Gecko makes the **spec** the source of truth
+and the **tools a regenerable function of it** — so a change propagates instead of
+rotting, and the corpus warns you when the surface moves under a spec that never changed.

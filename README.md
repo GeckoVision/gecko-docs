@@ -3,7 +3,7 @@
 The public documentation site for **Gecko** — the API comprehension layer for agents.
 Built with [Mintlify](https://mintlify.com).
 
-This repo is **docs only**. The product engine lives in the `surfcall` repo (the
+This repo is **docs only**. The product engine lives in the `Gecko` repo (the
 engine keeps its codename); these pages describe it and must stay accurate to it.
 
 ## Structure
@@ -69,7 +69,7 @@ tab to `navigation.tabs` in `docs.json`:
 
 ## Editing principles
 
-- **Honest status first.** Match the `surfcall` engine repo README's tone — state what
+- **Honest status first.** Match the `Gecko` engine repo README's tone — state what
   is live (the comprehension path on one real API) and what is not (multi-API, data
   verification).
 - **Lead with the $0 recorded path.** A reader must be able to see it work with no key

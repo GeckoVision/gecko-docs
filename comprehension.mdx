@@ -6,6 +6,8 @@ description: Ingest, catalog, and the question-shaped tool generator — the pat
 Comprehension is the product. It is the path from a raw API surface to tools an agent
 calls correctly the first time. Three stages, each a small focused module.
 
+![Gecko turns a raw OpenAPI operation into a question-shaped tool with a JSON schema — auth header removed](/images/rawtool.gif)
+
 ## 1. Ingest the surface
 
 Gecko parses an **OpenAPI 3.x** document (YAML or JSON) into a normalized list of
@@ -95,7 +97,7 @@ and offline, recording **only outcome metadata** (tool, rank, ok/reason), never
 payloads.
 
 ```python
-from surfcall.evaluate import evaluate_tasks
+from gecko.evaluate import evaluate_tasks
 
 card = evaluate_tasks(client, tasks)
 print(card["top1_rate"], card["top5_rate"], card["well_formed_rate"])

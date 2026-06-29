@@ -58,17 +58,17 @@ client, and the scripts are thin transport.
 
 | Module | Responsibility |
 |---|---|
-| `surfcall/ingest.py` | OpenAPI 3.x → normalized `Operation` / `Param` (`$ref` resolution, cycle/depth guarded) |
-| `surfcall/catalog.py` | Lexical capability search (intent → endpoint) |
-| `surfcall/tools.py` | `Operation` → question-shaped agent tool defs (**auth hidden**) |
-| `surfcall/caller.py` | tool + args → correct `PreparedRequest` (stdlib `urllib`) |
-| `surfcall/access.py` | `Session.auth_headers()` — the engine/adapter seam; two-token session |
-| `surfcall/sample.py` | deterministic schema → example (powers $0 recorded mode) |
-| `surfcall/client.py` | `AgentApiClient` — `search` / `list_tools` / `prepare` / `call` |
-| `surfcall/mcp_server.py` | `McpSurface` — the agent-facing MCP surface |
-| `surfcall/validator.py` | replay + first-call-correct check + JSONL outcome log (metadata only) |
-| `surfcall/evaluate.py` | task-based first-call-correct scorecard (top-1 / top-5 / well-formed) |
-| `surfcall/demo.py` | `run()` (recorded, $0) + `live_demo()` |
+| `gecko/ingest.py` | OpenAPI 3.x → normalized `Operation` / `Param` (`$ref` resolution, cycle/depth guarded) |
+| `gecko/catalog.py` | Lexical capability search (intent → endpoint) |
+| `gecko/tools.py` | `Operation` → question-shaped agent tool defs (**auth hidden**) |
+| `gecko/caller.py` | tool + args → correct `PreparedRequest` (stdlib `urllib`) |
+| `gecko/access.py` | `Session.auth_headers()` — the engine/adapter seam; two-token session |
+| `gecko/sample.py` | deterministic schema → example (powers $0 recorded mode) |
+| `gecko/client.py` | `AgentApiClient` — `search` / `list_tools` / `prepare` / `call` |
+| `gecko/mcp_server.py` | `McpSurface` — the agent-facing MCP surface |
+| `gecko/validator.py` | replay + first-call-correct check + JSONL outcome log (metadata only) |
+| `gecko/evaluate.py` | task-based first-call-correct scorecard (top-1 / top-5 / well-formed) |
+| `gecko/demo.py` | `run()` (recorded, $0) + `live_demo()` |
 
 ## The one seam that matters
 

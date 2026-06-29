@@ -1,49 +1,57 @@
 ---
 title: Quickstart
-description: Run the $0 recorded demo — natural goal to discovered endpoint to correct call to data — with no keys and no subscription.
+description: Make any API agent-usable in minutes — serve it over MCP, or embed the SDK. $0 recorded mode lets you prove every call offline first.
 ---
 
-The fastest way to see Gecko work is the **recorded demo**: it runs the *same code
-path* as live, but synthesizes responses from the API's schema instead of hitting the
-network. No keys, no subscription, no spend. You can falsify the comprehension offline
-before going live.
+You bring an `openapi.json`. Gecko comprehends the API's surface, turns every endpoint
+into a question-shaped, first-call-correct tool with a JSON schema, and hands your agent
+a one-line "add me" string. No client to hand-write, no guessing whether the agent is
+calling it right.
 
-## Prerequisites
-
-- Python 3.11+
-- [`uv`](https://docs.astral.sh/uv/)
-
-## Run the $0 recorded demo
+## Install
 
 ```bash
-git clone https://github.com/GeckoVision/surfcall
-cd surfcall && uv sync
-uv run pytest                       # 31+ passing
-uv run python -m surfcall.demo      # E2E: goal → discover → correct call → data (recorded, $0)
+pip install gecko-surf              # the engine + SDK
+pip install "gecko-surf[serve]"     # + the MCP server (adds mcp + uvicorn)
 ```
 
-The demo takes natural-language goals (e.g. *"get the latest live odds for a football
-fixture"*), discovers the right endpoint, fills the required parameters, and returns a
-schema-shaped sample — entirely offline.
+The package is **`gecko-surf`**; the CLI is **`gecko`**; the SDK is **`from gecko import …`**.
+
+## 1. Serve any API to your agent (the one-minute path)
+
+`gecko <openapi-url>` SSRF-validates the spec, comprehends it, prints the MCP URL + a
+one-click "add" string for Claude Code / Cursor / VS Code, then serves the API over
+Streamable-HTTP MCP.
+
+```bash
+# straight from PyPI, no clone:
+uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json
+```
+
+![gecko comprehends an API and prints the MCP URL + one-click add strings](/images/hero.gif)
+
+Paste the printed `claude mcp add …` line (or open the Cursor / VS Code deeplink) and
+your agent can call the API — first try, right params:
+
+![An agent asks in plain language, calls the right tool, and gets 200 on the first try](/images/first-try.gif)
 
 <Note>
-Recorded mode and the test suite need **no** API keys and **no** subscription. The
-recorded response is synthesized from the spec's response schema, so it proves the
-agent picked the right call and built a well-formed request — not that the upstream
-returned that exact data.
+Auth-gated operations are **hidden** from the agent unless the session can satisfy them.
+The CLI defaults to `--mode recorded` ($0, synthesized) — pass `--mode live` for real
+upstream calls. Exposing it to a remote agent? Add `--public-url https://<your-tunnel>`.
 </Note>
 
-## Use it programmatically
+## 2. Embed the SDK
 
-`AgentApiClient` is the one object that makes an API agent-usable. Point it at an
-OpenAPI document, search for a capability, and call it.
+Building your own app or agent loop? Skip the server and import the engine — no extras
+needed. `AgentApiClient` is the one object that makes an API agent-usable: point it at a
+spec, search for a capability, call it.
 
 ```python
-from surfcall.client import AgentApiClient
+from gecko import AgentApiClient, public_session
 
-# A spec path/URL or a parsed dict. With no session, a stub session is used,
-# so auth-gated operations are still surfaced in recorded mode.
-client = AgentApiClient("tests/fixtures/txodds_docs.yaml")
+# spec = a URL, a path, or a parsed dict. public_session() = no auth.
+client = AgentApiClient(spec, session=public_session())
 
 # intent → ranked endpoints
 hits = client.search("get the latest live odds for a fixture")
@@ -55,31 +63,45 @@ print(result["data"])   # schema-shaped sample
 ```
 
 `search()` returns ranked entries (`name`, `summary`, `path`, `method`). `call()`
-returns `{status, request, method, data, mode}`.
+returns `{status, request, method, data, mode}`. With a no-auth session, any operation
+that *requires* auth is automatically hidden from the agent — it can't satisfy it, so it
+never tries. For a paywalled API, pass a `Session` whose `auth_headers()` returns your
+credentials (BYOK) — the key is injected at call time and never reaches the agent.
 
-## Point it at a different public API
+A complete forkable example — an app on *any* API in ~20 lines — lives in
+[`examples/_starter/`](https://github.com/GeckoVision/gecko-surf/tree/main/examples/_starter);
+for a full LLM agent (Telegram + a tool-use loop), see `examples/sos_vzla_bot/`.
 
-The engine is API-agnostic — adding an API is data (the spec) plus, at most, one
-auth adapter. For a public, no-auth API, pass a `public_session()`:
+## 3. Falsify it offline first — $0 recorded mode
 
-```python
-from surfcall.access import public_session
-from surfcall.client import AgentApiClient
+`mode="recorded"` runs the **same code path** as live, but synthesizes the response from
+the API's own response schema instead of hitting the network. No keys, no subscription,
+no spend — so you can prove the agent picks the right call and builds a well-formed
+request *before* you go live.
 
-client = AgentApiClient("path/to/openapi.json", session=public_session())
-print(len(client.list_tools()), "tools surfaced to the agent")
+![$0 recorded mode — intent → the right capability → a first-call-correct request, proven offline](/images/recorded.gif)
+
+```bash
+git clone https://github.com/GeckoVision/gecko-surf
+cd gecko-surf && uv sync
+uv run pytest                       # 130+ passing
+uv run python -m gecko.demo         # E2E: goal → discover → correct call → data (recorded, $0)
 ```
 
-With a no-auth session, any operation that *requires* auth is automatically hidden
-from the agent — it can't satisfy it, so it should never try to call it.
+<Note>
+Recorded mode and the test suite need **no** API keys and **no** subscription. The
+recorded response is synthesized from the spec's response schema, so it proves the agent
+picked the right call and built a well-formed request — not that the upstream returned
+that exact data.
+</Note>
 
 ## Going live
 
-Recorded mode needs nothing. For live data you pass a real `Session`; the call uses
-the **same code path**, differing only at the transport edge:
+Recorded mode needs nothing. For live data you pass a real `Session`; the call uses the
+**same code path**, differing only at the transport edge:
 
 ```python
-from surfcall.client import AgentApiClient
+from gecko import AgentApiClient
 
 client = AgentApiClient(spec, base_url="https://...", session=my_session)
 client.call(tool_name, args, mode="live")   # same path as recorded
@@ -87,14 +109,3 @@ client.call(tool_name, args, mode="live")   # same path as recorded
 
 See [Access & auth](/access-and-auth) for how a session is established and how the
 two-token handshake works.
-
-## Next
-
-<CardGroup cols={2}>
-  <Card title="Concepts" icon="book-open" href="/concepts">
-    The terms used across these docs.
-  </Card>
-  <Card title="Recorded mode" icon="circle-play" href="/recorded-mode">
-    Why $0 offline simulation is the first deliverable, not an afterthought.
-  </Card>
-</CardGroup>

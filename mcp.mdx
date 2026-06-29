@@ -7,6 +7,32 @@ Gecko exposes an ingested API to an agent through the **Model Context Protocol
 (MCP)**. The surface is framework-agnostic and fully testable: it's a thin view over
 the client with two methods — `list_tools` and `call_tool`.
 
+## Connect it in one step
+
+The fastest way to give an agent an API: run the CLI and paste the printed line. It
+comprehends the spec, serves it over **Streamable-HTTP MCP**, and prints a one-click
+"add" string for each host app.
+
+```bash
+uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json
+```
+
+```text
+MCP URL (Streamable HTTP):  http://127.0.0.1:8000/mcp
+
+Add it to an agent (one step):
+  Claude Code:  claude mcp add --transport http your-api http://127.0.0.1:8000/mcp
+  Cursor:       cursor://…/mcp/install?name=your-api&config=…
+  VS Code:      vscode:mcp/install?…
+```
+
+- **Claude Code** — paste the printed `claude mcp add …` line.
+- **Cursor / VS Code** — open the printed deeplink (click it, or paste it into the address bar).
+
+Serving to a *remote* agent? Add `--public-url https://<tunnel>` so the add strings and
+the DNS-rebinding `Host`/`Origin` guard use your public URL. (For an embedded, in-process
+server there's also a stdio variant — see [Using it in code](#using-it-in-code) below.)
+
 ## What the agent sees
 
 The surface lists every usable, question-shaped tool for the API **plus one synthetic
@@ -51,8 +77,8 @@ plumbing and invocation metadata stay internal. Operations the current
 `McpSurface` wraps an `AgentApiClient` and is testable without any MCP SDK installed:
 
 ```python
-from surfcall.client import AgentApiClient
-from surfcall.mcp_server import McpSurface
+from gecko.client import AgentApiClient
+from gecko.mcp_server import McpSurface
 
 surface = McpSurface(AgentApiClient(spec), mode="recorded")
 
@@ -71,7 +97,7 @@ uv add mcp
 ```
 
 ```python
-from surfcall.mcp_server import serve_stdio
+from gecko.mcp_server import serve_stdio
 
 serve_stdio("path/to/openapi.yaml", base_url="https://...", mode="recorded")
 ```

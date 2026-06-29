@@ -31,7 +31,8 @@
             "pages": [
               "comprehension",
               "recorded-mode",
-              "access-and-auth"
+              "access-and-auth",
+              "stay-correct"
             ]
           },
           {
@@ -55,7 +56,7 @@
   "navbar": {
     "primary": {
       "type": "github",
-      "href": "https://github.com/GeckoVision/surfcall"
+      "href": "https://github.com/GeckoVision/gecko-surf"
     }
   },
   "footer": {
