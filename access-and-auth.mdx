@@ -4,7 +4,11 @@ description: The whole engine/adapter seam is one function — Session.auth_head
 ---
 
 Auth is invisible to the agent. The agent describes intent; Gecko injects
-credentials at call time. The entire engine/adapter seam is **one function**:
+credentials at call time.
+
+![The agent sees a tool with no auth field; Gecko injects the credentials into the real request (BYOK)](/images/auth.gif)
+
+The entire engine/adapter seam is **one function**:
 
 ```python
 class AuthSession(Protocol):

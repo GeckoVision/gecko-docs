@@ -28,6 +28,8 @@ surface_rev = sha256(canonicalized spec)[:12]
 Same spec → same `surface_rev`; any edit bumps it. It's a content fingerprint stamped on
 the cached comprehension and on **every** correctness record in the corpus.
 
+![Editing one field flips surface_rev and regenerates the affected tool](/images/surfacerev.gif)
+
 <Warning>
 The loop below is **designed; the watcher, the op-level diff, and the alert are V2 and
 not yet shipped.** What *is* shipped: content-addressed surfaces, comprehension as a pure
