@@ -45,6 +45,12 @@
             ]
           },
           {
+            "group": "Cloud",
+            "pages": [
+              "cloud"
+            ]
+          },
+          {
             "group": "Reference",
             "pages": [
               "architecture",
