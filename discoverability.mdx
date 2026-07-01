@@ -53,6 +53,37 @@ print(client.catalog.describe())
 This docs site itself ships an [`llms.txt`](/llms.txt) — a discoverability map for
 these docs, in the same spirit. If you're an agent, start there.
 
+## The agent-native layer — and we dogfood it
+
+Docs are a human handoff. An `llms.txt` or an MDX page is something an agent has to
+*read and trust*; the agent-native contract is a **structured tool it calls**. Gecko's
+job is to turn the human-shaped surface into that tool — so an agent finds and uses the
+right call without reading prose.
+
+Gecko projects one comprehended surface three ways, for three moments:
+
+- **`llms.txt`** — a breadcrumb for an agent that lands on the docs: the capability map
+  plus a pointer to the live MCP and `search_capabilities`. (These docs ship one —
+  [read it](/llms.txt).)
+- **OpenAPI + `x-gecko`** — the spec an OpenAPI-native tool already ingests, enriched in
+  place with question-shaped intents, prerequisites, and worked examples. Unknown `x-`
+  keys degrade gracefully, so a non-Gecko consumer just ignores them.
+- **`/.well-known/gecko.json`** — the machine-precise manifest `search_capabilities`
+  navigates: the capability graph (which call produces the id another call needs), worked
+  examples, and first-call-correct stats.
+
+All three cross-link, so an agent landing on any one reaches the callable tool. This docs
+site is the reference implementation — our own surface is exposed through the same layer
+we generate for any API.
+
+<Note>
+Shipped today: the MCP surface, `search_capabilities`, hidden auth, and a usable-only
+surface. Rolling out (see [Roadmap](/roadmap)): the `x-gecko` OpenAPI and
+`/.well-known/gecko.json` manifest, `search_capabilities` returning the full call recipe
+inline (prerequisites + a worked example), and access-quality measurement — did the agent
+find and correctly use the call. We build these against our own docs first.
+</Note>
+
 ## Honest scope
 
 Discoverability is real today on an ingested **OpenAPI 3.x** surface. Gecko does not
