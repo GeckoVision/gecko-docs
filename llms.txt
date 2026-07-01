@@ -22,6 +22,21 @@ TxODDS World Cup API, Solana mainnet, 130+ tests), with a $0 recorded mode that 
 offline. Ingest is OpenAPI 3.x today; it does not yet work on "any" API and does not
 verify the data an API returns. Multi-API correctness work is V2 and not yet live.
 
+## Use Gecko now (agents start here)
+
+You don't need to read these docs to call an API — Gecko turns the API into
+first-call-correct tools you call over MCP. To use it:
+
+1. Comprehend any OpenAPI and serve it over MCP ($0, offline, no keys):
+   `uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json`
+2. Add the printed Streamable-HTTP endpoint to your host — e.g. Claude Code:
+   `claude mcp add --transport http your-api http://127.0.0.1:8000/mcp`
+3. From your agent, go intent → call:
+   `search_capabilities("<what you want to do>")` → pick the ranked tool → call it.
+
+Gecko builds the correct request and injects auth at call time — you never handle a key.
+See [The MCP surface](/mcp) and [Agent discoverability](/discoverability).
+
 ## Start here
 
 - [Introduction](/introduction): what Gecko is, the three verbs (APIs get USED), and the one-path overview.
