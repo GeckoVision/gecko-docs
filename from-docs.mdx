@@ -1,0 +1,64 @@
+---
+title: From docs
+description: No OpenAPI? Point `gecko from-docs` at an API's doc site and it recovers a draft OpenAPI, then comprehends it into agent tools — with honest review notes for anything it couldn't pin down.
+---
+
+Not every painful API ships a spec. The long-tail, paywalled, human-documented ones — the
+exact APIs an agent *can't* one-shot — often have **only a doc site**. `gecko from-docs` is
+the on-ramp: it reads the docs and hands the comprehension engine a *draft* OpenAPI.
+
+```bash
+gecko from-docs https://docs.some-api.com
+gecko from-docs ./api-docs.html            # a local file, for dev
+gecko from-docs <doc-url> -o draft.json     # also write the draft spec
+```
+
+## What it does
+
+1. **Fetch** the doc page — SSRF-validated (private / loopback / link-local ranges and
+   non-HTTP schemes are refused, every redirect re-checked). The bytes are parsed and
+   **discarded**: Gecko is control-plane only, it never stores the doc.
+2. **Recover** candidate operations from the page's structure — headings, code blocks, and
+   parameter tables, in document order — into a draft OpenAPI 3.1. JSON-RPC methods are
+   modeled honestly (one operation per method; the envelope carried on `x-jsonrpc-*`).
+3. **Comprehend** the draft through the *same* engine as any spec → question-shaped,
+   first-call-correct agent tools.
+
+```text
+Gecko from-docs — recover a draft API from human docs
+========================================================
+source:    https://docs.some-api.com
+recovered 3 candidate operation(s):
+  - sendBundle       [POST /api/v1/bundles]            (jsonrpc, high)
+  - getTipAccounts   [POST /api/v1/bundles]            (jsonrpc, high)
+  - getTipFloor      [GET  /api/v1/bundles/tip_floor]  (rest, medium)
+
+honesty: 2 x-review note(s), 2 low/medium-confidence field(s) to confirm.
+optional auth recovered: x-tip-auth header (injected by the access layer, invisible to the agent).
+
+comprehended draft -> 3 agent tools.
+```
+
+## It's an assistive draft, not zero-touch
+
+<Note>
+`from-docs` is honest about its uncertainty. Every field it couldn't pin down from the docs
+is flagged with `x-review` and a confidence level in the draft spec — so a human (or an
+agent) confirms those before going live. It gets the **surface and shape** right; you confirm
+the ambiguous edges, then run [`gecko test <draft>`](/quickstart) to prove the calls before
+you ship.
+</Note>
+
+## JS-heavy doc sites
+
+Static docs work out of the box with the built-in reader — no extra dependencies. For doc
+sites that render their navigation with JavaScript, `from-docs` tells you when it recovered
+only a few operations and points you at the agent-browser driver in
+[`spikes/docs_reader`](https://github.com/GeckoVision/gecko-surf/tree/main/spikes/docs_reader),
+which renders the JS nav before extracting.
+
+## Why this matters
+
+This is the painful-API wedge, made concrete. A coding agent can one-shot a popular,
+well-specified API — it can't one-shot the **Nth painful one** with no OpenAPI. `from-docs`
+turns that API's docs into agent-usable tools without you hand-writing a client or a spec.
