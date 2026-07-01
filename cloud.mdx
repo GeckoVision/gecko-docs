@@ -1,0 +1,106 @@
+---
+title: "Cloud"
+sidebarTitle: "Cloud"
+description: "The free gecko-surf engine makes any API agent-usable and stays free forever. Cloud is the hosted, always-correct layer API providers pay for — and you pay only when it scales."
+icon: "cloud"
+---
+
+<Note>
+  **The engine is free and stays free.** Everything that makes an agent call an API
+  correctly the first time is in the open-source `gecko-surf` you run yourself — no
+  account, telemetry off by default. **Cloud** is what we're **building on top**: the
+  hosted, continuously-correct, cross-customer layer. This page describes what it's
+  becoming — honestly, it's incoming, not shipped.
+</Note>
+
+## Who pays, and why
+The free engine is the **funnel**: any developer points it at any painful API and gets
+first-call-correct tools, forever, on their own machine. **Cloud is where API providers
+pay** — to make *their* API the one agents call correctly, keep it correct as it drifts,
+and turn more correct calls into more usage (and, wired to their payment rail, more
+revenue). You pay **as you scale** — free to start, more when you need more performance,
+exactly like Vercel or Mintlify.
+
+## What Cloud adds over the free engine
+<CardGroup cols={2}>
+  <Card title="gecko-surf — free, self-hosted, forever" icon="box-open">
+    - Comprehend any OpenAPI → **first-call-correct** tools · auth hidden
+    - `$0` recorded mode · the MCP surface + one-click add — you host it
+    - Anti-poisoning defenses + agent-native artifacts
+    - Local eval + your own telemetry — **on your disk, we see nothing**
+    - No account. Telemetry ships **disabled**.
+  </Card>
+  <Card title="Cloud — hosted, continuous, multiplayer (building)" icon="cloud-bolt">
+    - **Hosted MCP** — always-on endpoint, nothing to run or scale
+    - **Drift-watch** — re-comprehend when the API changes, alert *before* prod breaks
+    - **Access analytics** — first-call-correct rate, dark ops, failed→settled
+    - **Correctness corpus** — day-one-correct on a new API, from across the fleet
+    - **Team** — shared surfaces, roles, audit, deploy-to-your-domain
+  </Card>
+</CardGroup>
+
+<Info>
+  **Control-plane holds in the cloud.** We store the API **surface**, the generated
+  **tool definitions**, and **correctness metadata** — never your response payloads,
+  user data, or secrets. No lock-in: you can go back to fully self-hosted anytime.
+</Info>
+
+## Plans — you pay when you scale
+The tier is what scales — performance and reach, not the core capability (that's free).
+
+<CardGroup cols={3}>
+  <Card title="Free" icon="gift">
+    The open-source engine + a free hosted tier to try — **shared throughput, best-effort
+    latency.** Point it at your API and see the agent-native surface today.
+  </Card>
+  <Card title="Pro (building)" icon="gauge-high">
+    **Low latency, dedicated throughput, faster drift-watch, analytics, longer retention.**
+    For an API that's becoming load-bearing for agents.
+  </Card>
+  <Card title="Scale (building)" icon="building">
+    **SLA, high throughput, white-label private discoverability, onboarding.** For an API
+    that's a real part of the agent economy.
+  </Card>
+</CardGroup>
+
+We price the **value** — keeping your surface correct through drift and turning failed
+agent calls into settled ones — **not the compute**, and **never a cut of what agents pay
+you.** The model we're building toward is a **flat per-API subscription** that steps up
+with performance/scale (Free → Pro → Scale), the Pro tier illustratively in the low
+hundreds/month per API, deliberately below the coding-agent seat you already pay for.
+
+<Warning>
+  Prices are **illustrative**, not committed — they land when Cloud ships. We'd rather
+  show you the shape honestly now than quote a number we haven't earned the right to charge.
+</Warning>
+
+## Payments — you keep 100%
+We collect **our own flat fee** over whatever rail fits you — **x402 / USDC** (or **PayAI**
+for recurring), or **card / fiat** via **Privy**, **abacatepay**, or Stripe. It's an injected,
+neutral seam, so the rail is a config choice, not a rewrite.
+
+And when it comes to *your* API getting paid by agents, we **compose** your rail — we point
+the tools at your x402 endpoint (**PayAI, Metera, or pay.sh**) as part of the setup. You keep
+every cent; **Gecko is never the payment rail and never a marketplace.**
+
+## How we make money, plainly
+<Note>
+  A flat monthly subscription per API we keep agent-correct and drift-watched — collected as
+  our own fee, **never a cut of what agents pay you.** The engine developers use is free and
+  open source; the compounding **correctness corpus** is the moat. Metera meters it; Gecko
+  multiplies it.
+</Note>
+
+## Come build it with us
+Cloud is being built alongside the API providers who feel it most. If agents keep calling
+your API wrong — or you want it to be the one they call *right* — that's exactly the surface
+we want to make agent-ready.
+
+<CardGroup cols={2}>
+  <Card title="Bring your API" icon="rocket" href="https://discord.gg/3gVF5NNbCa">
+    Join the Discord — we build in the open and figure out which API to make agent-ready next.
+  </Card>
+  <Card title="Run the free engine now" icon="terminal" href="/quickstart">
+    `uvx --from "gecko-surf[serve]" gecko <spec>` runs the whole engine on your machine today.
+  </Card>
+</CardGroup>
