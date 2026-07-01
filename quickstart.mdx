@@ -10,16 +10,27 @@ calling it right.
 
 ## Install
 
+One line, any system — no Python prerequisite (downloads a prebuilt binary, or falls back to `uv`):
+
 ```bash
-pip install gecko-surf              # the engine + SDK
-pip install "gecko-surf[serve]"     # + the MCP server (adds mcp + uvicorn)
+curl -fsSL https://get.geckovision.tech/install.sh | bash
+```
+
+Prefer a package manager? Run it straight from PyPI, or install the CLI + SDK:
+
+```bash
+uvx --from "gecko-surf[serve]" gecko <openapi-url>   # no install — run from PyPI
+uv tool install "gecko-surf[serve]"                  # or: pip install "gecko-surf[serve]"
 ```
 
 The package is **`gecko-surf`**; the CLI is **`gecko`**; the SDK is **`from gecko import …`**.
+The `gecko` CLI has three verbs — **`serve`** (this page), **`test`** (first-call-correctness
+checks), and **`from-docs`** (comprehend an API that has *no* OpenAPI). Bare `gecko <url>`
+is shorthand for `gecko serve <url>`.
 
 ## 1. Serve any API to your agent (the one-minute path)
 
-`gecko <openapi-url>` SSRF-validates the spec, comprehends it, prints the MCP URL + a
+`gecko serve <openapi-url>` SSRF-validates the spec, comprehends it, prints the MCP URL + a
 one-click "add" string for Claude Code / Cursor / VS Code, then serves the API over
 Streamable-HTTP MCP.
 
@@ -84,7 +95,7 @@ request *before* you go live.
 ```bash
 git clone https://github.com/GeckoVision/gecko-surf
 cd gecko-surf && uv sync
-uv run pytest                       # 130+ passing
+uv run pytest                       # 160+ passing
 uv run python -m gecko.demo         # E2E: goal → discover → correct call → data (recorded, $0)
 ```
 
@@ -94,6 +105,31 @@ recorded response is synthesized from the spec's response schema, so it proves t
 picked the right call and built a well-formed request — not that the upstream returned
 that exact data.
 </Note>
+
+## Prove it's correct — `gecko test`
+
+Generate and run first-call-correctness checks for every usable tool, offline:
+
+```bash
+gecko test https://api.example.com/openapi.json     # exits non-zero if any check fails
+gecko test <url> -o test_api_firstcall.py           # also writes a pytest module to commit
+```
+
+Each tool gets two checks — a well-formed first call (synthesized from the schema) and a
+required-field guard (dropping a required field is caught locally, not fired live). Wire it
+into CI to catch drift the moment the API changes.
+
+## No OpenAPI? Comprehend the docs — `gecko from-docs`
+
+Not every painful API ships a spec. Point Gecko at the **doc site** and it recovers a draft
+OpenAPI, then comprehends it into agent tools:
+
+```bash
+gecko from-docs https://docs.some-api.com
+```
+
+See [From docs](/from-docs) for how the on-ramp works — and the honest review notes it emits
+for anything it couldn't pin down.
 
 ## Going live
 

@@ -30,6 +30,7 @@
             "group": "How it works",
             "pages": [
               "comprehension",
+              "from-docs",
               "recorded-mode",
               "access-and-auth",
               "stay-correct"
