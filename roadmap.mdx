@@ -1,0 +1,54 @@
+---
+title: Roadmap
+description: What's live, what's coming, and what we'll never build. We label everything — no vaporware on this page.
+---
+
+We label everything. **Live** = run it today. **Building** = designed and in progress.
+**Exploring** = we want your input before we commit. No vaporware on this page.
+
+## Live today — V1, comprehension
+
+- **Ingest any OpenAPI → first-call-correct MCP tools** (`gecko <url>`). Run it now.
+- **`gecko from-docs`** — an API with no OpenAPI? Point it at the doc site → a draft spec → agent tools. See [From docs](/from-docs).
+- **Invisible auth** — the credential is injected at call time, never in the tool defs, never seen by the agent.
+- **`$0` recorded mode** — falsify every call offline, from the schema, before you spend a token.
+- **Hosted MCP** — one-click add to Claude Code / Cursor / VS Code.
+- **Control-plane correctness corpus + replay** — call-outcome *metadata* (never payloads) that proves first-call-correctness.
+
+## Building — V2, continuous correctness
+
+<Note>Designed, in progress. The primitives ship today; the scheduled pieces are being built.</Note>
+
+- **Stay-correct watcher** — notice when an API drifts, diff what moved, regenerate the tool defs, and tell you — *before* your agent breaks in prod. See [Stay correct](/stay-correct).
+- **The correctness corpus as a compounding asset** — every call teaches how to call an API right, so a new painful API is more first-call-correct because someone already paid the tax.
+- **Poisoning / tampering monitoring** — we treat every ingested spec and doc as **untrusted**. When a stable surface silently shifts — a moved auth location, a changed host, a dropped required field — we quarantine it and alert, instead of letting the agent fire a poisoned call.
+- **Vectorized semantic catalog · multi-API scale.**
+
+## Exploring — V3, trust + Cloud
+
+<Note>Unbuilt. If one of these is the reason you'd adopt, tell us below — it moves up.</Note>
+
+- **Trust & verification** — *"is this the **right** call, is this response **sane**?"*
+- **Cloud** — hosted always-on watcher jobs, drift + poisoning alerts, team entitlements, and the shared correctness corpus that makes an API you've never called **day-one-correct**.
+
+## Free vs Cloud
+
+The **`gecko-surf` engine is free and open-source, forever** — ingest, comprehend, first-call-correct
+tools, recorded mode, run it yourself. **Cloud** (hosted) adds what you don't want to operate: the
+always-on stay-correct watcher, drift + poisoning alerts, team entitlements, and the managed
+cross-customer corpus. **You never pay us a cut of your API calls** — the provider charges you
+directly; we charge for comprehension + access.
+
+## What we'll never build
+
+So the labels above stay credible:
+
+- **No browsable provider marketplace.** Point us at the OpenAPI URL — the flow is identical for every API.
+- **No payment rail, no custody** of your funds or your provider keys. We compose x402 / pay.sh; the provider charges you directly.
+- **No storage of your API responses, request values, or secrets.** The correctness corpus is metadata-only *by construction* — a fail-closed allowlist, not a policy you have to trust.
+
+## Tell us what to comprehend next
+
+<Card title="What painful API broke your agent?" icon="github" href="https://github.com/GeckoVision/gecko-surf/issues/new">
+The Nth painful, paywalled, poorly-documented API — the one your agent *can't* one-shot. Open an issue and tell us. Public 👍s rank what we comprehend next.
+</Card>
