@@ -1,0 +1,96 @@
+---
+title: "For API providers"
+sidebarTitle: "For API providers"
+description: "Agents are becoming a consumer of your API — and they fail it silently. Make yours the API agents find, call correctly on the first try, and keep calling as you ship."
+icon: "building-columns"
+---
+
+## The problem you can't see from your side
+
+Your docs are written for humans — and they work for humans. But a growing share of your
+integrations are now attempted by **AI agents**, and for them the experience is different:
+
+- **Agents mis-call you.** Wrong parameter, wrong endpoint, an auth scheme inferred
+  incorrectly from prose. On your side that's malformed requests, retry storms,
+  rate-limit pressure, and support tickets that read "your API doesn't work" — when
+  really, the agent guessed wrong.
+- **Agents can't find you.** An agent picks the API it can *discover and call correctly
+  today*. If that's your competitor, the traffic — and the integration — goes there. You
+  never see the loss; it just never arrives.
+- **Your own changes break your integrators.** A renamed field that no human would
+  miss silently breaks every downstream agent. Their 2am incident becomes your support
+  ticket and, eventually, your churn.
+- **A hand-rolled MCP server goes stale.** Teams that ship their own agent surface cover
+  a handful of endpoints, then drift out of date the next time the API ships.
+
+None of this shows up in your analytics, because failed and never-attempted agent calls
+are invisible by definition. That's the trap: the pain is real, and it's unmeasured.
+
+## What Gecko does about it
+
+Gecko is the **API comprehension layer for agents**. Point it at your OpenAPI (or your
+docs — [no spec needed](/from-docs)) and your **whole surface** becomes question-shaped,
+first-call-correct agent tools: auth handled invisibly, operations an agent can't
+satisfy hidden, everything provable offline first.
+
+<Steps>
+  <Step title="See the problem on your own API — free, one session">
+    We run the comprehension scorecard against your live spec: how an agent experiences
+    your API today (raw docs) vs comprehended. You get the mis-call picture you currently
+    can't see. The engine that does this is open source — you can run it yourself:
+    `uvx --from "gecko-surf[serve]" gecko <your-openapi-url>`.
+  </Step>
+  <Step title="Become discoverable to agents">
+    Gecko emits your API's own agent-native surface — `llms.txt`, `gecko.json`,
+    `/.well-known/gecko.json`, `tools.md` — generated from your comprehended surface,
+    hosted by you or by Cloud. Agents find you instead of guessing at you. See
+    [Agent discoverability](/discoverability).
+  </Step>
+  <Step title="Stay correct as you ship (Cloud — building)">
+    Drift-watch re-comprehends your API when it changes and regenerates the tools —
+    so your next release doesn't silently break every downstream agent. Alert fires
+    **before your integrators' prod breaks** — every silent change today is their
+    incident and your ticket.
+  </Step>
+  <Step title="Get paid for agent traffic (optional)">
+    We wire the generated tools to **your** x402 endpoint (PayAI, Metera, or pay.sh).
+    Agents pay you directly; **you keep 100%. Gecko is never the payment rail and never
+    a marketplace.**
+  </Step>
+</Steps>
+
+## Who pays, in one sentence
+
+> **The engine is free forever for builders; API providers pay a flat per-API
+> subscription for hosted, drift-watched, agent-ready surfaces.**
+
+Flat fee. Never a percentage of your revenue, never a cut of what agents pay you, never
+a public catalog listing you didn't ask for. Illustrative shape on the
+[Cloud page](/cloud) — prices land when Cloud ships.
+
+## Why this is measurable (unlike docs spend)
+
+Human-docs spend is famously unattributable. Agent comprehension isn't: a
+first-call-correct fix turns a **failed** call into a **completed** one — and if your
+API is x402-metered, into a **settled** one. The delta is visible per API revision.
+That's the difference between a cost center and an ROI line.
+
+## Honest status
+
+The comprehension engine, the scorecard, discoverability artifacts, and the free
+self-serve flow are **live today**. Drift-watch, access analytics, and the hosted
+provider plane are **building** — with the first design partners, now. See
+[Status](/status) and [Roadmap](/roadmap) for the exact line.
+
+## Bring your API
+
+<CardGroup cols={2}>
+  <Card title="Get the free scorecard" icon="clipboard-check" href="https://discord.gg/3gVF5NNbCa">
+    Join the Discord and drop your OpenAPI URL — we'll run the comprehension scorecard
+    on your API and show you what agents see.
+  </Card>
+  <Card title="Self-serve it now" icon="terminal" href="/quickstart">
+    Run the open-source engine against your own spec today — comprehend, serve over
+    MCP, emit your agent-native surface.
+  </Card>
+</CardGroup>
