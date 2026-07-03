@@ -63,6 +63,12 @@ See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverabil
 - [The MCP surface](https://docs.geckovision.tech/mcp): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
 - [Agent discoverability](https://docs.geckovision.tech/discoverability): intent → endpoint, hidden auth, surfacing only the calls that will work.
 
+## For API providers
+
+- [For API providers](https://docs.geckovision.tech/for-providers): agents mis-call you, can't find you, and your changes break integrators — how your API becomes the one agents call right, and who pays (flat per-API; never a cut).
+- [Cloud](https://docs.geckovision.tech/cloud): the hosted, drift-watched provider plane — what's free forever vs what providers pay for.
+- [Roadmap](https://docs.geckovision.tech/roadmap): Live / Building / Exploring, honestly labeled, and what we'll never build.
+
 ## Reference
 
 - [Architecture](https://docs.geckovision.tech/architecture): control plane vs data plane, the invariants, the module map, the one API-agnostic seam.

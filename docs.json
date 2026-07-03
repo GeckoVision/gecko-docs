@@ -45,8 +45,9 @@
             ]
           },
           {
-            "group": "Cloud",
+            "group": "For API providers",
             "pages": [
+              "for-providers",
               "cloud"
             ]
           },
