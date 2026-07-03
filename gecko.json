@@ -1,0 +1,18 @@
+{
+  "name": "gecko",
+  "description": "API comprehension layer for agents",
+  "canonical": "https://geckovision.tech/gecko.json",
+  "site": "docs",
+  "docs": "https://docs.geckovision.tech",
+  "repo": "https://github.com/GeckoVision/gecko-surf",
+  "mcp": {
+    "url": "https://mcp.geckovision.tech/mcp",
+    "transport": "streamable-http"
+  },
+  "artifacts": {
+    "llms_txt": "https://docs.geckovision.tech/llms.txt",
+    "llms_full": "https://docs.geckovision.tech/llms-full.txt",
+    "well_known": "https://docs.geckovision.tech/.well-known/gecko.json"
+  },
+  "pypi": "https://pypi.org/project/gecko-surf/"
+}

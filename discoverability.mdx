@@ -76,12 +76,27 @@ All three cross-link, so an agent landing on any one reaches the callable tool. 
 site is the reference implementation — our own surface is exposed through the same layer
 we generate for any API.
 
+## Everything an agent can fetch
+
+This docs site publishes the same agent-native surface Gecko generates for any API —
+point your agent at any of these:
+
+- [`llms.txt`](https://docs.geckovision.tech/llms.txt) — the curated index of these docs
+- [`llms-full.txt`](https://docs.geckovision.tech/llms-full.txt) — the whole docs as one Markdown file
+- [`gecko.json`](https://docs.geckovision.tech/gecko.json) — the machine-readable manifest for this site
+- [`/.well-known/gecko.json`](https://docs.geckovision.tech/.well-known/gecko.json) — the manifest at the discovery-convention path
+- **Any page as Markdown** — append `.md` to its URL (e.g. [`/discoverability.md`](https://docs.geckovision.tech/discoverability.md))
+- [Hosted MCP endpoint](https://mcp.geckovision.tech/mcp) — the live Gecko MCP (Streamable-HTTP), one-click add to Claude or Cursor
+- [Product manifest (canonical)](https://geckovision.tech/gecko.json) — the source-of-truth manifest on the landing
+
 <Note>
-Shipped today: the MCP surface, `search_capabilities`, hidden auth, and a usable-only
-surface. Rolling out (see [Roadmap](/roadmap)): the `x-gecko` OpenAPI and
-`/.well-known/gecko.json` manifest, `search_capabilities` returning the full call recipe
-inline (prerequisites + a worked example), and access-quality measurement — did the agent
-find and correctly use the call. We build these against our own docs first.
+Shipped today: the MCP surface, `search_capabilities`, hidden auth, a usable-only
+surface, and this site's own agent-native artifacts — `llms.txt`, `gecko.json`, and
+`/.well-known/gecko.json` (discovery level). Rolling out (see [Roadmap](/roadmap)): the
+`x-gecko` OpenAPI enrichment and the richer `/.well-known/gecko.json` **capability graph**
+(which call produces the id another call needs), `search_capabilities` returning the full
+call recipe inline (prerequisites + a worked example), and access-quality measurement —
+did the agent find and correctly use the call. We build these against our own docs first.
 </Note>
 
 ## Honest scope
