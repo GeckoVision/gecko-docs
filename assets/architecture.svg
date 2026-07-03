@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 960" width="1400" height="960">
+<defs>
+  <linearGradient id="cp" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ECF5FD"/><stop offset="1" stop-color="#D2E7F8"/>
+  </linearGradient>
+  <linearGradient id="agent" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#1B2230"/><stop offset="1" stop-color="#10141C"/>
+  </linearGradient>
+  <marker id="ab" markerWidth="15" markerHeight="15" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,5 L0,10 Z" fill="#378ADD"/></marker>
+  <marker id="ag" markerWidth="15" markerHeight="15" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,5 L0,10 Z" fill="#1F9D6B"/></marker>
+  <marker id="as" markerWidth="15" markerHeight="15" refX="10" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+    <path d="M0,0 L11,5 L0,10 Z" fill="#4A6076"/></marker>
+</defs>
+<rect x="0" y="0" width="1400" height="960" rx="0" ry="0" fill="#FFFFFF" />
+<text x="64" y="52" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="30" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">Gecko — a control plane, never a data plane</text>
+<text x="64" y="80" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15.5" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">Comprehend the surface · inject auth · the agent calls the real API directly for data</text>
+<path d="M150,592 L150,764 Q150,790 176,790 L1174,790 Q1200,790 1200,764 L1200,600" fill="none" stroke="#4A6076" stroke-width="2.6" stroke-linecap="round" marker-end="url(#as)"/>
+<path d="M1250,592 L1250,822 Q1250,848 1224,848 L146,848 Q120,848 120,822 L120,600" fill="none" stroke="#1F9D6B" stroke-width="2.6" stroke-linecap="round" marker-end="url(#ag)"/>
+<rect x="572.6" y="775.0" width="254.79999999999998" height="30" rx="15.0" ry="15.0" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1" />
+<text x="700" y="794.9" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="600" fill="#4A6076" text-anchor="middle" letter-spacing="0">calls the real API directly</text>
+<rect x="669.2" y="833.0" width="61.6" height="30" rx="15.0" ry="15.0" fill="#FFFFFF" stroke="#B9E2D0" stroke-width="1" />
+<text x="700" y="852.9" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#177552" text-anchor="middle" letter-spacing="0">data</text>
+<text x="700" y="884" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="400" fill="#5C6E7E" text-anchor="middle" letter-spacing="0" font-style="italic">the data plane bypasses Gecko entirely</text>
+<rect x="64" y="250" width="250" height="342" rx="20" ry="20" fill="url(#agent)" stroke="#2B3646" stroke-width="1.5" />
+<text x="92" y="294" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#7FD8B4" text-anchor="start" letter-spacing="2">AI AGENT</text>
+<text x="92" y="346" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" fill="#F3F7FB" text-anchor="start" letter-spacing="0">Has a goal.</text>
+<text x="92" y="380" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="25" font-weight="700" fill="#F3F7FB" text-anchor="start" letter-spacing="0">No API docs.</text>
+<text x="92" y="426" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#9FB4C8" text-anchor="start" letter-spacing="0">It describes intent —</text>
+<text x="92" y="448" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#9FB4C8" text-anchor="start" letter-spacing="0">not which endpoint to hit,</text>
+<text x="92" y="470" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#9FB4C8" text-anchor="start" letter-spacing="0">not how to authenticate.</text>
+<rect x="470" y="118" width="460" height="596" rx="22" ry="22" fill="url(#cp)" stroke="#378ADD" stroke-width="2" />
+<text x="500" y="160" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14" font-weight="700" fill="#215B96" text-anchor="start" letter-spacing="1">GECKO · COMPREHENSION LAYER</text>
+<rect x="781.15" y="141.0" width="113.7" height="26" rx="13.0" ry="13.0" fill="#378ADD" />
+<text x="838" y="158.025" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">CONTROL PLANE</text>
+<rect x="504" y="196" width="392" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1.2" />
+<circle cx="544" cy="246" r="22" fill="#378ADD"/>
+<text x="544" y="253" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">1</text>
+<text x="586" y="240" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">ingest</text>
+<text x="586" y="270" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">OpenAPI — the surface only</text>
+<rect x="504" y="326" width="392" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1.2" />
+<circle cx="544" cy="376" r="22" fill="#378ADD"/>
+<text x="544" y="383" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">2</text>
+<text x="586" y="370" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">catalog</text>
+<text x="586" y="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">intent</text>
+<line x1="646.4" y1="395" x2="663.4" y2="395" stroke="#5C6E7E" stroke-width="1.6"/>
+<path d="M663.4,395 l-5,-3.2 v6.4 z" fill="#5C6E7E"/>
+<text x="672.4" y="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">endpoint</text>
+<rect x="504" y="456" width="392" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1.2" />
+<circle cx="544" cy="506" r="22" fill="#378ADD"/>
+<text x="544" y="513" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">3</text>
+<text x="586" y="500" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">tools</text>
+<text x="586" y="530" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">question-shaped · auth hidden</text>
+<rect x="504" y="586" width="392" height="100" rx="14" ry="14" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1.2" />
+<circle cx="544" cy="636" r="22" fill="#378ADD"/>
+<text x="544" y="643" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">4</text>
+<text x="586" y="630" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="22" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">access</text>
+<text x="586" y="660" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">session handshake</text>
+<path d="M691.0,306 L700.0,316 L709.0,306" fill="none" stroke="#378ADD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M691.0,436 L700.0,446 L709.0,436" fill="none" stroke="#378ADD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M691.0,566 L700.0,576 L709.0,566" fill="none" stroke="#378ADD" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="1086" y="250" width="250" height="342" rx="20" ry="20" fill="#FFFFFF" stroke="#1F9D6B" stroke-width="2" />
+<rect x="1086" y="250" width="9" height="342" rx="4" ry="4" fill="#1F9D6B" />
+<text x="1116" y="294" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13" font-weight="700" fill="#177552" text-anchor="start" letter-spacing="2">DATA PLANE</text>
+<text x="1116" y="346" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="24" font-weight="700" fill="#1B2733" text-anchor="start" letter-spacing="0">The real API</text>
+<text x="1116" y="400" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">Gecko never stores</text>
+<text x="1116" y="422" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">the data it returns.</text>
+<text x="1116" y="464" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">The agent calls it</text>
+<text x="1116" y="486" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="400" fill="#5C6E7E" text-anchor="start" letter-spacing="0">directly.</text>
+<path d="M314,405 C 400,405 410,506 504,506" fill="none" stroke="#378ADD" stroke-width="2.6" marker-end="url(#ab)"/>
+<rect x="281.65" y="357.0" width="246.7" height="30" rx="15.0" ry="15.0" fill="#FFFFFF" stroke="#CBD8E4" stroke-width="1" />
+<text x="405" y="376.725" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#215B96" text-anchor="middle" letter-spacing="0">what can this API do for X?</text>
+<path d="M896,636 C 1000,636 1000,430 1086,430" fill="none" stroke="#378ADD" stroke-width="3.6" marker-end="url(#ab)"/>
+<rect x="932.0" y="483.0" width="140.0" height="34" rx="17.0" ry="17.0" fill="#378ADD" />
+<text x="1002" y="505.25" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#FFFFFF" text-anchor="middle" letter-spacing="0">injects auth</text>
+<text x="1002" y="528" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="11.5" font-weight="400" fill="#215B96" text-anchor="middle" letter-spacing="0">the only line into the data plane</text>
+<rect x="64" y="912" width="1272" height="40" rx="10" ry="10" fill="#F1F7FC" stroke="#DCE8F2" stroke-width="1" />
+<circle cx="90.0" cy="932" r="5" fill="#1F9D6B"/>
+<text x="106.0" y="937" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#1B2733" text-anchor="start" letter-spacing="0">API-agnostic engine — one adapter seam</text>
+<circle cx="514.0" cy="932" r="5" fill="#1F9D6B"/>
+<text x="530.0" y="937" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#1B2733" text-anchor="start" letter-spacing="0">One code path — recorded ($0) &amp; live</text>
+<circle cx="938.0" cy="932" r="5" fill="#1F9D6B"/>
+<text x="954.0" y="937" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif" font-size="14.5" font-weight="600" fill="#1B2733" text-anchor="start" letter-spacing="0">Auth invisible to the agent</text>
+</svg>
