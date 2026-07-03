@@ -9,23 +9,9 @@ That single invariant is what makes the rest of the design coherent.
 
 ## The flow
 
-```mermaid
-flowchart TD
-    A["AI agent<br/>(has a goal, no API docs)"] -->|"what can this API do for X?"| TOOL
-
-    subgraph SC["Gecko — comprehension layer (control plane)"]
-        direction TB
-        ING[("ingest<br/>OpenAPI — the surface only")]
-        CAT["catalog<br/>intent → endpoint"]
-        TOOL["tools<br/>question-shaped, auth hidden"]
-        ACC["access<br/>session handshake"]
-        ING --> CAT --> TOOL --> ACC
-    end
-
-    ACC -->|"injects auth"| CALL
-    A -->|"calls the real API directly"| CALL["the real API<br/>(data plane — Gecko never stores it)"]
-    CALL -->|"data"| A
-```
+<Frame>
+  <img src="/assets/architecture.svg" alt="Gecko architecture — a control plane, never a data plane. An AI agent (a goal, no API docs) asks the Gecko comprehension layer (the control plane) 'what can this API do for X?'. Inside, four stages run in order: ingest (OpenAPI — the surface only) → catalog (intent → endpoint) → tools (question-shaped, auth hidden) → access (session handshake). The access stage injects auth into the real API — the only line crossing from the control plane into the data plane. The agent then calls the real API directly and receives the data back directly; that data never passes through Gecko." />
+</Frame>
 
 The agent calls the real API **directly** for data. Gecko injects credentials and
 stays out of the data path.
