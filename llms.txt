@@ -18,7 +18,7 @@ calling the API correctly — especially for long-tail, messy, or paywalled APIs
 Gecko turns "I want X" into the right endpoint and a well-formed first call.
 
 Honest scope: V1 (comprehension) is live end-to-end on one real, painful API (the
-TxODDS World Cup API, Solana mainnet, 130+ tests), with a $0 recorded mode that runs
+TxODDS World Cup API, Solana mainnet, 442 tests), with a $0 recorded mode that runs
 offline. Ingest is OpenAPI 3.x today; it does not yet work on "any" API and does not
 verify the data an API returns. Multi-API correctness work is V2 and not yet live.
 
@@ -35,26 +35,35 @@ first-call-correct tools you call over MCP. To use it:
    `search_capabilities("<what you want to do>")` → pick the ranked tool → call it.
 
 Gecko builds the correct request and injects auth at call time — you never handle a key.
-See [The MCP surface](/mcp) and [Agent discoverability](/discoverability).
+See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
+
+## Agent integration
+
+- [Hosted MCP endpoint](https://mcp.geckovision.tech/mcp): the live Gecko MCP (Streamable-HTTP) — one-click add to Claude or Cursor
+- [llms-full.txt](https://docs.geckovision.tech/llms-full.txt): the whole docs as one Markdown file
+- [gecko.json](https://docs.geckovision.tech/gecko.json): machine-readable manifest for these docs
+- [/.well-known/gecko.json](https://docs.geckovision.tech/.well-known/gecko.json): the manifest at the discovery-convention path
+- [Product manifest (canonical)](https://geckovision.tech/gecko.json): the source-of-truth product manifest on the landing
+- [Landing](https://geckovision.tech): the product site — its own llms.txt + gecko.json
 
 ## Start here
 
-- [Introduction](/introduction): what Gecko is, the three verbs (APIs get USED), and the one-path overview.
-- [Quickstart](/quickstart): run the $0 recorded demo and the programmatic client — no keys, no spend.
-- [Concepts](/concepts): surface, operation, question-shaped tool, session, recorded vs live, first-call-correct.
+- [Introduction](https://docs.geckovision.tech/introduction): what Gecko is, the three verbs (APIs get USED), and the one-path overview.
+- [Quickstart](https://docs.geckovision.tech/quickstart): run the $0 recorded demo and the programmatic client — no keys, no spend.
+- [Concepts](https://docs.geckovision.tech/concepts): surface, operation, question-shaped tool, session, recorded vs live, first-call-correct.
 
 ## How it works
 
-- [How comprehension works](/comprehension): ingest → catalog → question-shaped tools → correct request, tied to the engine.
-- [Recorded mode](/recorded-mode): one code path, two modes; deterministic schema → sample; $0 offline falsification.
-- [Access & auth](/access-and-auth): the `Session.auth_headers()` seam, no-auth gating, and the two-token handshake.
+- [How comprehension works](https://docs.geckovision.tech/comprehension): ingest → catalog → question-shaped tools → correct request, tied to the engine.
+- [Recorded mode](https://docs.geckovision.tech/recorded-mode): one code path, two modes; deterministic schema → sample; $0 offline falsification.
+- [Access & auth](https://docs.geckovision.tech/access-and-auth): the `Session.auth_headers()` seam, no-auth gating, and the two-token handshake.
 
 ## For AI agents
 
-- [The MCP surface](/mcp): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
-- [Agent discoverability](/discoverability): intent → endpoint, hidden auth, surfacing only the calls that will work.
+- [The MCP surface](https://docs.geckovision.tech/mcp): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
+- [Agent discoverability](https://docs.geckovision.tech/discoverability): intent → endpoint, hidden auth, surfacing only the calls that will work.
 
 ## Reference
 
-- [Architecture](/architecture): control plane vs data plane, the invariants, the module map, the one API-agnostic seam.
-- [Status](/status): what is live, what is early, what is deliberately deferred (V1 / V2 / V3).
+- [Architecture](https://docs.geckovision.tech/architecture): control plane vs data plane, the invariants, the module map, the one API-agnostic seam.
+- [Status](https://docs.geckovision.tech/status): what is live, what is early, what is deliberately deferred (V1 / V2 / V3).

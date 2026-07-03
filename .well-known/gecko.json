@@ -1,0 +1,11 @@
+{
+  "name": "gecko",
+  "description": "API comprehension layer for agents",
+  "manifest": "https://docs.geckovision.tech/gecko.json",
+  "canonical": "https://geckovision.tech/gecko.json",
+  "llms_txt": "https://docs.geckovision.tech/llms.txt",
+  "mcp": {
+    "url": "https://mcp.geckovision.tech/mcp",
+    "transport": "streamable-http"
+  }
+}
