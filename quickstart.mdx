@@ -8,19 +8,51 @@ into a question-shaped, first-call-correct tool with a JSON schema, and hands yo
 a one-line "add me" string. No client to hand-write, no guessing whether the agent is
 calling it right.
 
-## Install
+## Try it in 10 seconds — no install
 
-One line, any system — no Python prerequisite (downloads a prebuilt binary, or falls back to `uv`):
+Give your agent a live, Gecko-comprehended surface and watch it call correctly — no
+`pip`, no spec, no key:
 
 ```bash
-curl -fsSL https://get.geckovision.tech/install.sh | bash
+claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
 ```
 
-Prefer a package manager? Run it straight from PyPI, or install the CLI + SDK:
+That's the **TxODDS TxLINE** World Cup API — 18 first-call-correct tools over an API with
+a two-token on-chain paywall a coding agent does *not* one-shot. It's served **recorded**
+($0/offline, responses synthesized from the schema), so you explore the real surface
+without a subscription; point it at your own TxLINE session for live data. In **Cursor /
+VS Code / any framework**, point it at the same URL:
+
+```jsonc
+{ "mcpServers": { "gecko-txline": { "type": "http", "url": "https://mcp.geckovision.tech/txline/mcp" } } }
+```
+
+## In Claude Code — install the plugin
+
+The plugin bundles the skills + commands **and** wires that live demo surface, so one
+install gives your agent working tools *and* the workflow to make your own API agent-ready:
+
+```
+/plugin marketplace add GeckoVision/gecko-surf
+/plugin install gecko-surf@geckovision
+```
+
+Then `/make-agent-ready <openapi-url>` comprehends your API and serves it over MCP; you
+also get `/setup-x402` and the anti-poisoning guard.
+
+## Bring your own API — run the CLI
+
+No install needed — run it straight from PyPI with `uvx` (the `npx` equivalent for Python):
 
 ```bash
-uvx --from "gecko-surf[serve]" gecko <openapi-url>   # no install — run from PyPI
-uv tool install "gecko-surf[serve]"                  # or: pip install "gecko-surf[serve]"
+uvx --from "gecko-surf[serve]" gecko <openapi-url>
+```
+
+Prefer a persistent install, or a zero-Python binary?
+
+```bash
+uv tool install "gecko-surf[serve]"                          # or: pip install "gecko-surf[serve]"
+curl -fsSL https://get.geckovision.tech/install.sh | bash    # prebuilt binary, no Python prereq
 ```
 
 The package is **`gecko-surf`**; the CLI is **`gecko`**; the SDK is **`from gecko import …`**.
