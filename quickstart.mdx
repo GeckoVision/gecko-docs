@@ -20,12 +20,19 @@ claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline
 That's the **TxODDS TxLINE** World Cup API — 18 first-call-correct tools over an API with
 a two-token on-chain paywall a coding agent does *not* one-shot. It's served **recorded**
 ($0/offline, responses synthesized from the schema), so you explore the real surface
-without a subscription; point it at your own TxLINE session for live data. In **Cursor /
-VS Code / any framework**, point it at the same URL:
+without a subscription; point it at your own TxLINE session for live data.
+
+<Note>
+`claude mcp add` and `/plugin` are **Claude-Code-only**. In **Cursor** (`~/.cursor/mcp.json`),
+**VS Code**, or any other MCP client, add the same endpoint to your `mcp.json`:
 
 ```jsonc
 { "mcpServers": { "gecko-txline": { "type": "http", "url": "https://mcp.geckovision.tech/txline/mcp" } } }
 ```
+
+The transport is **MCP Streamable HTTP** (protocol `2025-11-25`), not SSE. From the Python
+MCP SDK use `mcp.client.streamable_http.streamablehttp_client(url)` — an `sse_client` returns `400`.
+</Note>
 
 ## In Claude Code — install the plugin
 
