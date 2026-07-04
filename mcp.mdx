@@ -7,6 +7,16 @@ Gecko exposes an ingested API to an agent through the **Model Context Protocol
 (MCP)**. The surface is framework-agnostic and fully testable: it's a thin view over
 the client with two methods — `list_tools` and `call_tool`.
 
+<Tip>
+Want to see it without installing anything? Add a live, hosted surface to your agent:
+```bash
+claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
+```
+That's the TxODDS TxLINE World Cup API (18 first-call-correct tools, served recorded/$0).
+In Claude Code you can instead `/plugin install gecko-surf@geckovision` — it wires that
+surface **and** the make-agent-ready workflow. See the [Quickstart](/quickstart).
+</Tip>
+
 ## Connect it in one step
 
 The fastest way to give an agent an API: run the CLI and paste the printed line. It
