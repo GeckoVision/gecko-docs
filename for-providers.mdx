@@ -33,31 +33,65 @@ docs — [no spec needed](/from-docs)) and your **whole surface** becomes questi
 first-call-correct agent tools: auth handled invisibly, operations an agent can't
 satisfy hidden, everything provable offline first.
 
+## Bringing your API onboard — five moves
+
+Some moves are self-serve and free today; one is a deliberate manual handshake (we don't
+want your credentials flowing through a form); a couple are still hands-on while we build
+them toward self-serve. Each is labeled with what's real right now.
+
 <Steps>
-  <Step title="See the problem on your own API — free, one session">
-    We run the comprehension scorecard against your live spec: how an agent experiences
-    your API today (raw docs) vs comprehended. You get the mis-call picture you currently
-    can't see. The engine that does this is open source — you can run it yourself:
-    `uvx --from "gecko-surf[serve]" gecko <your-openapi-url>`.
+  <Step title="1. Comprehend — prove it works, offline, for $0 (live · self-serve)">
+    Paste your OpenAPI URL — or [your docs](/from-docs), no spec needed — and get
+    question-shaped, first-call-correct tools back, provable offline before a single live
+    call. Run it yourself: `uvx --from "gecko-surf[serve]" gecko <your-openapi-url>`. You
+    see your own API comprehended in one session, no account, no cost.
   </Step>
-  <Step title="Become discoverable to agents">
-    Gecko emits your API's own agent-native surface — `llms.txt`, `gecko.json`,
-    `/.well-known/gecko.json`, `tools.md` — generated from your comprehended surface,
-    hosted by you or by Cloud. Agents find you instead of guessing at you. See
-    [Agent discoverability](/discoverability).
+  <Step title="2. Access — the one manual handshake (seam live · manual on purpose)">
+    Most real APIs are auth-gated, so this is the step that needs a human exchange: hand
+    us a **sandbox key** and agree the **safe scope** — which operations agents may call;
+    anything that moves money is excluded or step-up-gated, not handed to an arbitrary
+    agent. Gecko stores the credential as an *opaque reference* and injects it at call
+    time — the agent never sees a token. See [Access & auth](/access-and-auth).
   </Step>
-  <Step title="Stay correct as you ship (Cloud — building)">
-    Drift-watch re-comprehends your API when it changes and regenerates the tools —
-    so your next release doesn't silently break every downstream agent. Alert fires
-    **before your integrators' prod breaks** — every silent change today is their
-    incident and your ticket.
+  <Step title="3. Serve — your surface, one add-command (live · hands-on for new partners today)">
+    Your comprehended surface is hosted at `/{you}/mcp` with the agent-native breadcrumbs
+    — `llms.txt`, `gecko.json`, `/.well-known/gecko.json`, `/.well-known/x402.json` — so
+    agents *discover* you, not just call you ([Agent discoverability](/discoverability)).
+    Your own MCP, if you have one, keeps running untouched; Gecko sits **beside** it. You
+    get one line to hand your developers: `claude mcp add --transport http you https://mcp.geckovision.tech/you/mcp`.
   </Step>
-  <Step title="Get paid for agent traffic (optional)">
-    We wire the generated tools to **your** x402 endpoint (PayAI, Metera, or pay.sh).
-    Agents pay you directly; **you keep 100%. Gecko is never the payment rail and never
-    a marketplace.**
+  <Step title="4. Settle — get paid, keep 100% (optional · proven offline, live is early)">
+    Charge agents per call by wiring the generated tools to **your own** x402 endpoint
+    (PayAI, Metera, or pay.sh). The 402 challenge, the funds, and the settlement are
+    yours; Gecko composes the rail, holds nothing, signs nothing, and **takes no cut.**
+    You see the full challenge→settle handshake offline first (`X402_MODE=stub`) before
+    any real money moves; on-chain settlement is proven on devnet, and any mainnet
+    transaction is run by you, never by us.
+  </Step>
+  <Step title="5. Stay correct — drift-watch (Cloud — building)">
+    Drift-watch re-comprehends your API when you ship and regenerates the tools, so your
+    next release doesn't silently break downstream agents — the alert fires **before their
+    prod does.** The surface fingerprint that makes this tractable exists today; the
+    auto-update loop and the adoption dashboard are **designed for V2, not yet shipped**
+    ([Stay correct](/stay-correct)).
   </Step>
 </Steps>
+
+## What we need from you
+
+To take a real API from comprehended to a live, measured surface:
+
+- **A sandbox / test API key** (+ the sandbox base URL) — unlocks the gated operations
+  and keeps calls off production.
+- **Your current OpenAPI spec** (or confirmation the docs URL is current) — so the
+  surface reflects today's API, and drift is measured against a real baseline.
+- **The safe scope** — which operations agents may call; what to exclude or
+  step-up-gate (anything that moves money).
+- **Distribution** — put the add-command in front of your developers. Gecko *measures*
+  the funnel (who connected, called, came back); it doesn't *create* the traffic.
+
+That's the whole ask. **No production credentials, no build work on your side, no money
+changing hands to start, no exclusivity.**
 
 ## Who pays, in one sentence
 
