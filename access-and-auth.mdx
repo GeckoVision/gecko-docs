@@ -35,6 +35,31 @@ adapter.
   </Card>
 </CardGroup>
 
+## Store your keys safely — the credential resolver
+
+You don't have to hand-write a `Session`. Gecko ships a credential resolver that keeps
+provider secrets in your **OS keychain** and injects them at call time — the key never
+enters the agent's context, shell history, a dotfile, or a log, and **it never leaves
+your machine**.
+
+```bash
+gecko auth set colosseum      # hidden prompt — paste the key; it goes to your OS keychain
+gecko auth list               # names only, never values
+gecko auth test colosseum     # reports which backend answered — never the value
+gecko auth rm colosseum       # remove
+```
+
+The resolver tries, in order: your **OS keychain** → an external secret-manager command
+(`op` / `vault` / `pass`) → an environment variable (CI/headless). For CI, just
+`export COLOSSEUM_COPILOT_PAT=...`.
+
+<Note>
+**Local vs hosted.** Because the key stays on *your* machine, an API that needs *your*
+key runs **locally** (`gecko auth set …` then serve it). The hosted
+`mcp.geckovision.tech` serves only the **public** surfaces — Gecko never holds a user's
+key, so a keyed, per-person API can't be a shared hosted surface.
+</Note>
+
 ## How auth gating works
 
 When a session returns an **empty** auth-header dict, Gecko treats it as "this
@@ -91,10 +116,38 @@ lives outside the access layer (in `scripts/`). The access layer takes the resul
 it. Gecko does not sign or broadcast mainnet transactions on its own.
 </Warning>
 
+## Short-lived tokens & OAuth — auto-refresh
+
+Most production APIs hand you a **short-lived access token plus a refresh token**
+(the OAuth pattern). Gecko manages that lifecycle for you, behind the same
+`auth_headers()` seam — the agent never sees an expiry:
+
+- **Proactive refresh** — when the token is within a leeway window of expiry, the
+  session refreshes it *before* returning headers.
+- **Reactive self-heal** — if a live call still comes back `401`, Gecko re-authenticates
+  and retries the identical call **once** (bounded — a second failure raises a typed,
+  redacted error, never an infinite loop).
+
+You do the one-time interactive login yourself (Gecko can't complete a human's 2FA);
+after that, Gecko takes over. `OAuth2Lifecycle` refreshes via a `refresh_token` grant,
+and adapters like `oauth2_from_dpo2u()` read a local token file and refresh on their own.
+
+```python
+from gecko.access import oauth2_from_dpo2u   # reads ~/.dpo2u/oauth.json, refreshes at the token endpoint
+session = oauth2_from_dpo2u()
+session.auth_headers()   # a valid Bearer token — refreshed transparently as it nears expiry
+```
+
+The refresh token (a secret) resolves through the credential resolver in your local
+runner; the short-lived access token lives in memory only. Nothing about the token is
+persisted by Gecko's control plane.
+
 ## What Gecko never does with credentials
 
 - It never exposes auth headers in the agent-facing tool definitions.
 - It never logs tokens or keys — secrets are redacted before any error is raised.
-- It never stores secrets; they are read from the session/environment at call time.
+- Its **control plane** never stores or transmits your secret: the credential resolver
+  reads it from your local OS keychain (or env) and injects it at call time, on your
+  machine. Gecko only ever sends it toward the API's own host — never anywhere else.
 
 See [Architecture](/architecture) for how this fits the control-plane model.
