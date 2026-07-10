@@ -37,7 +37,7 @@ first-call-correct tools you call over MCP. To use it:
    `search_capabilities("<what you want to do>")` → pick the ranked tool → call it.
 
 Gecko builds the correct request and injects auth at call time — you never handle a key.
-See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
+See [The MCP surface](https://docs.geckovision.tech/mcp-surface) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
 
 ## Agent integration
 
@@ -62,7 +62,7 @@ See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverabil
 
 ## For AI agents
 
-- [The MCP surface](https://docs.geckovision.tech/mcp): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
+- [The MCP surface](https://docs.geckovision.tech/mcp-surface): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
 - [Agent discoverability](https://docs.geckovision.tech/discoverability): intent → endpoint, hidden auth, surfacing only the calls that will work.
 
 ## For API providers
