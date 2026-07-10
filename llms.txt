@@ -17,10 +17,12 @@ you don't have hand-written integration code, and you can't tell whether you'd b
 calling the API correctly — especially for long-tail, messy, or paywalled APIs.
 Gecko turns "I want X" into the right endpoint and a well-formed first call.
 
-Honest scope: V1 (comprehension) is live end-to-end on one real, painful API (the
-TxODDS World Cup API, Solana mainnet, 442 tests), with a $0 recorded mode that runs
-offline. Ingest is OpenAPI 3.x today; it does not yet work on "any" API and does not
-verify the data an API returns. Multi-API correctness work is V2 and not yet live.
+Honest scope: V1 (comprehension) is live end-to-end — ingest → first-call-correct tools
+→ paid access handshake → real data — on the TxODDS World Cup API (Solana mainnet, 857
+tests), with a $0 recorded mode that runs offline. Comprehension into first-call-correct
+tools is additionally proven on several more real APIs (Colosseum Copilot, Jito, dpo2u).
+Ingest is OpenAPI 3.x today; Gecko does not yet work on literally "any" API and does not
+verify the data an API returns. Multi-API correctness-corpus work is V2 and not yet live.
 
 ## Use Gecko now (agents start here)
 
@@ -35,7 +37,7 @@ first-call-correct tools you call over MCP. To use it:
    `search_capabilities("<what you want to do>")` → pick the ranked tool → call it.
 
 Gecko builds the correct request and injects auth at call time — you never handle a key.
-See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
+See [The MCP surface](https://docs.geckovision.tech/mcp-surface) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
 
 ## Agent integration
 
@@ -60,7 +62,7 @@ See [The MCP surface](https://docs.geckovision.tech/mcp) and [Agent discoverabil
 
 ## For AI agents
 
-- [The MCP surface](https://docs.geckovision.tech/mcp): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
+- [The MCP surface](https://docs.geckovision.tech/mcp-surface): `list_tools` / `call_tool`, the synthetic `search_capabilities` tool, and `serve_stdio`.
 - [Agent discoverability](https://docs.geckovision.tech/discoverability): intent → endpoint, hidden auth, surfacing only the calls that will work.
 
 ## For API providers
