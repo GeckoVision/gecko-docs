@@ -67,6 +67,45 @@ The `gecko` CLI has three verbs — **`serve`** (this page), **`test`** (first-c
 checks), and **`from-docs`** (comprehend an API that has *no* OpenAPI). Bare `gecko <url>`
 is shorthand for `gecko serve <url>`.
 
+## Bundled examples & your keys (the fastest path)
+
+Two ready-to-run surfaces ship in the package — no spec file needed:
+
+```bash
+uvx --from "gecko-surf[serve]" jupiter-mcp        # Jupiter Swap — keyless (free tier)
+uvx --from "gecko-surf[serve]" colosseum-mcp      # Colosseum Copilot — needs your key (below)
+```
+
+For a keyed API, store the key **once** in your OS keychain; Gecko injects it at call
+time, hidden from the agent, and it never leaves your machine:
+
+```bash
+gecko auth set colosseum      # hidden prompt — paste the PAT (arena.colosseum.org/copilot)
+gecko auth list               # names only, never values
+```
+
+<Note>
+**Local vs hosted.** An API that needs *your* key runs **locally** — the key stays on
+your machine. The hosted `mcp.geckovision.tech` serves only the **public** surfaces
+(Gecko never holds a user's key), so it can't serve a keyed API like Colosseum.
+</Note>
+
+<Warning>
+**"Connected" but 0 tools?** Your MCP **client** (Claude Code / Cursor) runs in a
+different network sandbox than the shell where you started the server, so it can't reach
+`http://127.0.0.1:8000`. Expose the server on a real URL with a tunnel:
+
+```bash
+# 1) stop the running server (Ctrl+C), then in one terminal:
+cloudflared tunnel --url http://127.0.0.1:8000        # prints https://<name>.trycloudflare.com
+# 2) re-run the server advertising that URL (so Gecko trusts the host):
+uvx --from "gecko-surf[serve]" colosseum-mcp --public-url https://<name>.trycloudflare.com
+# 3) add the tunnel URL, not localhost:
+claude mcp add --transport http colosseum https://<name>.trycloudflare.com/mcp
+```
+(Install the tunnel once: `brew install cloudflared`, or grab it from Cloudflare.)
+</Warning>
+
 ## 1. Serve any API to your agent (the one-minute path)
 
 `gecko serve <openapi-url>` SSRF-validates the spec, comprehends it, prints the MCP URL + a
@@ -134,7 +173,7 @@ request *before* you go live.
 ```bash
 git clone https://github.com/GeckoVision/gecko-surf
 cd gecko-surf && uv sync
-uv run pytest                       # 442 passing
+uv run pytest                       # 857 passing
 uv run python -m gecko.demo         # E2E: goal → discover → correct call → data (recorded, $0)
 ```
 
