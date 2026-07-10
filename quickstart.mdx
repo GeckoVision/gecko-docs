@@ -91,19 +91,28 @@ your machine. The hosted `mcp.geckovision.tech` serves only the **public** surfa
 </Note>
 
 <Warning>
-**"Connected" but 0 tools?** Your MCP **client** (Claude Code / Cursor) runs in a
-different network sandbox than the shell where you started the server, so it can't reach
-`http://127.0.0.1:8000`. Expose the server on a real URL with a tunnel:
+**"Connected" but 0 tools?** Try these first — a tunnel is usually **not** needed:
+
+1. **Wait ~20 s and re-check.** Tool discovery can lag right after the client connects;
+   the tools often appear on their own with no change.
+2. **Server up + add in a second terminal.** Leave the server running in terminal 1; run
+   `claude mcp add …` in terminal 2 (the server only *prints* that line, it doesn't run it),
+   then reconnect the agent session.
+3. **Clear a stale registration.** An old `local`-scope entry can silently shadow a new
+   `user`-scope one — `claude mcp remove colosseum`, re-add, then `claude mcp list` to
+   confirm a single **Connected** entry.
+
+Only if it still shows 0 tools is your client genuinely network-isolated from
+`127.0.0.1` (a sandboxed or remote client). Then expose the server on a real URL:
 
 ```bash
-# 1) stop the running server (Ctrl+C), then in one terminal:
-cloudflared tunnel --url http://127.0.0.1:8000        # prints https://<name>.trycloudflare.com
-# 2) re-run the server advertising that URL (so Gecko trusts the host):
+brew install cloudflared                                       # once
+# stop the server (Ctrl+C), then in terminal A:
+cloudflared tunnel --url http://127.0.0.1:8000                 # prints https://<name>.trycloudflare.com
+# terminal B — re-run advertising that URL so Gecko trusts the host:
 uvx --from "gecko-surf[serve]" colosseum-mcp --public-url https://<name>.trycloudflare.com
-# 3) add the tunnel URL, not localhost:
 claude mcp add --transport http colosseum https://<name>.trycloudflare.com/mcp
 ```
-(Install the tunnel once: `brew install cloudflared`, or grab it from Cloudflare.)
 </Warning>
 
 ## 1. Serve any API to your agent (the one-minute path)
