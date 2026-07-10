@@ -193,6 +193,17 @@ picked the right call and built a well-formed request — not that the upstream 
 that exact data.
 </Note>
 
+<Note>
+**Recorded vs live — what unlocks live.** `python -m gecko.demo` (and `gecko serve`) run
+**recorded ($0)** *by default*, and **auto-switch to live** the moment a real session or
+credential is present — no flag to remember. The demo goes live when it finds a TxODDS
+session (`~/.gecko/txodds-session.json`, or `TXODDS_API_TOKEN` + `TXODDS_JWT`); a served
+API goes live once you've stored its key (`gecko auth set <api>`). So a recorded run means
+everything is wired correctly — you just haven't supplied a live credential yet. Live data
+for a **paid/gated** API also needs that provider's real session (e.g. TxODDS's on-chain
+subscription), which is separate from Gecko.
+</Note>
+
 ## Prove it's correct — `gecko test`
 
 Generate and run first-call-correctness checks for every usable tool, offline:
