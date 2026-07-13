@@ -1,0 +1,119 @@
+---
+title: "Example: TxLINE trading agent"
+description: Start a new Solana project with Gecko — an agent comprehends the paywalled TxLINE World Cup odds API, flags sharp moves, and settles a prediction market on-chain, with a policy-gated wallet. Runs $0 offline.
+---
+
+A complete, runnable use case for the whole thesis on one *painful, paywalled* API. A trader wants
+a Solana agent that watches the World Cup and settles prediction markets. Starting from nothing —
+with **Gecko as the brain** and a **policy-gated wallet as the hands** — the agent comprehends
+[TxLINE](https://txodds.com) (odds behind a two-token on-chain paywall), flags **sharp moves**, and
+settles a market against TxLINE's **on-chain Merkle proof**. The user reads no docs and writes no
+integration code.
+
+It runs **`$0` offline** (recorded feed + a sandbox wallet); mainnet swaps only the signer edge.
+
+## See the whole thing in one run
+
+```bash
+git clone https://github.com/GeckoVision/gecko-surf && cd gecko-surf && uv sync
+uv run python -m examples.txline_sharp_agent.story
+```
+
+<Steps>
+  <Step title="User sets up the agentic wallet — the only manual steps">
+    The user's *entire* on-chain surface is **three acts**: fund a wallet, set it up once, and
+    **authorize one policy** (`spend ≤ $50 for {subscription, settlement}`). Nothing else is on
+    the user — the agent does the rest.
+  </Step>
+  <Step title="Gecko comprehends the paywalled TxLINE API">
+    One line turns TxLINE into **18 first-call-correct tools**. Auth-gated odds tools stay hidden
+    until a session can satisfy them, so the agent can't mis-call what it can't see. No docs, no
+    hand-written client.
+    ```bash
+    npx @geckovision/gecko add \
+      examples/txline_demo/spec/txline_openapi.yaml \
+      --base-url https://txline.txodds.com --mode recorded
+    ```
+  </Step>
+  <Step title="Agent subscribes to TxLINE — the wallet signs within the policy">
+    The agent builds the on-chain subscribe transaction; the wallet signs it **within** the
+    authorized policy. Gecko never touches a key.
+  </Step>
+  <Step title="Agent monitors the odds and flags a sharp move">
+    Successive odds snapshots run through the detector; a shift past the threshold is the trading
+    signal: `fixture 42 · Home 45.6% → 54.8% (+9.2pp) ⚡`.
+  </Step>
+  <Step title="Agent settles the market on TxLINE's Merkle proof — the wallet signs">
+    Every TxLINE call is **risk-scored** by the security gateway. The agent maps the 3-stage
+    Merkle proof onto the on-chain `validate_stat` instruction and the wallet signs the settle —
+    the program never decides the outcome, the proof does.
+  </Step>
+</Steps>
+
+<Note>
+The user did **3 acts** (fund · set up · authorize). The agent comprehended a paywalled API,
+subscribed, caught the move, and settled a market — the wallet signing only within the policy,
+**Gecko never holding a key or a dollar**.
+</Note>
+
+## The agentic wallet in the middle
+
+<CardGroup cols={3}>
+  <Card title="1 · Fund" icon="wallet">
+    The user funds the wallet with the budgeted USDC. Funding is always the user's side.
+  </Card>
+  <Card title="2 · Set up" icon="key">
+    One-time wallet setup (social login on a Privy/Phantom embedded wallet, or a `pay --sandbox`
+    ephemeral wallet for the `$0` demo).
+  </Card>
+  <Card title="3 · Authorize" icon="shield-check">
+    One policy: a spend cap + an allow-list of purposes. The wallet signs **only** within it —
+    an over-cap request is refused.
+  </Card>
+</CardGroup>
+
+**Gecko is the brain; the wallet is the policy-gated hands.** They meet at a `WalletSeam` — an
+injected boundary, exactly like Gecko's `Session` seam — so the wallet is pluggable and Gecko is
+never the signer.
+
+- **Mainnet hands:** **Privy** (Solana instruction-level policy enforced in-enclave at signing) or
+  **Phantom** (embedded wallet + social login, MCP-native). **OKX OnchainOS** is a valid alternate.
+- **The rail:** **pay.sh** sits *on top* as the x402 payment rail — the wallet signs, the rail
+  settles. (pay.sh is a rail, not a wallet.)
+- **Deferred:** MagicBlock — its session keys only bind if the counterparty program integrated
+  them, so they don't provide bounded authority for an arbitrary third-party API.
+
+<Warning>
+Gecko is **control-plane only** — it never holds keys, funds, or response payloads. The offline
+sim **profiles** transactions (via Surfpool's `surfnet_profileTransaction`) and **never signs or
+broadcasts**. A real mainnet settle is always the user's own signed action, under the policy they
+pre-authorized.
+</Warning>
+
+## Break it into parts
+
+Each piece runs on its own, `$0` and offline:
+
+| Command | What it shows |
+|---|---|
+| `python -m examples.txline_sharp_agent.story` | **The whole use case, end to end** |
+| `python -m examples.txline_sharp_agent.demo` | Comprehension + first-call-correct call + sharp-move detection |
+| `python -m examples.txline_sharp_agent.settlement_sim` | A flagged move → the on-chain `validate_stat` settlement plan |
+| `python -m examples.txline_sharp_agent.wallet_sim` | The 3-step agentic wallet, policy-bounded |
+
+The example also bundles curated Solana subagents (`defi-engineer`, `solana-architect`,
+`solana-qa-engineer`) and a Surfpool MCP config, so a forked project can build the on-chain
+settlement side. See the example's [README on
+GitHub](https://github.com/GeckoVision/gecko-surf/tree/main/examples/txline_sharp_agent).
+
+## Going live
+
+Recorded mode needs nothing. For live TxLINE data the user completes an on-chain subscription
+(fund a wallet + sign — their action); the agent drives the guest → subscribe → activate handshake
+and Gecko seals the two tokens in the OS keychain. Same tool-building code path — only the transport
+edge changes. See [Access & auth](/access-and-auth).
+
+<Card title="Fork it for your own API" icon="rocket" href="/quickstart">
+  `gecko add <your-api>` and your agent is calling it correctly, first try — then wire in a
+  policy-gated wallet the same way.
+</Card>
