@@ -34,6 +34,42 @@ The transport is **MCP Streamable HTTP** (protocol `2025-11-25`), not SSE. From 
 MCP SDK use `mcp.client.streamable_http.streamablehttp_client(url)` — an `sse_client` returns `400`.
 </Note>
 
+## Add any API to your agent — `npx` (no Python)
+
+Bringing *someone else's* API into *your* agent? The branded CLI runs straight from
+`npx` — no clone, no Python, no key ever pasted into `mcp.json`. **One command**
+comprehends the API, seals your key in the OS keychain, and wires it into Claude Code
+over stdio:
+
+```bash
+npx @geckovision/gecko add https://api.provider.com/openapi.json
+```
+
+Because the spec is fetched from the API's own host, Gecko pins requests there and injects
+your key **live** — the agent never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
+
+**Spec served off-host?** Colosseum Copilot's OpenAPI lives separately from
+`copilot.colosseum.com`, and Gecko refuses to trust a spec's `servers[]` host when it was
+fetched from a different origin (the token-exfil defense). Assert the real host yourself
+with `--base-url` — still one line:
+
+```bash
+npx @geckovision/gecko add \
+  https://raw.githubusercontent.com/GeckoVision/gecko-surf/main/gecko/examples/colosseum_copilot_openapi.json \
+  --base-url https://copilot.colosseum.com/api/v1 --mode live
+```
+
+`add` prompts once for your PAT (free at `arena.colosseum.org/copilot`), seals it, pins the
+host, and wires the surface in **live** mode. Then ask your agent *"search Colosseum for
+agent-payment projects"* — authenticated call, first try. (Drop `--mode live` to wire the
+$0 recorded surface and falsify the calls offline first.)
+
+<Note>
+Gecko never mints or holds API keys — a provider's key is yours, sealed in your OS keychain
+and resolved only at call time. This whole path is **local**: it wires an API into your own
+agent and never touches Gecko's servers.
+</Note>
+
 ## In Claude Code — install the plugin
 
 The plugin bundles the skills + commands **and** wires that live demo surface, so one
@@ -62,10 +98,12 @@ uv tool install "gecko-surf[serve]"                          # or: pip install "
 curl -fsSL https://get.geckovision.tech/install.sh | bash    # prebuilt binary, no Python prereq
 ```
 
-The package is **`gecko-surf`**; the CLI is **`gecko`**; the SDK is **`from gecko import …`**.
-The `gecko` CLI has three verbs — **`serve`** (this page), **`test`** (first-call-correctness
-checks), and **`from-docs`** (comprehend an API that has *no* OpenAPI). Bare `gecko <url>`
-is shorthand for `gecko serve <url>`.
+The package is **`gecko-surf`**; the CLI is **`gecko`** (or `npx @geckovision/gecko`, no
+Python); the SDK is **`from gecko import …`**. Key verbs — **`add`** (comprehend an API and
+wire it into your agent, key sealed in the keychain), **`serve`** (serve a spec over MCP),
+**`auth set`** (seal a provider key), **`test`** (first-call-correctness checks), and
+**`from-docs`** (comprehend an API that has *no* OpenAPI). Bare `gecko <url>` is shorthand
+for `gecko serve <url>`.
 
 ## Bundled examples & your keys (the fastest path)
 
