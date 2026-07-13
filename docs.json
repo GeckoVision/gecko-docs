@@ -41,7 +41,8 @@
             "group": "For AI agents",
             "pages": [
               "mcp-surface",
-              "discoverability"
+              "discoverability",
+              "txline-trading-agent"
             ]
           },
           {
