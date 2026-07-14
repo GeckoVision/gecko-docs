@@ -40,6 +40,17 @@ want your credentials flowing through a form); a couple are still hands-on while
 them toward self-serve. Each is labeled with what's real right now.
 
 <Steps>
+  <Step title="0. Inspect — score your agent-readiness, offline & $0 (live · self-serve)">
+    Before anything else, see where you stand. `gecko inspect <your-api>` grades your API
+    across four dimensions — **first-call-correct**, **spec hygiene**, **agent-friendliness**
+    (ambiguous routing traps a schema linter can't see), and **security** — and prints
+    located, fixable findings. Wire it into CI (`--min-grade B`) to fail a deploy that
+    regresses. It's TDD for your API.
+
+    ```bash
+    npx @geckovision/gecko inspect <your-openapi-url>    # or a bare domain / docs URL
+    ```
+  </Step>
   <Step title="1. Comprehend — prove it works, offline, for $0 (live · self-serve)">
     Paste your OpenAPI URL — or [your docs](/from-docs), no spec needed — and get
     question-shaped, first-call-correct tools back, provable offline before a single live
@@ -119,9 +130,9 @@ provider plane are **building** — with the first design partners, now. See
 ## Bring your API
 
 <CardGroup cols={2}>
-  <Card title="Get the free scorecard" icon="clipboard-check" href="https://discord.gg/3gVF5NNbCa">
-    Join the Discord and drop your OpenAPI URL — we'll run the comprehension scorecard
-    on your API and show you what agents see.
+  <Card title="Get the free scorecard" icon="clipboard-check" href="/quickstart">
+    `npx @geckovision/gecko inspect <your-api>` — your agent-readiness grade + fixable
+    findings in one session. Self-serve, offline, $0, no account.
   </Card>
   <Card title="Self-serve it now" icon="terminal" href="/quickstart">
     Run the open-source engine against your own spec today — comprehend, serve over
