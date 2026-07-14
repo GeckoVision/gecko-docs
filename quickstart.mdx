@@ -21,7 +21,7 @@ flow below.
 Every command here is meant to be **inspected first** — nothing pipes a remote script into
 a shell. Run them in this order and you never take a step you haven't checked:
 
-1. **Check (no side effects).** `npx @geckovision/gecko@0.4.1 doctor` — read-only. It
+1. **Check (no side effects).** `npx @geckovision/gecko doctor` — read-only. It
    reports your setup and the exact next step, and touches nothing.
 2. **Dry-run ($0).** `gecko serve <openapi-url>` defaults to **recorded** mode — responses
    are synthesized from the API's own schema, so **no request reaches the real API and
@@ -112,15 +112,17 @@ also get `/setup-x402` and the anti-poisoning guard.
 
 ## Bring your own API — run the CLI
 
-No install needed — run it straight from PyPI with `uvx` (the `npx` equivalent for Python):
+No install needed — `npx` runs the whole engine straight from npm (no clone, no Python).
+Bare `gecko <url>` serves the API over MCP:
 
 ```bash
-uvx --from "gecko-surf[serve]" gecko <openapi-url>
+npx @geckovision/gecko <openapi-url>
 ```
 
-Prefer a persistent install, or a zero-Python binary?
+Prefer Python, a persistent install, or a zero-Python binary?
 
 ```bash
+uvx --from "gecko-surf[serve]" gecko <openapi-url>          # Python, no install
 uv tool install "gecko-surf[serve]"                          # or: pip install "gecko-surf[serve]"
 curl -fsSL https://get.geckovision.tech/install.sh | bash    # prebuilt binary, no Python prereq
 ```
@@ -137,8 +139,8 @@ for `gecko serve <url>`.
 Two ready-to-run surfaces ship in the package — no spec file needed:
 
 ```bash
-uvx --from "gecko-surf[serve]" jupiter-mcp        # Jupiter Swap — keyless (free tier)
-uvx --from "gecko-surf[serve]" colosseum-mcp      # Colosseum Copilot — needs your key (below)
+npx @geckovision/gecko jupiter-mcp        # Jupiter Swap — keyless (free tier)
+npx @geckovision/gecko colosseum-mcp      # Colosseum Copilot — needs your key (below)
 ```
 
 For a keyed API, store the key **once** in your OS keychain; Gecko injects it at call
@@ -175,7 +177,7 @@ brew install cloudflared                                       # once
 # stop the server (Ctrl+C), then in terminal A:
 cloudflared tunnel --url http://127.0.0.1:8000                 # prints https://<name>.trycloudflare.com
 # terminal B — re-run advertising that URL so Gecko trusts the host:
-uvx --from "gecko-surf[serve]" colosseum-mcp --public-url https://<name>.trycloudflare.com
+npx @geckovision/gecko colosseum-mcp --public-url https://<name>.trycloudflare.com
 claude mcp add --transport http colosseum https://<name>.trycloudflare.com/mcp
 ```
 </Warning>
@@ -188,7 +190,7 @@ Streamable-HTTP MCP.
 
 ```bash
 # straight from PyPI, no clone:
-uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json
+npx @geckovision/gecko https://api.example.com/openapi.json
 ```
 
 ![gecko comprehends an API and prints the MCP URL + one-click add strings](/images/hero.gif)
