@@ -44,7 +44,7 @@ them toward self-serve. Each is labeled with what's real right now.
     Before anything else, see where you stand. `gecko inspect <your-api>` grades your API
     across four dimensions — **first-call-correct**, **spec hygiene**, **agent-friendliness**
     (ambiguous routing traps a schema linter can't see), and **security** — and prints
-    located, fixable findings. Wire it into CI (`--min-grade B`) to fail a deploy that
+    located, fixable findings. Integrate it into CI (`--min-grade B`) to fail a deploy that
     regresses. It's TDD for your API.
 
     ```bash
@@ -72,7 +72,7 @@ them toward self-serve. Each is labeled with what's real right now.
     get one line to hand your developers: `claude mcp add --transport http you https://mcp.geckovision.tech/you/mcp`.
   </Step>
   <Step title="4. Settle — get paid, keep 100% (optional · proven offline, live is early)">
-    Charge agents per call by wiring the generated tools to **your own** x402 endpoint
+    Charge agents per call by pointing the generated tools at **your own** x402 endpoint
     (PayAI, Metera, or pay.sh). The 402 challenge, the funds, and the settlement are
     yours; Gecko composes the rail, holds nothing, signs nothing, and **takes no cut.**
     You see the full challenge→settle handshake offline first (`X402_MODE=stub`) before
