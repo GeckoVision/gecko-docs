@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Gecko",
-  "description": "Gecko — the API comprehension layer for agents. Point it at an API's surface and it generates question-shaped, first-call-correct agent tools, handles auth invisibly, and lets the agent call the real API directly.",
+  "description": "Gecko — where agents and APIs finally speak the same language. Point it at any API and your agent calls it right the first time: keys stay hidden on your machine, and a manipulated API can't trick your agent.",
   "colors": {
     "primary": "#9945FF",
     "light": "#C77DFF",

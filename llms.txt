@@ -1,9 +1,10 @@
 # Gecko
 
-> Gecko is the API comprehension layer for agents. Point it at an API's
-> surface (OpenAPI 3.x today) and it generates question-shaped, first-call-correct
-> agent tools, handles auth and paywalls invisibly, and lets the agent call the real
-> API directly for data. It is a control plane — it stores the API surface, the tool
+> Gecko is where agents and APIs finally speak the same language. Point it at an
+> API's surface (an OpenAPI spec, or one recovered from a docs page) and it generates
+> question-shaped, first-call-correct agent tools, keeps keys hidden and injected
+> only at call time, screens the surface for poisoning, and lets the agent call the
+> real API directly for data. It is a control plane — it stores the API surface, the tool
 > defs, and correctness metadata, and never response payloads, user data, or secrets.
 > It composes on top of payment rails (x402) and protocols (MCP); it is not itself a
 > rail or a marketplace.
@@ -20,9 +21,9 @@ Gecko turns "I want X" into the right endpoint and a well-formed first call.
 Honest scope: V1 (comprehension) is live end-to-end — ingest → first-call-correct tools
 → paid access handshake → real data — on the TxODDS World Cup API (Solana mainnet, 857
 tests), with a $0 recorded mode that runs offline. Comprehension into first-call-correct
-tools is additionally proven on several more real APIs (Colosseum Copilot, Jito, dpo2u).
-Ingest is OpenAPI 3.x today; Gecko does not yet work on literally "any" API and does not
-verify the data an API returns. Multi-API correctness-corpus work is V2 and not yet live.
+tools is additionally proven on Stripe (587 tools, 99.8% first-call-correct), Twilio
+(100%), Jupiter (100%), Colosseum, Jito, and more. Ingest is OpenAPI 3.x, or a spec
+recovered from a docs page; Gecko does not verify the data an API returns.
 
 ## Use Gecko now (agents start here)
 

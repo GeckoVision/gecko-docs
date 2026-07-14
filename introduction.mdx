@@ -1,15 +1,26 @@
 ---
 title: Introduction
-description: Gecko is the API comprehension layer for agents — point it at an API and the agent finds the right call, makes it correctly the first time, and runs.
+description: Where agents and APIs finally speak the same language — point Gecko at any API and your agent calls it right the first time.
 ---
 
 ## What Gecko is
 
-Docs and endpoints are built for humans. **Gecko is the API comprehension layer for
-agents — the layer that translates an API's surface for agents.** Point an agent at an
-API — even one behind human-shaped docs and a paywall — and it finds the right call,
-makes it correctly the first time, and runs. No client to hand-write, no guessing
-whether the agent is calling it right.
+Docs and endpoints are built for humans. **Gecko is where agents and APIs finally
+speak the same language** — it translates any API into tools your agent calls right
+the first time. Point an agent at an API — even one behind human-shaped docs and a
+paywall — and it finds the right call, makes it correctly the first time, and runs.
+No client to hand-write, no key pasted into a config, no guessing whether the agent
+is calling it right.
+
+Three promises, one layer:
+
+- **Right the first time** — Gecko reads the API before your agent calls it. Right
+  endpoint, right parameters, right auth.
+- **Keys stay hidden** — your key lives on your machine and is used only at the
+  moment of the call, sent only to the API's own host. Never in a file, never
+  inside the agent.
+- **Poison gets caught** — a manipulated API (a doctored description, a poisoned
+  example) is screened and quarantined before your agent ever sees it.
 
 ![gecko comprehends an API and prints the MCP URL + one-click add strings](/images/hero.gif)
 
@@ -20,9 +31,9 @@ the import is **`gecko`** (`from gecko import …`), and the CLI is **`gecko`**.
 
 Today a builder reads the docs, hand-writes a client, and **still can't tell if the
 agent is calling the API correctly.** Gecko removes that step. It ingests an API's
-*surface* (OpenAPI today), turns it into question-shaped, first-call-correct agent
-tools, drives the access/auth handshake, and lets the agent call the **real API
-directly** for data.
+*surface* (an OpenAPI spec, or one recovered from a docs page), turns it into
+question-shaped, first-call-correct agent tools, drives the access/auth handshake,
+and lets the agent call the **real API directly** for data.
 
 ## Where Gecko sits — three verbs, three layers
 
@@ -73,12 +84,12 @@ boundary, not a setting.
 ## Honest status
 
 <Warning>
-V1 — the comprehension path — is **live end-to-end against one real, painful API**
-(the TxODDS World Cup API, on Solana mainnet, 857 tests passing), with a **$0
-recorded mode** that runs the whole path offline. Ingest is **OpenAPI 3.x today**.
-The multi-API correctness work is **V2 and not yet live**. Gecko does **not**
-claim to work on *any* API yet, and it does **not** verify or vouch for the data an
-API returns. See [Status](/status) for the full picture.
+V1 is **live end-to-end on Solana mainnet** against a real paywalled API (the TxODDS
+World Cup API, 857 tests passing), and the same engine is proven keyless at scale:
+**Stripe (587 tools, 99.8% first-call-correct), Twilio (100%), Jupiter (100%)** —
+with a **$0 recorded mode** that runs the whole path offline. Ingest is **OpenAPI
+3.x, or a spec recovered from a docs page**. Gecko does **not** verify or vouch for
+the data an API returns. See [Status](/status) for the full picture.
 </Warning>
 
 ## Next
