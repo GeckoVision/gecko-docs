@@ -72,6 +72,19 @@ over stdio:
 npx @geckovision/gecko add https://api.provider.com/openapi.json
 ```
 
+<Note>
+**No `openapi.json`? That's the *normal* case for a painful API.** The APIs agents don't
+one-shot rarely publish a discoverable spec — and you don't need one. `add` takes whatever you
+have: point it at the **docs** and it recovers a draft spec; a **local file** if you have one;
+or — from **v0.4.3** — a bare **domain** and it probes the common spec paths for you.
+
+```bash
+npx @geckovision/gecko add https://docs.someapi.com   # no spec? recovers one from the docs
+npx @geckovision/gecko add ./openapi.json             # a file you already have
+npx @geckovision/gecko add api.stripe.com             # a bare domain (v0.4.3+) — Gecko finds it
+```
+</Note>
+
 Because the spec is fetched from the API's own host, Gecko pins requests there and injects
 your key **live** — the agent never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
 
