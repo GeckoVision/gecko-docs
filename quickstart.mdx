@@ -8,6 +8,33 @@ into a question-shaped, first-call-correct tool with a JSON schema, and hands yo
 a one-line "add me" string. No client to hand-write, no guessing whether the agent is
 calling it right.
 
+<Note>
+**Handing these docs to a coding agent?** Point it at
+[`/llms.txt`](https://docs.geckovision.tech/llms.txt) — a compact, agent-readable map of
+this whole site — or append `.md` to any page URL for the raw markdown (e.g.
+`/quickstart.md`). The agent reads what it needs and skips the rest, then runs the safe
+flow below.
+</Note>
+
+## Safe to run — verify before you execute
+
+Every command here is meant to be **inspected first** — nothing pipes a remote script into
+a shell. Run them in this order and you never take a step you haven't checked:
+
+1. **Check (no side effects).** `npx @geckovision/gecko@0.4.1 doctor` — read-only. It
+   reports your setup and the exact next step, and touches nothing.
+2. **Dry-run ($0).** `gecko serve <openapi-url>` defaults to **recorded** mode — responses
+   are synthesized from the API's own schema, so **no request reaches the real API and
+   nothing is billed**. Prove the agent calls correctly *before* going live.
+3. **Live.** Add `--mode live` (and, for a keyed API, `gecko auth set` first — the key is
+   sealed in your OS keychain, never written to a file).
+
+**Why it's safe to trust:** Gecko is open-source (Apache-2.0) and installed from a public
+registry (`npx @geckovision/gecko`, `pip install gecko-surf`) **with a live SLSA provenance
+attestation** tracing the package to its CI build — verifiable, not an opaque remote script.
+It's **control-plane only**: it never stores your API responses, and never stores or logs
+your keys.
+
 ## Try it in 10 seconds — no install
 
 Give your agent a live, Gecko-comprehended surface and watch it call correctly — no
