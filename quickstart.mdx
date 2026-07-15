@@ -88,6 +88,17 @@ npx @geckovision/gecko add api.stripe.com             # a bare domain (v0.4.3+) 
 Because the spec is fetched from the API's own host, Gecko pins requests there and injects
 your key **live** — the agent never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
 
+<Note>
+**Which platforms get the `npx` binary?** Linux (x64 + arm64) and **Apple Silicon Macs** — one
+command, no Python. On an **Intel Mac** or **Windows** (no prebuilt binary yet), use the Python
+path instead — same CLI, and your system's own certificates are used:
+
+```bash
+uvx gecko-surf add api.stripe.com                       # no install, just needs Python/uv
+pip install gecko-surf && gecko add api.stripe.com      # or a normal pip install
+```
+</Note>
+
 **Spec served off-host?** Colosseum Copilot's OpenAPI lives separately from
 `copilot.colosseum.com`, and Gecko refuses to trust a spec's `servers[]` host when it was
 fetched from a different origin (the token-exfil defense). Assert the real host yourself
