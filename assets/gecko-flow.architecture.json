@@ -1,0 +1,153 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Gecko — the flow",
+    "subtitle": "control plane, never data plane",
+    "output": "architecture.html",
+    "viewBox": [1200, 560]
+  },
+  "components": [
+    {
+      "id": "agent",
+      "type": "frontend",
+      "label": "Your AI agent",
+      "sublabel": "Claude Code · Cursor · …",
+      "pos": [40, 120],
+      "size": [150, 64]
+    },
+    {
+      "id": "login",
+      "type": "security",
+      "label": "gecko login",
+      "sublabel": "email → OTP → sealed key",
+      "pos": [40, 360],
+      "size": [150, 64],
+      "tag": "hosted, optional"
+    },
+    {
+      "id": "mcp",
+      "type": "backend",
+      "label": "MCP surface",
+      "sublabel": "list_tools · call · search",
+      "pos": [280, 120],
+      "size": [160, 64]
+    },
+    {
+      "id": "comprehend",
+      "type": "database",
+      "label": "Comprehend",
+      "sublabel": "ingest → catalog → tools",
+      "pos": [520, 120],
+      "size": [160, 64],
+      "tag": "once"
+    },
+    {
+      "id": "caller",
+      "type": "backend",
+      "label": "Caller",
+      "sublabel": "tool + args → request",
+      "pos": [760, 120],
+      "size": [160, 64]
+    },
+    {
+      "id": "access",
+      "type": "security",
+      "label": "Access — the seam",
+      "sublabel": "Session.auth_headers()",
+      "pos": [760, 360],
+      "size": [160, 64]
+    },
+    {
+      "id": "api",
+      "type": "external",
+      "label": "The real API",
+      "sublabel": "the provider's own host",
+      "pos": [1010, 360],
+      "size": [150, 64],
+      "tag": "data plane"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Gecko control plane — surface + tool defs + correctness metadata (never payloads, keys, or user data)",
+      "wraps": ["mcp", "comprehend", "caller", "access"]
+    }
+  ],
+  "connections": [
+    {
+      "from": "login",
+      "to": "mcp",
+      "label": "authenticate (hosted only)",
+      "variant": "dashed",
+      "fromSide": "top",
+      "toSide": "bottom"
+    },
+    {
+      "from": "agent",
+      "to": "mcp",
+      "label": "intent",
+      "variant": "emphasis"
+    },
+    { "from": "mcp", "to": "comprehend" },
+    { "from": "comprehend", "to": "caller" },
+    {
+      "from": "caller",
+      "to": "access",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "from": "access",
+      "to": "api",
+      "label": "live · inject creds at call time",
+      "variant": "security",
+      "labelDy": -26
+    },
+    {
+      "from": "access",
+      "to": "agent",
+      "label": "recorded · $0 · synthesized from schema (offline)",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom",
+      "via": [[215, 392]]
+    },
+    {
+      "from": "api",
+      "to": "agent",
+      "label": "live: the real API's data returns to the agent directly · never through Gecko",
+      "variant": "emphasis",
+      "fromSide": "bottom",
+      "toSide": "bottom",
+      "via": [[1085, 505], [115, 505]]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Control plane, never data plane",
+      "items": [
+        "Holds the surface, tool defs, correctness metadata",
+        "Never response payloads, keys, or user data"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "One path, two modes",
+      "items": [
+        "recorded — synthesized from schema, $0, offline",
+        "live — access injects creds; data returns direct"
+      ]
+    },
+    {
+      "dot": "violet",
+      "title": "One API-agnostic seam",
+      "items": [
+        "Session.auth_headers() is the only adapter",
+        "A new API touches no other module"
+      ]
+    }
+  ]
+}
