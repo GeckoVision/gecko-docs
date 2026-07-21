@@ -1,336 +1,185 @@
 ---
 title: Quickstart
-description: Make any API agent-usable in minutes — serve it over MCP, or embed the SDK. $0 recorded mode lets you prove every call offline first.
+description: Point Gecko at any API and your agent calls it right the first time. One command to add it, $0 recorded mode to prove every call offline first.
 ---
 
-You bring an `openapi.json`. Gecko comprehends the API's surface, turns every endpoint
-into a question-shaped, first-call-correct tool with a JSON schema, and hands your agent
-a one-line "add me" string. No client to hand-write, no guessing whether the agent is
-calling it right.
+Point Gecko at an API — even a messy, paywalled one with no published spec. It reads the
+API's *surface*, turns every endpoint into a question-shaped, first-call-correct tool, and
+wires it into your agent. No client code, no key in a config file.
 
 <Note>
 **Handing these docs to a coding agent?** Point it at
 [`/llms.txt`](https://docs.geckovision.tech/llms.txt) — a compact, agent-readable map of
-this whole site — or append `.md` to any page URL for the raw markdown (e.g.
-`/quickstart.md`). The agent reads what it needs and skips the rest, then runs the safe
-flow below.
+this site — or append `.md` to any page URL for raw markdown (e.g. `/quickstart.md`).
 </Note>
 
-## Safe to run — verify before you execute
+## Add any API to your agent
 
-Every command here is meant to be **inspected first** — nothing pipes a remote script into
-a shell. Run them in this order and you never take a step you haven't checked:
+<Steps>
+  <Step title="Comprehend and wire it in — one command">
+    Straight from `npx`, no clone, no Python. It comprehends the API, seals your key in
+    the OS keychain, and wires it into Claude Code over stdio.
 
-1. **Check (no side effects).** `npx @geckovision/gecko doctor` — read-only. It
-   reports your setup and the exact next step, and touches nothing.
-2. **Dry-run ($0).** `gecko serve <openapi-url>` defaults to **recorded** mode — responses
-   are synthesized from the API's own schema, so **no request reaches the real API and
-   nothing is billed**. Prove the agent calls correctly *before* going live.
-3. **Live.** Add `--mode live` (and, for a keyed API, `gecko auth set` first — the key is
-   sealed in your OS keychain, never written to a file).
+    ```bash
+    npx @geckovision/gecko add https://api.provider.com/openapi.json
+    ```
 
-**Why it's safe to trust:** Gecko is open-source (Apache-2.0) and installed from a public
-registry (`npx @geckovision/gecko`, `pip install gecko-surf`) **with a live SLSA provenance
-attestation** tracing the package to its CI build — verifiable, not an opaque remote script.
-It's **control-plane only**: it never stores your API responses, and never stores or logs
-your keys.
+    It prompts once (hidden) for the key and injects it **live** at call time — the agent
+    never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
+
+    **No `openapi.json`?** That's the normal case for a painful API — `add` takes whatever
+    you have:
+
+    ```bash
+    npx @geckovision/gecko add https://docs.someapi.com   # recovers a spec from the docs
+    npx @geckovision/gecko add ./openapi.json             # a file you already have
+    npx @geckovision/gecko add api.stripe.com             # a bare domain — Gecko finds it
+    ```
+  </Step>
+
+  <Step title="Ask your agent — it calls it right">
+    ```
+    You:   search the API for X
+    Agent: ✓ called GET /v1/search?q=X  →  200, first try
+    ```
+
+    No integration code, no docs-diving, no key in sight. That's the whole loop.
+  </Step>
+
+  <Step title="Prove it offline first — $0 recorded mode">
+    Every path has a **recorded mode** that runs the *same code* but synthesizes the
+    response from the API's own schema — no network, no key, no spend. Falsify the calls
+    before going live, then flip one flag (`--mode live`) for real data.
+
+    ```bash
+    uv run python -m gecko.demo    # goal → discover → correct call → data (recorded, $0)
+    ```
+  </Step>
+</Steps>
+
+<Note>
+**Gecko never holds your keys.** A provider's key is yours — sealed in *your* OS keychain,
+resolved only at call time. Control plane only: Gecko stores the API surface, never keys or
+response data. This whole path is **local** — it never touches Gecko's servers.
+</Note>
 
 ## Try it in 10 seconds — no install
 
-Give your agent a live, Gecko-comprehended surface and watch it call correctly — no
-`pip`, no spec, no key:
+Give your agent a live, Gecko-comprehended surface and watch it call correctly — no `pip`,
+no spec, no key:
 
 ```bash
 claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
 ```
 
-That's the **TxODDS TxLINE** World Cup API — 18 first-call-correct tools over an API with
-a two-token on-chain paywall a coding agent does *not* one-shot. It's served **recorded**
-($0/offline, responses synthesized from the schema), so you explore the real surface
-without a subscription; point it at your own TxLINE session for live data.
+That's **TxODDS TxLINE** — 18 first-call-correct tools over a World Cup API with a two-token
+on-chain paywall a coding agent does *not* one-shot. Served **recorded** ($0/offline), so you
+explore the real surface without a subscription.
 
 <Note>
-`claude mcp add` and `/plugin` are **Claude-Code-only**. In **Cursor** (`~/.cursor/mcp.json`),
-**VS Code**, or any other MCP client, add the same endpoint to your `mcp.json`:
+`claude mcp add` is Claude-Code-only. In **Cursor**, **VS Code**, or any MCP client, add the
+same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025-11-25`), not SSE:
 
 ```jsonc
 { "mcpServers": { "gecko-txline": { "type": "http", "url": "https://mcp.geckovision.tech/txline/mcp" } } }
 ```
-
-The transport is **MCP Streamable HTTP** (protocol `2025-11-25`), not SSE. From the Python
-MCP SDK use `mcp.client.streamable_http.streamablehttp_client(url)` — an `sse_client` returns `400`.
 </Note>
 
-## Add any API to your agent — `npx` (no Python)
-
-Bringing *someone else's* API into *your* agent? The branded CLI runs straight from
-`npx` — no clone, no Python, no key ever pasted into `mcp.json`. **One command**
-comprehends the API, seals your key in the OS keychain, and wires it into Claude Code
-over stdio:
-
-```bash
-npx @geckovision/gecko add https://api.provider.com/openapi.json
-```
-
-<Note>
-**No `openapi.json`? That's the *normal* case for a painful API.** The APIs agents don't
-one-shot rarely publish a discoverable spec — and you don't need one. `add` takes whatever you
-have: point it at the **docs** and it recovers a draft spec; a **local file** if you have one;
-or — from **v0.4.3** — a bare **domain** and it probes the common spec paths for you.
-
-```bash
-npx @geckovision/gecko add https://docs.someapi.com   # no spec? recovers one from the docs
-npx @geckovision/gecko add ./openapi.json             # a file you already have
-npx @geckovision/gecko add api.stripe.com             # a bare domain (v0.4.3+) — Gecko finds it
-```
-</Note>
-
-Because the spec is fetched from the API's own host, Gecko pins requests there and injects
-your key **live** — the agent never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
-
-<Note>
-**Which platforms get the `npx` binary?** Linux (x64 + arm64) and **Apple Silicon Macs** — one
-command, no Python. On an **Intel Mac** or **Windows** (no prebuilt binary yet), use the Python
-path instead — same CLI, and your system's own certificates are used:
-
-```bash
-uvx gecko-surf add api.stripe.com                       # no install, just needs Python/uv
-pip install gecko-surf && gecko add api.stripe.com      # or a normal pip install
-```
-</Note>
-
-**Spec served off-host?** Colosseum Copilot's OpenAPI lives separately from
-`copilot.colosseum.com`, and Gecko refuses to trust a spec's `servers[]` host when it was
-fetched from a different origin (the token-exfil defense). Assert the real host yourself
-with `--base-url` — still one line:
-
-```bash
-npx @geckovision/gecko add \
-  https://raw.githubusercontent.com/GeckoVision/gecko-surf/main/gecko/examples/colosseum_copilot_openapi.json \
-  --base-url https://copilot.colosseum.com/api/v1 --mode live
-```
-
-`add` prompts once for your PAT (free at `arena.colosseum.org/copilot`), seals it, pins the
-host, and connects the surface in **live** mode. Then ask your agent *"search Colosseum for
-agent-payment projects"* — authenticated call, first try. (Drop `--mode live` to connect the
-$0 recorded surface and falsify the calls offline first.)
-
-<Note>
-Gecko never mints or holds API keys — a provider's key is yours, sealed in your OS keychain
-and resolved only at call time. This whole path is **local**: it wires an API into your own
-agent and never touches Gecko's servers.
-</Note>
-
-## In Claude Code — install the plugin
-
-The plugin bundles the skills + commands **and** wires that live demo surface, so one
-install gives your agent working tools *and* the workflow to make your own API agent-ready:
-
-```
-/plugin marketplace add GeckoVision/gecko-surf
-/plugin install gecko-surf@geckovision
-```
-
-Then `/make-agent-ready <openapi-url>` comprehends your API and serves it over MCP; you
-also get `/setup-x402` and the anti-poisoning guard.
-
-## Bring your own API — run the CLI
-
-No install needed — `npx` runs the whole engine straight from npm (no clone, no Python).
-Bare `gecko <url>` serves the API over MCP:
-
-```bash
-npx @geckovision/gecko <openapi-url>
-```
-
-Prefer Python, a persistent install, or a zero-Python binary?
-
-```bash
-uvx --from "gecko-surf[serve]" gecko <openapi-url>          # Python, no install
-uv tool install "gecko-surf[serve]"                          # or: pip install "gecko-surf[serve]"
-curl -fsSL https://get.geckovision.tech/install.sh | bash    # prebuilt binary, no Python prereq
-```
-
-The package is **`gecko-surf`**; the CLI is **`gecko`** (or `npx @geckovision/gecko`, no
-Python); the SDK is **`from gecko import …`**. Key verbs — **`add`** (comprehend an API and
-integrate it into your agent, key sealed in the keychain), **`serve`** (serve a spec over MCP),
-**`auth set`** (seal a provider key), **`test`** (first-call-correctness checks), and
-**`from-docs`** (comprehend an API that has *no* OpenAPI). Bare `gecko <url>` is shorthand
-for `gecko serve <url>`.
-
-## Bundled examples & your keys (the fastest path)
-
-Two ready-to-run surfaces ship in the package — no spec file needed:
-
-```bash
-npx @geckovision/gecko jupiter-mcp        # Jupiter Swap — keyless (free tier)
-npx @geckovision/gecko colosseum-mcp      # Colosseum Copilot — needs your key (below)
-```
-
-For a keyed API, store the key **once** in your OS keychain; Gecko injects it at call
-time, hidden from the agent, and it never leaves your machine:
-
-```bash
-gecko auth set colosseum      # hidden prompt — paste the PAT (arena.colosseum.org/copilot)
-gecko auth list               # names only, never values
-```
-
-<Note>
-**Local vs hosted.** An API that needs *your* key runs **locally** — the key stays on
-your machine. The hosted `mcp.geckovision.tech` serves only the **public** surfaces
-(Gecko never holds a user's key), so it can't serve a keyed API like Colosseum.
-</Note>
-
-<Warning>
-**"Connected" but 0 tools?** Try these first — a tunnel is usually **not** needed:
-
-1. **Wait ~20 s and re-check.** Tool discovery can lag right after the client connects;
-   the tools often appear on their own with no change.
-2. **Server up + add in a second terminal.** Leave the server running in terminal 1; run
-   `claude mcp add …` in terminal 2 (the server only *prints* that line, it doesn't run it),
-   then reconnect the agent session.
-3. **Clear a stale registration.** An old `local`-scope entry can silently shadow a new
-   `user`-scope one — `claude mcp remove colosseum`, re-add, then `claude mcp list` to
-   confirm a single **Connected** entry.
-
-Only if it still shows 0 tools is your client genuinely network-isolated from
-`127.0.0.1` (a sandboxed or remote client). Then expose the server on a real URL:
-
-```bash
-brew install cloudflared                                       # once
-# stop the server (Ctrl+C), then in terminal A:
-cloudflared tunnel --url http://127.0.0.1:8000                 # prints https://<name>.trycloudflare.com
-# terminal B — re-run advertising that URL so Gecko trusts the host:
-npx @geckovision/gecko colosseum-mcp --public-url https://<name>.trycloudflare.com
-claude mcp add --transport http colosseum https://<name>.trycloudflare.com/mcp
-```
-</Warning>
-
-## 1. Serve any API to your agent (the one-minute path)
-
-`gecko serve <openapi-url>` SSRF-validates the spec, comprehends it, prints the MCP URL + a
-one-click "add" string for Claude Code / Cursor / VS Code, then serves the API over
-Streamable-HTTP MCP.
-
-```bash
-# straight from PyPI, no clone:
-npx @geckovision/gecko https://api.example.com/openapi.json
-```
-
-![gecko comprehends an API and prints the MCP URL + one-click add strings](/images/hero.gif)
-
-Paste the printed `claude mcp add …` line (or open the Cursor / VS Code deeplink) and
-your agent can call the API — first try, right params:
-
-![An agent asks in plain language, calls the right tool, and gets 200 on the first try](/images/first-try.gif)
-
-<Note>
-Auth-gated operations are **hidden** from the agent unless the session can satisfy them.
-The CLI defaults to `--mode recorded` ($0, synthesized) — pass `--mode live` for real
-upstream calls. Exposing it to a remote agent? Add `--public-url https://<your-tunnel>`.
-</Note>
-
-## 2. Embed the SDK
-
-Building your own app or agent loop? Skip the server and import the engine — no extras
-needed. `AgentApiClient` is the one object that makes an API agent-usable: point it at a
-spec, search for a capability, call it.
-
-```python
-from gecko import AgentApiClient, public_session
-
-# spec = a URL, a path, or a parsed dict. public_session() = no auth.
-client = AgentApiClient(spec, session=public_session())
-
-# intent → ranked endpoints
-hits = client.search("get the latest live odds for a fixture")
-
-# call the top hit in recorded mode ($0, offline)
-result = client.call(hits[0]["name"], {"fixtureId": 123}, mode="recorded")
-print(result["method"], result["request"], result["status"])
-print(result["data"])   # schema-shaped sample
-```
-
-`search()` returns ranked entries (`name`, `summary`, `path`, `method`). `call()`
-returns `{status, request, method, data, mode}`. With a no-auth session, any operation
-that *requires* auth is automatically hidden from the agent — it can't satisfy it, so it
-never tries. For a paywalled API, pass a `Session` whose `auth_headers()` returns your
-credentials (BYOK) — the key is injected at call time and never reaches the agent.
-
-A complete forkable example — an app on *any* API in ~20 lines — lives in
-[`examples/_starter/`](https://github.com/GeckoVision/gecko-surf/tree/main/examples/_starter);
-for a full LLM agent (Telegram + a tool-use loop), see `examples/sos_vzla_bot/`.
-
-## 3. Falsify it offline first — $0 recorded mode
-
-`mode="recorded"` runs the **same code path** as live, but synthesizes the response from
-the API's own response schema instead of hitting the network. No keys, no subscription,
-no spend — so you can prove the agent picks the right call and builds a well-formed
-request *before* you go live.
-
-![$0 recorded mode — intent → the right capability → a first-call-correct request, proven offline](/images/recorded.gif)
-
-```bash
-git clone https://github.com/GeckoVision/gecko-surf
-cd gecko-surf && uv sync
-uv run pytest                       # 857 passing
-uv run python -m gecko.demo         # E2E: goal → discover → correct call → data (recorded, $0)
-```
-
-<Note>
-Recorded mode and the test suite need **no** API keys and **no** subscription. The
-recorded response is synthesized from the spec's response schema, so it proves the agent
-picked the right call and built a well-formed request — not that the upstream returned
-that exact data.
-</Note>
-
-<Note>
-**Recorded vs live — what unlocks live.** `python -m gecko.demo` (and `gecko serve`) run
-**recorded ($0)** *by default*, and **auto-switch to live** the moment a real session or
-credential is present — no flag to remember. The demo goes live when it finds a TxODDS
-session (`~/.gecko/txodds-session.json`, or `TXODDS_API_TOKEN` + `TXODDS_JWT`); a served
-API goes live once you've stored its key (`gecko auth set <api>`). So a recorded run means
-everything is set up correctly — you just haven't supplied a live credential yet. Live data
-for a **paid/gated** API also needs that provider's real session (e.g. TxODDS's on-chain
-subscription), which is separate from Gecko.
-</Note>
-
-## Prove it's correct — `gecko test`
-
-Generate and run first-call-correctness checks for every usable tool, offline:
-
-```bash
-gecko test https://api.example.com/openapi.json     # exits non-zero if any check fails
-gecko test <url> -o test_api_firstcall.py           # also writes a pytest module to commit
-```
-
-Each tool gets two checks — a well-formed first call (synthesized from the schema) and a
-required-field guard (dropping a required field is caught locally, not fired live). Integrate it
-into CI to catch drift the moment the API changes.
-
-## No OpenAPI? Comprehend the docs — `gecko from-docs`
-
-Not every painful API ships a spec. Point Gecko at the **doc site** and it recovers a draft
-OpenAPI, then comprehends it into agent tools:
-
-```bash
-gecko from-docs https://docs.some-api.com
-```
-
-See [From docs](/from-docs) for how the on-ramp works — and the honest review notes it emits
-for anything it couldn't pin down.
-
-## Going live
-
-Recorded mode needs nothing. For live data you pass a real `Session`; the call uses the
-**same code path**, differing only at the transport edge:
-
-```python
-from gecko import AgentApiClient
-
-client = AgentApiClient(spec, base_url="https://...", session=my_session)
-client.call(tool_name, args, mode="live")   # same path as recorded
-```
-
-See [Access & auth](/access-and-auth) for how a session is established and how the
-two-token handshake works.
+## Other ways in
+
+<CardGroup cols={2}>
+  <Card title="Claude Code plugin" icon="puzzle-piece">
+    Bundles the skills + a live demo surface.
+
+    ```
+    /plugin marketplace add GeckoVision/gecko-surf
+    /plugin install gecko-surf@geckovision
+    /make-agent-ready https://api.example.com/openapi.json
+    ```
+  </Card>
+  <Card title="Serve over MCP" icon="server">
+    Prints the MCP URL + one-click add strings, then serves the API.
+
+    ```bash
+    uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json
+    ```
+  </Card>
+  <Card title="Embed the SDK" icon="code">
+    For your own app or agent loop.
+
+    ```python
+    from gecko import AgentApiClient, public_session
+    client = AgentApiClient(spec, session=public_session())
+    hit = client.search("what you want")[0]
+    client.call(hit["name"], {...}, mode="recorded")
+    ```
+  </Card>
+  <Card title="No OpenAPI?" icon="file-magnifying-glass">
+    Recover a draft spec from the docs, then comprehend it.
+
+    ```bash
+    uv run gecko from-docs https://api.example.com/docs
+    ```
+
+    Review the draft (especially auth) before trusting it live.
+  </Card>
+</CardGroup>
+
+## Good to know
+
+<AccordionGroup>
+  <Accordion title="Is it safe to run? (verify before you execute)">
+    Nothing here pipes a remote script into a shell. Run in order and you never take an
+    unchecked step:
+
+    1. **Check (no side effects):** `npx @geckovision/gecko doctor` — read-only; reports your
+       setup and the exact next step.
+    2. **Dry-run ($0):** `gecko serve <url>` defaults to **recorded** — no request reaches the
+       real API, nothing is billed.
+    3. **Live:** add `--mode live` (and `gecko auth set` first for a keyed API).
+
+    Gecko is open-source (Apache-2.0), installed from a public registry **with a live SLSA
+    provenance attestation** tracing the package to its CI build — verifiable, not an opaque
+    script. Control-plane only: it never stores your responses or your keys.
+  </Accordion>
+
+  <Accordion title="Spec served off-host? (e.g. Colosseum Copilot)">
+    Gecko refuses to trust a spec's `servers[]` host when the spec was fetched from a
+    different origin (the token-exfil defense). Assert the real host yourself:
+
+    ```bash
+    npx @geckovision/gecko add \
+      https://raw.githubusercontent.com/GeckoVision/gecko-surf/main/gecko/examples/colosseum_copilot_openapi.json \
+      --base-url https://copilot.colosseum.com/api/v1 --mode live
+    ```
+
+    `add` prompts once for your PAT, seals it, pins the host, and connects in live mode. Drop
+    `--mode live` to falsify the calls offline first.
+  </Accordion>
+
+  <Accordion title="Which platforms get the npx binary?">
+    Linux (x64 + arm64) and Apple Silicon Macs — one command, no Python. On an Intel Mac or
+    Windows, use the Python path (same CLI, your system's own certificates):
+
+    ```bash
+    uvx gecko-surf add api.stripe.com                    # no install, needs Python/uv
+    pip install gecko-surf && gecko add api.stripe.com   # or a normal pip install
+    ```
+  </Accordion>
+
+  <Accordion title="Remote / hosted MCP?">
+    Serve behind an HTTPS tunnel with `--public-url https://<tunnel>` (trusted for the
+    Host/Origin guard). Gecko also runs a hosted surface at `mcp.geckovision.tech`.
+  </Accordion>
+
+  <Accordion title="Still V2 (designed, not built)">
+    A vectorized semantic index (today's catalog is lexical) and an auto-update job that
+    re-comprehends an API when it ships a new version. See [Stay correct](/stay-correct).
+  </Accordion>
+</AccordionGroup>
+
+<CardGroup cols={3}>
+  <Card title="How it works" icon="gears" href="/comprehension" />
+  <Card title="For API providers" icon="building" href="/for-providers" />
+  <Card title="Prove it's correct" icon="circle-check" href="/recorded-mode" />
+</CardGroup>
