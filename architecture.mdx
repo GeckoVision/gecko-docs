@@ -14,43 +14,9 @@ agent connects to the **MCP surface**; the engine comprehends the API once, then
 serves and calls it — injecting credentials at call time and staying out of the
 data path.
 
-```mermaid
-flowchart TB
-    AGENT(["Your AI agent<br/>Claude Code · Cursor · …"])
-
-    subgraph IDP["Identity plane · agent ↔ Gecko (hosted, optional)"]
-      LOGIN["gecko login<br/>email → OTP → sealed credential<br/>attribution + rate-limit · key in OS keychain"]
-    end
-
-    subgraph GECKO["Gecko comprehension engine — CONTROL PLANE · holds surface + tool defs + correctness metadata only (never payloads, user data, or secrets)"]
-      direction TB
-      MCP["MCP surface<br/>list_tools · call_tool · search_capabilities"]
-      subgraph ENGINE["comprehend the surface — once"]
-        direction LR
-        ING["ingest<br/>OpenAPI 3.x / from-docs<br/>→ Operation · Param"]
-        CAT["catalog<br/>intent → endpoint"]
-        TOOL["tools<br/>question-shaped · auth hidden"]
-        ING --> CAT --> TOOL
-      end
-      CALLER["caller<br/>tool + args → correct request"]
-      ACCESS["access · Session.auth_headers()<br/>the one API-agnostic seam"]
-      TOOL --> MCP --> CALLER --> ACCESS
-    end
-
-    subgraph PROV["Provider plane · Gecko ↔ third-party API"]
-      KEYS["credential resolver / BYOK<br/>key never leaves your machine"]
-      API[["the real provider API<br/>DATA PLANE"]]
-    end
-
-    AGENT -->|"1 · authenticate (hosted plane only)"| LOGIN
-    AGENT -->|"2 · intent (plain language)"| MCP
-    MCP -->|"result"| AGENT
-
-    ACCESS -->|"inject creds at call time"| KEYS
-    KEYS ==>|"live: authed request → provider's own host only"| API
-    API ==>|"response · Gecko stays out of the data path"| AGENT
-    ACCESS -.->|"recorded · $0 · response synthesized from schema (offline)"| AGENT
-```
+<Frame caption="Your agent connects to the MCP surface; Gecko comprehends the API once, then injects credentials at call time and stays out of the data path.">
+  <img src="/assets/architecture.svg" alt="Gecko flow — the agent states intent to the MCP surface; the control plane comprehends the API (ingest → catalog → tools) and the caller builds the request; access injects credentials at call time; in live mode the real API's data returns to the agent directly, never through Gecko; recorded mode synthesizes the response from the schema for $0 offline." />
+</Frame>
 
 Local `gecko add` stays **zero-login**; the identity plane gates only the hosted
 surface. In `recorded` mode the request is built and proven well-formed but the
