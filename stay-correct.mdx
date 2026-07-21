@@ -31,10 +31,9 @@ the cached comprehension and on **every** correctness record in the corpus.
 ![Editing one field flips surface_rev and regenerates the affected tool](/images/surfacerev.gif)
 
 <Warning>
-The loop below is **designed; the watcher, the op-level diff, and the alert are V2 and
-not yet shipped.** What *is* shipped: content-addressed surfaces, comprehension as a pure
-function of the spec, and the control-plane correctness corpus + validator replay. We
-won't pretend the cron job exists — the architecture just makes it a small addition, not
+The loop below is **on the roadmap; the watcher, the op-level diff, and the alert are V2.**
+What's shipped today: content-addressed surfaces, comprehension as a pure function of the
+spec, and the validator replay. The architecture makes the watcher a small addition, not
 a rewrite.
 </Warning>
 
