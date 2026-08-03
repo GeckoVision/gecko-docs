@@ -1,18 +1,21 @@
 ---
 title: Introduction
-description: Where agents and APIs finally speak the same language — point Gecko at any API and your agent calls it right the first time.
+description: The Swagger for agents — point Gecko at any API and your agent calls it right the first time.
 ---
 
 ## What Gecko is
 
-Docs and endpoints are built for humans. **Gecko is where agents and APIs finally
-speak the same language** — it translates any API into tools your agent calls right
-the first time. Point an agent at an API — even one behind human-shaped docs and a
+Docs and endpoints are built for humans. **Gecko is the Swagger for agents.** An
+OpenAPI tells a human what endpoints exist; Gecko turns that surface into tools your
+agent calls right the first time — not just *what* endpoints exist, but *which* calls,
+in *what* order, with auth handled and poison screened out. Point an agent at an API —
+even one behind human-shaped docs and a
 paywall — and it finds the right call, makes it correctly the first time, and runs.
 No client to hand-write, no key pasted into a config, no guessing whether the agent
 is calling it right.
 
-Three promises, one layer:
+Three promises — comprehension, comprehension-native security, and auth handled from
+day one — one layer:
 
 - **Right the first time** — Gecko reads the API before your agent calls it. Right
   endpoint, right parameters, right auth.
@@ -84,7 +87,7 @@ boundary, not a setting.
 ## What's live
 
 Comprehension is **live end-to-end on Solana mainnet** against a real paywalled API (the
-TxODDS World Cup API, 857 tests passing), and the same engine is proven keyless at scale:
+TxODDS World Cup API, 2,170+ tests passing), and the same engine is proven keyless at scale:
 **Stripe — 587 tools, 99.8% first-call-correct · Twilio — 100% · Jupiter — 100%** — with
 a **`$0` recorded mode** that runs the whole path offline. Ingest is OpenAPI 3.x, or a spec
 recovered from a docs page. See [Status](/status) for what's next.
@@ -103,5 +106,9 @@ recovered from a docs page. See [Status](/status) for what's next.
   </Card>
   <Card title="For AI agents" icon="robot" href="/mcp">
     The MCP surface an agent installs, and how Gecko makes an API discoverable.
+  </Card>
+  <Card title="The Program Surface" icon="link" href="/program-surface">
+    Comprehend a Solana program on-chain — recover the PDA seeds an IDL drops, derive
+    first-plan-correct.
   </Card>
 </CardGroup>

@@ -9,13 +9,14 @@ Comprehension is **live end-to-end on Solana mainnet** against a real, paywalled
 
 - ingest → catalog → question-shaped tools → access → first-call-correct request → real data
 - a **`$0` recorded mode** that runs the whole path offline — no subscription, no keys, no spend
-- **857 tests passing**, with a falsifiable first-call-correct scorecard
+- **2,170+ tests passing**, with a falsifiable first-call-correct scorecard
 - **API-agnostic by construction** — one adapter seam; a new API touches no engine code
 
 Ingest is OpenAPI 3.x, or a spec recovered from a docs page.
 
 ## What's next
 
+- **The Program Surface** — comprehending Solana programs on-chain (PDA-seed recovery, first-plan-correct derivation, compose-not-sign); proven on four mainnet programs. See [Program Surface](/program-surface).
 - **Multi-API correlations** — a spec-derived surface graph that plans the right *chain* of calls across APIs.
 - **Comprehension-native anti-poisoning** — provenance on every inferred edge, so a manipulated spec can't trick your agent.
 

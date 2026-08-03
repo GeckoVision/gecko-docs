@@ -37,8 +37,10 @@ own an API, start at [For API providers](/for-providers).
     - **Hosted MCP** — always-on endpoint, nothing to run or scale
     - **Drift-watch** — re-comprehend when your API changes, alert *before* your integrators break
     - **Access analytics** — first-call-correct rate, dark ops, failed→settled
-    - **Correctness corpus** — day-one-correct on a new API, from across the fleet
     - **Team** — shared surfaces, roles, audit, deploy-to-your-domain
+
+    *Explored V2 direction (not delivered): a cross-API correctness signal drawn from
+    across the fleet.*
   </Card>
 </CardGroup>
 
@@ -83,15 +85,15 @@ for recurring), or **card / fiat** via **Privy**, **abacatepay**, or Stripe. It'
 neutral seam, so the rail is a config choice, not a rewrite.
 
 And when it comes to *your* API getting paid by agents, we **compose** your rail — we point
-the tools at your x402 endpoint (**PayAI, Metera, or pay.sh**) as part of the setup. You keep
+the tools at your x402 endpoint (**PayAI, pay.sh, or a metering/billing rail**) as part of the setup. You keep
 every cent; **Gecko is never the payment rail and never a marketplace.**
 
 ## How we make money, plainly
 <Note>
   A flat monthly subscription per API we keep agent-correct and drift-watched — collected as
   our own fee, **never a cut of what agents pay you.** The engine developers use is free and
-  open source; the compounding **correctness corpus** is the moat. Metera meters it; Gecko
-  multiplies it.
+  open source. The moat is execution: comprehension + comprehension-native security + auth
+  handled day-one, combined — not a data corpus.
 </Note>
 
 ## Come build it with us

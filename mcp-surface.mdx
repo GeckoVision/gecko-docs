@@ -7,6 +7,9 @@ Gecko exposes an ingested API to an agent through the **Model Context Protocol
 (MCP)**. The surface is framework-agnostic and fully testable: it's a thin view over
 the client with two methods — `list_tools` and `call_tool`.
 
+A Solana [Program Surface](/program-surface) is served the same way, via
+`gecko-orquestra --program <name>`.
+
 <Tip>
 Want to see it without installing anything? Add a live, hosted surface to your agent:
 ```bash
