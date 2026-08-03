@@ -64,6 +64,9 @@ client, and the scripts are thin transport.
 | `gecko/evaluate.py` | task-based first-call-correct scorecard (top-1 / top-5 / well-formed) |
 | `gecko/demo.py` | `run()` (recorded, $0) + `live_demo()` |
 
+Gecko comprehends Solana programs the same way — see [The Program Surface](/program-surface)
+for the on-chain twin (PDA-seed recovery, compose-not-sign).
+
 ## The one seam that matters
 
 Adding a new API should not require touching ingest, catalog, tools, or the caller. The

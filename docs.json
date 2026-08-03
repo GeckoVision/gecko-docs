@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Gecko",
-  "description": "Gecko — where agents and APIs finally speak the same language. Point it at any API and your agent calls it right the first time: keys stay hidden on your machine, and a manipulated API can't trick your agent.",
+  "description": "Gecko is the Swagger for agents — point it at any API and your agent calls it right the first time: the right call, in the right order, with keys kept hidden and a manipulated API screened out.",
   "colors": {
     "primary": "#9945FF",
     "light": "#C77DFF",
@@ -35,6 +35,12 @@
               "recorded-mode",
               "access-and-auth",
               "stay-correct"
+            ]
+          },
+          {
+            "group": "On-chain",
+            "pages": [
+              "program-surface"
             ]
           },
           {

@@ -44,7 +44,8 @@ uv run python -m examples.txline_sharp_agent.story
     signal: `fixture 42 · Home 45.6% → 54.8% (+9.2pp) ⚡`.
   </Step>
   <Step title="Agent settles the market on TxLINE's Merkle proof — the wallet signs">
-    Every TxLINE call is **risk-scored** by the security gateway. The agent maps the 3-stage
+    The comprehended TxLINE surface is **anti-poisoning-checked** — a manipulated tool is
+    quarantined at comprehension, before the agent ever sees it. The agent maps the 3-stage
     Merkle proof onto the on-chain `validate_stat` instruction and the wallet signs the settle —
     the program never decides the outcome, the proof does.
   </Step>

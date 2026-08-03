@@ -14,13 +14,14 @@ We label everything. **Live** = run it today. **Building** = designed and in pro
 - **`$0` recorded mode** — falsify every call offline, from the schema, before you spend a token.
 - **Hosted MCP** — one-click add to Claude Code / Cursor / VS Code.
 - **Control-plane correctness corpus + replay** — call-outcome *metadata* (never payloads) that proves first-call-correctness.
+- **The Program Surface** — comprehend Solana programs on-chain, recovering the PDA seeds an IDL drops; proven on four mainnet programs. See [Program Surface](/program-surface).
 
 ## Building — V2, continuous correctness
 
 <Note>Designed, in progress. The primitives ship today; the scheduled pieces are being built.</Note>
 
 - **Stay-correct watcher** — notice when an API drifts, diff what moved, regenerate the tool defs, and tell you — *before* your agent breaks in prod. See [Stay correct](/stay-correct).
-- **The correctness corpus as a compounding asset** — every call teaches how to call an API right, so a new painful API is more first-call-correct because someone already paid the tax.
+- **Multi-API correlations + the feedback path** — joining surfaces so an agent can chain calls across APIs, and capturing call outcomes (control-plane metadata only) to prove first-call-correctness as a spec drifts. An honest frontier, not a data moat.
 - **Poisoning / tampering monitoring** — we treat every ingested spec and doc as **untrusted**. When a stable surface silently shifts — a moved auth location, a changed host, a dropped required field — we quarantine it and alert, instead of letting the agent fire a poisoned call.
 - **Vectorized semantic catalog · multi-API scale.**
 
@@ -29,14 +30,13 @@ We label everything. **Live** = run it today. **Building** = designed and in pro
 <Note>Unbuilt. If one of these is the reason you'd adopt, tell us below — it moves up.</Note>
 
 - **Trust & verification** — *"is this the **right** call, is this response **sane**?"*
-- **Cloud** — hosted always-on watcher jobs, drift + poisoning alerts, team entitlements, and the shared correctness corpus that makes an API you've never called **day-one-correct**.
+- **Cloud** — hosted always-on watcher jobs, drift + poisoning alerts, and team entitlements. Cross-API correctness signal is an explored V2 direction, not a delivered capability.
 
 ## Free vs Cloud
 
 The **`gecko-surf` engine is free and open-source, forever** — ingest, comprehend, first-call-correct
 tools, recorded mode, run it yourself. **Cloud** (hosted) adds what you don't want to operate: the
-always-on stay-correct watcher, drift + poisoning alerts, team entitlements, and the managed
-cross-customer corpus. Who pays, in one sentence: **the engine is free forever for builders; API
+always-on stay-correct watcher, drift + poisoning alerts, team entitlements, and the Agent-Readiness Scorecard + drift-watch. Who pays, in one sentence: **the engine is free forever for builders; API
 providers pay a flat per-API subscription for hosted, drift-watched, agent-ready surfaces** — and
 nobody ever pays us a cut of an API call ([For API providers](/for-providers)).
 

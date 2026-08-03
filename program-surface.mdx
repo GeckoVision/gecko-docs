@@ -1,0 +1,52 @@
+---
+title: The Program Surface (on-chain)
+description: The on-chain twin of the Agent Surface — comprehend a Solana program, recover the PDA seeds an IDL drops, and derive the accounts first-plan-correct.
+---
+
+## The same thesis, one layer down
+
+An HTTP API has an OpenAPI spec; a Solana program has an on-chain instruction↔account↔PDA
+graph. Both are surfaces an agent must understand before it can act — and both lose
+something the agent needs: an Anchor IDL (or an `llms.txt` built from one) **drops the PDA
+seed recipes**, so the agent derives the wrong accounts and the transaction fails.
+
+The **Program Surface** is Gecko's on-chain surface: it recovers those seed recipes from
+program source and derives the PDAs **first-plan-correct** — the accounts a naive IDL tool
+omits or gets wrong.
+
+## Gecko comprehends; the builder accesses
+
+Gecko does the **comprehension**, not the access. It recovers the dropped seeds and derives
+the accounts. [Orquestra](https://github.com/berkayoztunc/orquestra) does the **access** —
+it builds and submits the transaction against the program. Gecko fills the derivation gap
+and hands the plan to the builder to execute. **Gecko never signs** and never replaces the
+builder.
+
+<Note>
+Control plane, on-chain too: Gecko derives addresses and returns a plan. It holds no keys,
+signs nothing, and moves no funds — the same invariant as the HTTP path.
+</Note>
+
+## Proven on four mainnet programs
+
+Every derivation is verified against real mainnet accounts on a local `surfpool` fork —
+`$0`, read-only, no signing — each program with a gap a naive IDL tool gets wrong:
+
+| Program | The gap Gecko fills |
+|---|---|
+| Meteora DLMM | a helper-seeded root PDA the IDL drops |
+| Pump.fun | a seed read from inside another account's data |
+| ORE | a cross-program account the IDL mis-owns |
+| MetaDAO | an IDL that declares no PDA seeds at all |
+
+## Serve one
+
+```bash
+uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program meteora --stdio
+```
+
+## Safe to sign
+
+Gecko's anti-poisoning verdict can gate a downstream custody/signing layer: it refuses to
+sign for a tool Gecko quarantined, so the key holder only ever signs what Gecko cleared.
+Gecko comprehends the call; the builder builds it; the vault signs it.
