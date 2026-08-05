@@ -1,6 +1,6 @@
 ---
 title: Concepts
-description: The vocabulary behind Gecko — surface, operation, question-shaped tool, session, and the two run modes.
+description: The vocabulary — surface, graph, provenance, receipt, drift, question-shaped tool, session, and the two run modes.
 ---
 
 A small, precise vocabulary runs through the whole system. Learn these and the rest of
@@ -16,12 +16,72 @@ returns. Gecko ingests the surface and nothing more — this is the basis of the
 A **Program Surface** is the on-chain analog — a Solana program's instruction↔PDA graph
 with the seeds an IDL drops recovered. See [The Program Surface](/program-surface).
 
+Every surface is treated as **untrusted input**, whether it came from a provider's spec,
+a docs page, an IDL, or program source.
+
+## Graph
+
+A surface tells you what exists. A **graph** tells you what depends on what — which call
+must happen before which, which account must be derived before another can be, which
+field from one response keys a call to a different API.
+
+Gecko's graphs are what the agent **traverses instead of guessing**. Two of them:
+
+- The **surface graph** — operations, their relationships, and cross-API joins.
+- The **program graph** — instructions, accounts, and the dependency-ordered derivation
+  those accounts require.
+
+## Provenance
+
+The tag on every edge and every account, from a **closed** vocabulary. Never a free-text
+justification, never a fabrication.
+
+| On-chain | Meaning |
+|---|---|
+| `EXTRACTED` | read directly off the surface |
+| `RECOVERED` | not on any public surface — reconstructed from source, or resolved empirically |
+| `FLAGGED` | unknown. Named explicitly and never dropped. |
+
+| HTTP | Meaning |
+|---|---|
+| `EXTRACTED` | in the spec |
+| `DECLARED` | stated by the provider (e.g. a vendor extension) |
+| `INFERRED` | derived by Gecko from structure |
+| `CLAIMED` → `VERIFIED` / `REFUTED` | asserted in prose, then checked against reality |
+
+Provenance is the honesty mechanism. If Gecko doesn't know, it says `FLAGGED` — it does
+not fill the hole.
+
+## Overlay
+
+The measured artifact of comprehension: for an auto-comprehended program, the explicit
+list of facts that could **not** be derived from any public surface. It quantifies the
+gap between "what the IDL says" and "what it takes to act" — per program.
+
+## Receipt
+
+The output of simulating a built transaction on a $0 mainnet fork, *before money moves*:
+`status` (pass/fail), a **categorical** `revert_class`, `units_consumed`, best-effort
+deltas, and an honest `network_label`. A fork Receipt is never presented as mainnet
+truth, and a Receipt never predicts price. See [The Receipt](/receipt).
+
+## Corpus and drift
+
+The **corpus** is Gecko's episodic memory: categorical call outcomes from closed
+vocabularies (`observed` / `reported` / `synthetic` / `simulated` tiers) — status class,
+revert family, compute units, a values-free recipe hash. **Never** a payload, a pubkey,
+an amount, or a log line. Recording is an explicit opt-in; the default is record nothing.
+
+**Drift** is the N-confirmed signal derived from it: "clean at slot S, reverts at S′."
+It is how you learn a provider broke you without waiting for a production incident.
+Read it back with `gecko drift <series>`. See [Stay correct](/stay-correct).
+
 ## Operation
 
-A single callable endpoint, normalized from the spec into a typed record: method,
-path, `operation_id`, summary/description, tags, parameters, request body, responses,
-and security. Local `$ref`s are resolved (with cycle and depth guards) so each
-operation is self-contained.
+A single callable endpoint, normalized from the spec into a typed record: method, path,
+`operation_id`, summary/description, tags, parameters, request body, responses, and
+security. Local `$ref`s are resolved (with cycle and depth guards) so each operation is
+self-contained.
 
 ## Parameter
 
@@ -31,16 +91,17 @@ location is what lets the caller place each agent-supplied value in the right sp
 
 ## Catalog
 
-The "find the right endpoint" layer. It does lexical search over each operation's
-surface text (summary, description, path, tags, id), with summary matches weighted
-highest. At the scale of tens of endpoints this is more accurate and far simpler than
-vector search — vectorization is a deliberately deferred multi-API concern.
+The "find the right starting point" layer — lexical, token-overlap scoring over each
+operation's surface text, summary weighted highest. **No vectors:** the graph never
+*approximately* remembers, and BM25 and semantic tiers sit behind evidence gates that
+flip only on measured recall failure. On-chain, the same engine powers
+[`find_start`](/find-start).
 
 ## Question-shaped tool
 
-The comprehension payload: an operation rendered as an agent-reasonable tool
-definition — a name, a question-shaped description, and a JSON-Schema input. Two
-decisions separate it from a raw OpenAPI dump:
+The comprehension payload: an operation rendered as an agent-reasonable tool definition —
+a name, a question-shaped description, and a JSON-Schema input. Two decisions separate it
+from a raw OpenAPI dump:
 
 - **Auth is hidden.** Authorization-style headers are removed from the agent-facing
   input. The agent only sees decision-relevant inputs.
@@ -48,22 +109,28 @@ decisions separate it from a raw OpenAPI dump:
   locations ride along so the caller can build a real request without re-parsing the
   spec.
 
-Each tool also carries `requires_auth` and the `auth_schemes` it references, so a
-session with no credentials can hide operations it could never satisfy.
+Each tool also carries `requires_auth` and the `auth_schemes` it references, so a session
+with no credentials can hide operations it could never satisfy.
+
+## Plan
+
+Procedural memory as **typed, executable JSON** — a `landing_plan`, a
+`derivation_order` — not prose an LLM has to re-read and re-interpret. A builder can run
+a plan directly. Text loses the join; typed data can't.
 
 ## Session
 
 The access/auth seam. Any object with `auth_headers() -> dict[str, str]` is a valid
 session. A paywalled API returns its tokens; a public API returns an empty dict. The
-agent never sees these headers — Gecko injects them at call time. See
-[Access & auth](/access-and-auth).
+agent never sees these headers — Gecko injects them at call time from your OS keychain.
+See [Access &amp; auth](/access-and-auth).
 
 ## Caller
 
-Turns a question-shaped tool plus the agent's arguments into a correct HTTP request:
-it places each value in the right location (path / query / header), injects the hidden
-auth headers, and **catches the failure the agent can't see** — like a missing
-required path parameter — instead of firing a malformed call.
+Turns a question-shaped tool plus the agent's arguments into a correct HTTP request: it
+places each value in the right location (path / query / header), injects the hidden auth
+headers, and **catches the failure the agent can't see** — like a missing required path
+parameter — instead of firing a malformed call.
 
 ## Modes: recorded vs live
 
@@ -74,11 +141,16 @@ Gecko runs one code path in two modes:
 | `recorded` | none | $0 | response synthesized from the response schema — falsifiable offline |
 | `live` | yes | per the API | the real upstream response |
 
-They differ **only at the transport edge**. See [Recorded mode](/recorded-mode).
+They differ **only at the transport edge**. Recorded is the default; live requires a
+credential you set explicitly. See [Recorded mode](/recorded-mode).
 
 ## First-call-correct
 
 The bar Gecko holds itself to: given a natural-language goal, retrieve the right
 operation and build a **well-formed** request for it on the first try — no trial calls,
 no malformed requests the agent can't diagnose. A built-in evaluation scores retrieval
-(top-1 / top-5) and request well-formedness against a task set.
+(top-1 / top-5) and request well-formedness against a task set, and `gecko test <spec>`
+turns that into a suite you can fail a build on.
+
+First-call-correctness is a **proof point**, not the headline. The headline is the graph:
+provenance you can audit, and a receipt before money moves.

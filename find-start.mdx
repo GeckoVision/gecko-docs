@@ -1,0 +1,133 @@
+---
+title: find_start — intent to starting point
+description: The hardest part isn't making the call, it's knowing where to start. find_start routes a plain intent to the right (program, instruction) with a provenance-tagged derive plan — and says "no start found" rather than guessing.
+---
+
+The hardest thing for an agent acting against an unfamiliar surface is not making the
+call. It is knowing **where to start** among N programs × dozens of instructions, or N
+endpoints across a 600-operation spec.
+
+Gecko has two routers for that, one engine underneath.
+
+| Router | Question it answers | Surface |
+|---|---|---|
+| `search_capabilities` | "which endpoint fits this intent?" | any comprehended HTTP API |
+| `find_start` | "which (program, instruction) do I start at, and what do I derive first?" | on-chain program surfaces |
+
+Both score lexically, by token overlap between the intent and the surface text. **No
+vectors.** At this scale lexical retrieval is more accurate and fully deterministic — the
+graph never *approximately* remembers. BM25 and semantic tiers sit behind evidence gates
+that flip only on measured recall failure, fed by a misrank-aware evaluation (a golden
+set plus a closed miss-cause vocabulary). Misses are instrumented **categorically** —
+never the intent text.
+
+## The API catalog
+
+```python
+catalog.search("get live odds for a fixture", limit=5)
+# → ranked CatalogEntry list, highest score first
+```
+
+Over MCP the same thing is a synthetic tool your agent calls first:
+
+```json
+{
+  "name": "search_capabilities",
+  "description": "Find which endpoint/tool fits a natural-language intent. Returns ranked tool names you can then call.",
+  "inputSchema": {
+    "type": "object",
+    "properties": { "query": { "type": "string" } },
+    "required": ["query"]
+  }
+}
+```
+
+Operations the current [session](/access-and-auth) could never satisfy are not listed at
+all, so the agent never burns a call on them. See [The MCP surface](/mcp-surface).
+
+## find_start, on-chain
+
+```bash
+gecko orquestra find-start "buy token X on pump"
+```
+
+Exit code `0` means a start was found; `1` is an honest no-start.
+
+It returns, per ranked candidate:
+
+- **The start point** — `program/instruction`, its `program_id`, the score, and which
+  tokens matched.
+- **A dependency-ordered derive plan** — every account in the order you must derive it,
+  each carrying a **provenance tag**.
+- **Declared preludes** — the instructions that must ride along for the transaction to
+  land (idempotent ATA creation with the Token-2022 resolution note, compute budget).
+- **Flagged gaps** — facts Gecko will not guess, named explicitly so you resolve them
+  before building.
+- **An execute pointer** — the external builder's URL. Orquestra builds; Gecko never
+  signs or broadcasts.
+
+The shape of the output (scores and the full account list vary per intent and per
+program — run it to see yours):
+
+```text
+START 1. pumpfun/plan_buy — score <n> (matched: buy, pump, token)
+    program_id: 6EF8rrecthR5Dkzon8Nwu78hRvfCKubJ14M5uBEwF6P
+    next tool:  plan_buy
+    derive plan (dependency-ordered):
+     1. global                       [extracted]
+     2. bonding_curve                [extracted]
+     3. associated_bonding_curve     [extracted]
+     4. associated_user              [extracted]
+     5. creator_vault                [recovered]
+     6. bonding_curve_v2             [recovered]
+    preludes (DECLARED):
+      - create_idempotent_ata: … removes the AnchorError 3012 revert …
+      - compute_budget: SetComputeUnitLimit + SetComputeUnitPrice …
+    flagged gaps (honest — resolve before building):
+      ! fee_recipient: …
+    execute:    POST https://…/build (Orquestra builds; Gecko never signs or broadcasts)
+```
+
+## Provenance is the point
+
+Every account in the plan carries one of three closed tags:
+
+| Tag | Meaning |
+|---|---|
+| `extracted` | read directly off the surface (the IDL, the spec) |
+| `recovered` | **not on any public surface** — reconstructed from program source or resolved empirically |
+| `FLAGGED` | Gecko does not know it, and says so. Never dropped, never invented. |
+
+`recovered` is where the value is. `bonding_curve_v2` is required by Pump.fun's `buy`
+and never appears in the IDL. Meteora's `base_factor` seed was added by the SDK in 2024
+and the deprecated three-seed scheme derives **the wrong pool, silently**. A tool that
+only reads the IDL cannot know either.
+
+On the HTTP side the vocabulary is richer, because docs make claims:
+`EXTRACTED` > `DECLARED` > `INFERRED` > `CLAIMED` → `VERIFIED` / `REFUTED`. A claim
+recovered from a docs page stays `CLAIMED` until a probe verifies or refutes it. See
+[From docs](/from-docs).
+
+## The honesty floor
+
+Below the retrieval floor `find_start` returns **`NO START FOUND`** and labels the
+closest candidates as `GUESS` — never dressed up as starts. A nonsense intent cannot
+clear the floor on stopword overlap alone.
+
+This is the same rule as the rest of the system: an unknown is `FLAGGED`, not
+fabricated.
+
+## Not built yet
+
+Catalog **breadth** is the open frontier: 4,500 projects are listed, 4 are wired deep.
+For an unwired project, `find_start` returns it as a **catalog candidate** with the
+comprehend-first command rather than pretending it has a plan. See [Status](/status).
+
+<CardGroup cols={2}>
+  <Card title="The Program Surface" icon="link" href="/program-surface">
+    What a program surface is, and the four mainnet programs it's proven on.
+  </Card>
+  <Card title="The Receipt" icon="receipt" href="/receipt">
+    Once you have the plan: simulate it to a receipt before anything is signed.
+  </Card>
+</CardGroup>

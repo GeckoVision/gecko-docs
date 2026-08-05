@@ -1,114 +1,141 @@
 ---
 title: Introduction
-description: The Swagger for agents — point Gecko at any API and your agent calls it right the first time.
+description: The knowledge graph for APIs your agent can trust. Open-source, runs on your machine — one command maps any API into a verified graph your agent traverses instead of guessing.
 ---
 
-## What Gecko is
+**The knowledge graph for APIs your agent can trust.**
 
-Docs and endpoints are built for humans. **Gecko is the Swagger for agents.** An
-OpenAPI tells a human what endpoints exist; Gecko turns that surface into tools your
-agent calls right the first time — not just *what* endpoints exist, but *which* calls,
-in *what* order, with auth handled and poison screened out. Point an agent at an API —
-even one behind human-shaped docs and a
-paywall — and it finds the right call, makes it correctly the first time, and runs.
-No client to hand-write, no key pasted into a config, no guessing whether the agent
-is calling it right.
+Open-source. Runs on your machine. One command maps any API — even the messy,
+paywalled, or on-chain ones — into a verified graph your agent **traverses instead of
+guessing**. Every action can be simulated to a **receipt** before money moves. Built
+for the calls your agent must not get wrong.
 
-Three promises — comprehension, comprehension-native security, and auth handled from
-day one — one layer:
+```bash
+npx @geckovision/gecko doctor              # 1. check your environment
+npx @geckovision/gecko add <spec-or-docs>  # 2. comprehend it — $0, no live call
+npx @geckovision/gecko report <spec>       # 3. get the scorecard — grade + findings
+npx @geckovision/gecko serve <spec>        # 4. your agent uses it over MCP
+```
 
-- **Right the first time** — Gecko reads the API before your agent calls it. Right
-  endpoint, right parameters, right auth.
-- **Keys stay hidden** — your key lives on your machine and is used only at the
-  moment of the call, sent only to the API's own host. Never in a file, never
-  inside the agent.
-- **Poison gets caught** — a manipulated API (a doctored description, a poisoned
-  example) is screened and quarantined before your agent ever sees it.
-
-![gecko comprehends an API and prints the MCP URL + one-click add strings](/images/hero.gif)
+<Frame caption="Untrusted surfaces → a provenance knowledge graph → verified action: simulate to a receipt, then hand off to an external signer.">
+  <img src="/assets/architecture.png" alt="Gecko architecture — untrusted surfaces (OpenAPI, docs, Anchor IDLs, program source) pass an anti-poison gate into comprehension, become provenance-tagged knowledge graphs, are projected as MCP tools, and reach action only through plan → external build → simulate → receipt → signing gate → external signer." />
+</Frame>
 
 <Note>
 The brand is **Gecko**. The PyPI package is **`gecko-surf`** (`pip install gecko-surf`),
 the import is **`gecko`** (`from gecko import …`), and the CLI is **`gecko`**.
 </Note>
 
-Today a builder reads the docs, hand-writes a client, and **still can't tell if the
-agent is calling the API correctly.** Gecko removes that step. It ingests an API's
-*surface* (an OpenAPI spec, or one recovered from a docs page), turns it into
-question-shaped, first-call-correct agent tools, drives the access/auth handshake,
-and lets the agent call the **real API directly** for data.
+## Why a graph and not a wrapper
 
-## Where Gecko sits — three verbs, three layers
+An OpenAPI says what exists. An IDL says what a program looks like. Neither is enough
+to act:
+
+- **Docs drift.** Working integrations broke twice in 2026 from silent layout changes.
+- **IDLs drop facts.** A required Pump.fun account never appears in the IDL at all.
+- **Agents guess.** A wrong guess posts a charge, reverts a transaction, burns fees.
+
+Gecko replaces the guess with a graph.
+
+<CardGroup cols={2}>
+  <Card title="Provenance on every edge" icon="fingerprint">
+    Every fact is tagged `extracted` from the surface, `recovered` from source, or
+    honestly `flagged` as unknown. Never fabricated. Below the retrieval floor, Gecko
+    says "no start found" instead of inventing one.
+  </Card>
+  <Card title="The receipt" icon="receipt">
+    An action is simulated on a $0 mainnet fork first, producing a **Receipt**: pass,
+    or a categorical revert class — before any spend. See [The Receipt](/receipt).
+  </Card>
+  <Card title="Drift" icon="wave-square">
+    Outcomes land in a categorical corpus; an N-confirmed drift series flags when a
+    provider ships a change that breaks a working call. See [Stay correct](/stay-correct).
+  </Card>
+  <Card title="Auth invisible to the agent" icon="eye-slash">
+    Keys are injected at call time from your OS keychain. The model never sees a
+    credential, and no key goes in `mcp.json`. See [Access &amp; auth](/access-and-auth).
+  </Card>
+</CardGroup>
+
+## Who this is for
+
+Two axes — **either one qualifies**:
+
+- **A messy surface** — paywalled, drifting, undocumented, or on-chain. The Nth painful
+  API your coding agent does not one-shot.
+- **A high-stakes action** — your agent runs unattended, holding credentials or moving
+  money.
+
+**Clean API, and a human reviewing the diff? You may not need us — and that's fine.**
+Gecko earns its place where a wrong call costs something.
+
+## Proof, not promises
+
+Live, on a **surfpool mainnet fork** (a mainnet-backed state snapshot — **not mainnet**),
+simulation only, $0, nothing signed or broadcast:
+
+| Case | Naive path | Gecko |
+|---|---|---|
+| Pump.fun buy | ❌ reverts — `AccountNotInitialized (3012)` | ✅ lands — 86,669 CU |
+| Meteora DLMM swap | ❌ reverts — derive-only, no ATA/wrap/bin-array preludes | ✅ wrap → swap → unwrap — 81,964 CU |
+| Meteora pool derivation | ❌ stale 3-seed scheme → the wrong pool, silently | ✅ correct 4-seed derivation, differential-proven |
+| Docs-only API (no spec) | agent invents endpoints | ✅ draft spec recovered, claims marked `VERIFIED` / `REFUTED` |
+
+The facts behind those passes are not on any surface: a 4th PDA seed the SDK added in
+2024, an account the IDL only mentions in prose, a fee field resolved by a refuting
+simulation. That is the graph your agent traverses.
+
+<Note>
+Compute-unit numbers are **measured per run** against a fork snapshot and vary slightly
+with on-chain state. The stable claim is the side-by-side verdict: the naive path's
+revert class vs Gecko's pass. The `base_factor` row is a **derivation** result — it has
+no CU number and is never paired with one.
+</Note>
+
+## Where Gecko sits
+
+Gecko is **not the agent** and **not an orchestrator**. It is the memory-and-context
+substrate *under* other people's agents: it comprehends external surfaces, projects them
+as first-call-correct tools over MCP, verifies actions by simulation before execution,
+and **never signs, never broadcasts, never stores payloads**.
 
 There are three distinct jobs in the agentic economy. Gecko does exactly one.
 
-| Layer | What it does | Examples |
-|---|---|---|
-| APIs get **PAID** | billing / settlement rail | x402, payment rails |
-| skills get **DISTRIBUTED** | marketplace / discovery | skill marketplaces |
-| **APIs get USED** | **comprehension / consumption** | **Gecko** |
+| Layer | What it does |
+|---|---|
+| APIs get **PAID** | billing / settlement rail |
+| skills get **DISTRIBUTED** | marketplace / discovery |
+| **APIs get USED** | **comprehension, verification, memory** — Gecko |
 
-Gecko **composes on top of** x402 / MCP / payment catalogs — it *consumes* them as
-input. It is **not** a payment rail and **not** a marketplace. It is the layer that
-makes an API actually *usable* by an agent.
-
-## What it does, in one path
-
-<Steps>
-  <Step title="Ingest the surface">
-    Parse an OpenAPI 3.x document into normalized operations and parameters — the
-    *surface only* (method, path, params, schemas). Never the response data.
-  </Step>
-  <Step title="Catalog">
-    Build a capability list so an agent can go from natural-language intent to the
-    right endpoint. Lexical at this scale; no vectors.
-  </Step>
-  <Step title="Comprehend">
-    Turn each operation into a question-shaped tool an agent picks correctly with no
-    API docs in front of it. Auth headers are hidden from the agent.
-  </Step>
-  <Step title="Access">
-    Drive the access/subscription handshake. The whole engine/adapter seam is one
-    function: `Session.auth_headers()`.
-  </Step>
-  <Step title="Call">
-    The agent calls the real API directly; Gecko injects credentials and stays out
-    of the data path.
-  </Step>
-</Steps>
+Gecko **composes on top of** MCP, x402, and payment catalogs — it *consumes* them as
+input. It is not a payment rail and not a marketplace. Building transactions belongs to
+builders; signing belongs to signers. That is the design, not a gap.
 
 ## Control plane, never data plane
 
-Gecko holds the API's *surface*, the generated tool defs, and *correctness
-metadata*. It **never** stores response payloads, user data, or secrets. That
-invariant is what lets it ingest an API's surface unilaterally — and it is a hard
-boundary, not a setting.
-
-## What's live
-
-Comprehension is **live end-to-end on Solana mainnet** against a real paywalled API (the
-TxODDS World Cup API, 2,170+ tests passing), and the same engine is proven keyless at scale:
-**Stripe — 587 tools, 99.8% first-call-correct · Twilio — 100% · Jupiter — 100%** — with
-a **`$0` recorded mode** that runs the whole path offline. Ingest is OpenAPI 3.x, or a spec
-recovered from a docs page. See [Status](/status) for what's next.
+Gecko holds the API's *surface*, the generated tool defs, and *correctness metadata*. It
+**never** stores response payloads, user data, or secrets. That invariant is what lets it
+ingest a surface unilaterally — and it is a hard boundary, not a setting.
 
 ## Next
 
 <CardGroup cols={2}>
   <Card title="Quickstart" icon="rocket" href="/quickstart">
-    Run the $0 recorded demo — goal to correct call to data, no keys, no spend.
+    doctor → add → report → serve. The $0 recorded path — no key, no spend.
+  </Card>
+  <Card title="Architecture" icon="diagram-project" href="/architecture">
+    The three views, with the interactive diagrams.
+  </Card>
+  <Card title="The Receipt" icon="receipt" href="/receipt">
+    What a Receipt asserts — and, in detail, what it deliberately does not.
+  </Card>
+  <Card title="find_start" icon="compass" href="/find-start">
+    Intent → the right starting point, with a provenance-tagged derive plan.
   </Card>
   <Card title="Concepts" icon="book-open" href="/concepts">
-    The vocabulary: surface, operation, question-shaped tool, session, modes.
+    Surface, provenance, receipt, drift, question-shaped tool, the two modes.
   </Card>
-  <Card title="How comprehension works" icon="gears" href="/comprehension">
-    Ingest, catalog, and the question-shaped tool generator, tied to the real code.
-  </Card>
-  <Card title="For AI agents" icon="robot" href="/mcp">
-    The MCP surface an agent installs, and how Gecko makes an API discoverable.
-  </Card>
-  <Card title="The Program Surface" icon="link" href="/program-surface">
-    Comprehend a Solana program on-chain — recover the PDA seeds an IDL drops, derive
-    first-plan-correct.
+  <Card title="Status" icon="list-check" href="/status">
+    What works today, and what is honestly not built yet.
   </Card>
 </CardGroup>

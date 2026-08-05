@@ -45,9 +45,13 @@ catalog.search("get live odds for a fixture", limit=5)
 ```
 
 It can also group capabilities by tag and emit a human/agent-readable capability map.
-This is **lexical, not vector** search: at tens of endpoints it is more accurate and
-far simpler than vector RAG. Vectorization is a deliberately deferred multi-API / large-API
-concern, not part of V1.
+
+This is **lexical, not vector** search, and that is a design choice rather than a
+milestone: the graph never *approximately* remembers. BM25 and semantic tiers both sit
+behind evidence gates that flip only on **measured** lexical recall failure — fed by a
+misrank-aware evaluation (a golden set plus a closed miss-cause vocabulary). One measured
+negative result on embeddings is already on record. See [find_start](/find-start) for the
+on-chain twin of this router and the honesty floor it enforces.
 
 ## 3. Comprehend — the question-shaped tool
 

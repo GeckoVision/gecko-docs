@@ -1,0 +1,117 @@
+---
+title: The Receipt
+description: Simulate before money moves. What a Receipt asserts, what it deliberately does NOT, and the two paths to get one.
+---
+
+A **Receipt** is the output of Gecko's simulate engine. It closes a built transaction
+into one legible, honest verdict — **before any money moves**.
+
+The loop: intent → derive the full account set → external build → unsigned prelude
+assembly → `simulateTransaction` on a $0 mainnet fork → **Receipt** → a fail-closed
+signing gate. Only a passing Receipt reaches a signer, and the signer is never Gecko.
+
+## What a Receipt asserts
+
+- **Would this transaction LAND** against a *snapshot* of on-chain state (`status`:
+  `pass` / `fail`), via `simulateTransaction` (`sigVerify:false`,
+  `replaceRecentBlockhash:true`, `commitment:"processed"`).
+- **Why it wouldn't**, as a **categorical `revert_class`** — a stable string vocabulary:
+  `slippage`, `custom_program_error:<code>`, `insufficient_funds`, `account_error`,
+  `other`. Never a fabricated dollar number.
+- **Compute units** consumed (`units_consumed`).
+- **Best-effort deltas**: `sol_delta` (post − pre lamports for the first tracked account)
+  and `tokens_received` (only when a token account is tracked and decodable — otherwise
+  `None`, never guessed).
+- A **`network_label`** honesty caveat, present on every Receipt.
+
+## What a Receipt does NOT do
+
+<Warning>
+Read this section before you build a policy on top of a Receipt. These limits are
+deliberate, not gaps we intend to close by loosening the claim.
+</Warning>
+
+- It does **not predict price or slippage** — only whether the tx lands against a
+  snapshot.
+- A fork/RPC result is **NOT mainnet** — the `network_label` says so; a surfpool-fork
+  Receipt is never presented as mainnet truth.
+- It says **nothing about send-time blockhash validity** — the simulation uses
+  `replaceRecentBlockhash:true`, so the real transaction must take a fresh blockhash at
+  sign time (the builder/lander's job); a passing Receipt can still expire before it is
+  signed.
+- It does **not quote a priority fee** — `SetComputeUnitPrice` defaults to 0 in the
+  simulated bundle; landing under mainnet load needs a fee the operator (or builder)
+  supplies. The Receipt's `units_consumed` is the honest input for the CU *limit*, not
+  the price.
+- It **stores nothing** — the Receipt is returned to the caller and persisted nowhere
+  (the control-plane invariant). No payload, pubkey, or log line is written.
+- It **never signs and never broadcasts** — `simulateTransaction` only. No keypair, no
+  `sendTransaction`. Mainnet broadcast stays a separate, human-run step.
+
+## Two paths to a Receipt
+
+<CardGroup cols={2}>
+  <Card title="Path A — Gecko runs it" icon="play">
+    Hand a built plan (with `fee_recipient` supplied) to the `simulate` MCP tool on the
+    program surface; it builds, simulates, and returns the Receipt. One tool call, no
+    glue code.
+  </Card>
+  <Card title="Path B — self-serve" icon="wrench">
+    `plan_buy` returns a `simulate` recipe block — fill `fee_recipient`, POST `build_url`
+    to get the tx, then run `simulateTransaction` yourself. You own the loop; Gecko
+    supplies the correct account set and the recipe.
+  </Card>
+</CardGroup>
+
+Either path, `fee_recipient` stays an **honest gap**: Gecko will not guess it; the caller
+supplies it.
+
+## The proof
+
+Two live side-by-sides, both on a **surfpool mainnet fork** — a mainnet-backed state
+snapshot, **not mainnet** — simulation only, $0, nothing signed, nothing broadcast,
+nothing stored.
+
+| Case | Naive path | Gecko |
+|---|---|---|
+| Pump.fun `buy` | ❌ reverts — `account_error`, `AccountNotInitialized (3012)` | ✅ passes — 86,669 CU |
+| Meteora DLMM `swap` | ❌ reverts — derive-only, no ATAs/wrap/bin-arrays | ✅ wrap → swap → unwrap — 81,964 CU |
+| Meteora pool derivation | ❌ stale 3-seed scheme derives the wrong pool, silently | ✅ correct 4-seed derivation, differential-proven |
+
+The Pump.fun run reverts on the buyer's uninitialized ATA. The Gecko bundle passes
+because it carries a curve-quoted `max_sol_cost`, the recovered `bonding_curve_v2`, the
+buyback fee-recipient remaining accounts, an idempotent-ATA prelude, and a compute
+budget. The Meteora run exercises the full native-SOL bundle: both ATAs idempotent, wSOL
+wrap, the swap with the three bitmap-selected `bin_array` remaining accounts the IDL
+never names, and a `CloseAccount` unwrap — one unsigned simulated transaction.
+
+<Note>
+Compute-unit numbers are **measured per run** against a fork snapshot and can vary
+slightly with on-chain state. The stable claim is the side-by-side verdict — the naive
+path's revert class vs Gecko's pass. The `base_factor` derivation row is a separate
+result and carries no CU number.
+</Note>
+
+Both runs are re-runnable from the engine repo (they need `surfpool` on `PATH` and a
+mainnet RPC), and their verbatim output is recorded in
+[`docs/proofs.md`](https://github.com/GeckoVision/gecko-surf/blob/main/docs/proofs.md).
+
+## Recording an outcome (opt-in)
+
+A run can append its **categorical** outcome — status, revert family plus public code,
+compute units, slot, network category, and a values-free recipe hash; never a pubkey,
+amount, or log — to a segregated series. The default is **record nothing**; it takes an
+explicit `record_to` opt-in.
+
+```bash
+gecko drift path/to/simulated.jsonl   # exit 0 = stable, 1 = drift detected
+```
+
+That series is the episodic memory behind [Stay correct](/stay-correct).
+
+## What's not built yet
+
+The signing gate today is **verdict-based**: it gates on a passing Receipt. Binding the
+gate to the exact simulated message hash, and the TEE credential backend, are **not
+built** — see [Status](/status). Hosted point-and-simulate is not built either; the
+engine runs locally.

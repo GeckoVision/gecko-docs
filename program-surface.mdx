@@ -45,8 +45,32 @@ Every derivation is verified against real mainnet accounts on a local `surfpool`
 uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program meteora --stdio
 ```
 
+Not sure where to start? Route an intent to the right (program, instruction) first:
+
+```bash
+gecko orquestra find-start "swap SOL for USDC on meteora"
+```
+
+See [find_start](/find-start) for the provenance-tagged derive plan it returns.
+
+## Simulate before you spend
+
+A derived account set is not yet a landed transaction. The plan goes to an external
+builder, Gecko assembles the unsigned preludes, simulates on a $0 mainnet fork, and
+returns a **[Receipt](/receipt)** — pass, or a categorical revert class — before any
+signature exists.
+
+That loop is live-proven twice: a Pump.fun buy where the naive derive-only path reverts
+with `AccountNotInitialized (3012)` and Gecko's bundle passes at 86,669 CU, and a Meteora
+DLMM swap (wrap → swap across live bins → unwrap) at 81,964 CU. Both on a surfpool
+mainnet fork — a mainnet-backed snapshot, **not mainnet** — simulation only, $0, nothing
+signed or broadcast.
+
 ## Safe to sign
 
 Gecko's anti-poisoning verdict can gate a downstream custody/signing layer: it refuses to
 sign for a tool Gecko quarantined, so the key holder only ever signs what Gecko cleared.
 Gecko comprehends the call; the builder builds it; the vault signs it.
+
+The gate today is **verdict-based**. Binding it to the exact simulated message hash is
+[not built yet](/status).

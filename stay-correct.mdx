@@ -1,6 +1,6 @@
 ---
 title: Stay correct
-description: What happens when the upstream API changes — content-addressed surfaces, the regenerable-tool model, and the corpus tripwire. The watcher is V2.
+description: Drift — knowing when a provider breaks you. Content-addressed surfaces, the regenerable-tool model, the categorical corpus, and the N-confirmed drift detector. The scheduler is not built yet.
 ---
 
 It's Saturday. Nobody shipped anything. Your agent is down anyway — upstream renamed a
@@ -31,35 +31,60 @@ the cached comprehension and on **every** correctness record in the corpus.
 ![Editing one field flips surface_rev and regenerates the affected tool](/images/surfacerev.gif)
 
 <Warning>
-The loop below is **on the roadmap; the watcher, the op-level diff, and the alert are V2.**
-What's shipped today: content-addressed surfaces, comprehension as a pure function of the
-spec, and the validator replay. The architecture makes the watcher a small addition, not
-a rewrite.
+Honest split. **Shipped:** content-addressed surfaces, comprehension as a pure function
+of the spec, the categorical corpus, and the N-confirmed **drift detector**
+(`gecko drift`). **Not built:** the **scheduler** — the cadence that re-checks without you
+running anything — and the op-level diff report. Today the series accrues only when runs
+happen. See [Status](/status).
 </Warning>
 
 ## The stay-correct loop
 
 <Steps>
-  <Step title="Notice — V2">Poll the spec URL, take a provider webhook, or re-scrape the docs.</Step>
+  <Step title="Notice — detector shipped, scheduler not built">Re-fetch the spec, or re-simulate a known-good action. Doing this **on a cadence** is the piece we're building.</Step>
   <Step title="Re-fingerprint — shipped">Recompute `surface_rev`. Unchanged? Nothing happened, stop.</Step>
   <Step title="Re-ingest — shipped">Run the same comprehension engine on the new spec.</Step>
-  <Step title="Diff — V2">Old `surface_rev` vs new: what params were added, removed, renamed, retyped; what endpoints moved.</Step>
-  <Step title="Regenerate + flag — regen shipped, report V2">Emit the new tool defs and a human-readable changelog of what moved.</Step>
+  <Step title="Diff — report not built">Old `surface_rev` vs new: what params were added, removed, renamed, retyped; what endpoints moved.</Step>
+  <Step title="Regenerate — shipped">Emit the new tool defs from the new surface.</Step>
 </Steps>
 
-## The corpus is your early-warning system
+## The second signal: drift the spec never announced
 
-There's a second drift signal that doesn't need the spec to change — because providers
-don't always tell you. Every call your agent makes through Gecko logs a
-**control-plane-only** outcome: status class, error class, first-call-correct or not, and
-the `surface_rev` it ran against — **never** the response body, a param value, or a token
-(the writer is a fail-closed allowlist). When a tool that was first-call-correct for ten
-thousand calls starts returning `422` / `404` under the same `surface_rev`, the corpus
-tells you *something moved* before a human files a bug.
+Providers don't always tell you. The surface can stay byte-identical while the behaviour
+underneath moves — a tightened validation, a re-deployed program, a changed default.
+`surface_rev` sees none of that.
+
+So Gecko keeps a second, behavioural signal: the **categorical corpus**.
+
+A run can append its outcome to a series — status class, revert family plus public error
+code, compute units, slot, network category, and a values-free recipe hash. **Never** the
+response body, a param value, a pubkey, an amount, a log line, or a token. That's not a
+policy: the writer is a fail-closed allowlist, closed-vocabulary and audited.
+
+<Note>
+**Recording is opt-in and the default is record nothing.** It takes an explicit
+`record_to` on the run. Gecko does not silently observe your traffic — and it can't,
+because in the normal path your agent calls the API directly and Gecko is not in the data
+path at all.
+</Note>
+
+Gecko can also **generate its own episodes** rather than depending on your traffic: it
+re-simulates a known-good action and records the categorical result. That's what makes
+the drift signal work on-chain — "clean at slot S, reverts at S′" — without ever touching
+your data plane.
+
+Read the series back:
+
+```bash
+gecko drift path/to/simulated.jsonl   # exit 0 = stable, 1 = drift detected
+```
+
+Drift is **N-confirmed**: a single anomalous run is noise, not a verdict. It takes N
+confirmations before the detector calls it.
 
 ## In one line
 
 A hand-written client makes *you* the diffing engine: read the changelog, edit the code,
-hope you caught everything before Saturday. Gecko makes the **spec** the source of truth
-and the **tools a regenerable function of it** — so a change propagates instead of
-rotting, and the corpus warns you when the surface moves under a spec that never changed.
+hope you caught everything before Saturday. Gecko makes the **surface** the source of
+truth and the **tools a regenerable function of it** — so a change propagates instead of
+rotting — and the corpus catches the drift that never showed up in a spec at all.

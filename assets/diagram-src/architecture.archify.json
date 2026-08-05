@@ -1,0 +1,364 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Gecko \u2014 Full Architecture",
+    "subtitle": "Untrusted surfaces \u2192 provenance knowledge \u2192 verified action. Gecko never builds the production tx, never signs.",
+    "output": "gecko-full.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "comprehend-rail",
+        "label": "Comprehension rail",
+        "focus": [
+          "sources",
+          "gate",
+          "comprehend",
+          "knowledge",
+          "projection"
+        ],
+        "note": "Everything ingested is untrusted until sanitized; knowledge carries provenance tags (extracted / recovered / flagged)."
+      },
+      {
+        "id": "verify-rail",
+        "label": "Verify rail",
+        "focus": [
+          "agent",
+          "planner",
+          "builder",
+          "simulate",
+          "signgate",
+          "signer"
+        ],
+        "note": "External builder builds; Gecko simulates to a Receipt. The gate is verdict-based today \u2014 message-hash binding is planned, not built."
+      },
+      {
+        "id": "memory-loop",
+        "label": "Memory loop",
+        "focus": [
+          "simulate",
+          "corpusdrift",
+          "knowledge"
+        ],
+        "note": "Every simulation outcome lands as a categorical record; the drift series feeds comprehension back \u2014 self-generated episodic memory."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "sources",
+      "type": "external",
+      "label": "Untrusted Sources",
+      "sublabel": "OpenAPI \u00b7 IDL \u00b7 4,500-project catalog",
+      "pos": [
+        40,
+        140
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "gate",
+      "type": "security",
+      "label": "Anti-Poison Gate",
+      "sublabel": "sanitize \u00b7 quarantine \u00b7 Skill Guard",
+      "pos": [
+        290,
+        140
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "comprehend",
+      "type": "backend",
+      "label": "Comprehension",
+      "sublabel": "ingest \u00b7 seed recovery \u00b7 overlays",
+      "pos": [
+        540,
+        140
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "knowledge",
+      "type": "database",
+      "label": "Provenance Knowledge",
+      "sublabel": "extracted / recovered / flagged",
+      "pos": [
+        790,
+        140
+      ],
+      "size": [
+        180,
+        64
+      ]
+    },
+    {
+      "id": "projection",
+      "type": "frontend",
+      "label": "Projection",
+      "sublabel": "MCP \u00b7 CLI \u00b7 Scorecard",
+      "pos": [
+        1050,
+        140
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "external",
+      "label": "The Agent",
+      "sublabel": "intent in \u00b7 context out",
+      "pos": [
+        1280,
+        140
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "planner",
+      "type": "backend",
+      "label": "Planner",
+      "sublabel": "account set \u00b7 state reads \u00b7 preludes",
+      "pos": [
+        1280,
+        400
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "builder",
+      "type": "external",
+      "label": "Orquestra /build",
+      "sublabel": "external builder",
+      "pos": [
+        1010,
+        400
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "simulate",
+      "type": "backend",
+      "label": "Simulate \u2192 Receipt",
+      "sublabel": "surfpool \u00b7 $0 \u00b7 never signs",
+      "pos": [
+        740,
+        400
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "signgate",
+      "type": "security",
+      "label": "Signing Gate",
+      "sublabel": "fail-closed",
+      "pos": [
+        480,
+        400
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "signer",
+      "type": "external",
+      "label": "Signer",
+      "sublabel": "wallet \u00b7 TEE \u00b7 founder",
+      "pos": [
+        250,
+        400
+      ],
+      "size": [
+        130,
+        64
+      ]
+    },
+    {
+      "id": "corpusdrift",
+      "type": "database",
+      "label": "Corpus + Drift",
+      "sublabel": "categorical only",
+      "pos": [
+        740,
+        590
+      ],
+      "size": [
+        170,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Gecko control plane \u2014 stores surfaces + correctness metadata, never payloads",
+      "wraps": [
+        "gate",
+        "comprehend",
+        "knowledge",
+        "projection",
+        "planner",
+        "simulate",
+        "signgate",
+        "corpusdrift"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "ingest-flow",
+      "from": "sources",
+      "to": "gate",
+      "variant": "security"
+    },
+    {
+      "id": "gate-comprehend",
+      "from": "gate",
+      "to": "comprehend",
+      "variant": "emphasis"
+    },
+    {
+      "id": "comprehend-knowledge",
+      "from": "comprehend",
+      "to": "knowledge",
+      "variant": "emphasis"
+    },
+    {
+      "id": "knowledge-projection",
+      "from": "knowledge",
+      "to": "projection",
+      "variant": "emphasis"
+    },
+    {
+      "id": "projection-agent",
+      "from": "projection",
+      "to": "agent",
+      "label": "context",
+      "variant": "emphasis"
+    },
+    {
+      "id": "agent-intent",
+      "from": "agent",
+      "to": "planner",
+      "label": "intent",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "plan-to-build",
+      "from": "planner",
+      "to": "builder",
+      "label": "declared plan",
+      "variant": "emphasis"
+    },
+    {
+      "id": "build-to-sim",
+      "from": "builder",
+      "to": "simulate",
+      "label": "built ix",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sim-to-gate",
+      "from": "simulate",
+      "to": "signgate",
+      "label": "pass (verdict)",
+      "variant": "security"
+    },
+    {
+      "id": "gate-to-signer",
+      "from": "signgate",
+      "to": "signer",
+      "label": "sign",
+      "variant": "security"
+    },
+    {
+      "id": "sim-outcome",
+      "from": "simulate",
+      "to": "corpusdrift",
+      "label": "outcome",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 40
+    },
+    {
+      "id": "drift-back",
+      "from": "corpusdrift",
+      "to": "knowledge",
+      "label": "drift",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom",
+      "via": [
+        [
+          200,
+          622
+        ],
+        [
+          200,
+          300
+        ],
+        [
+          880,
+          300
+        ]
+      ]
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Comprehension rail",
+      "items": [
+        "Seed recovery beats the IDL (#4057)",
+        "Auto-comprehend + measured overlays",
+        "Every edge provenance-tagged"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Verify rail \u2014 proven live",
+      "items": [
+        "pump buy: naive \u274c3012 \u2192 Gecko \u2705 86,669 CU",
+        "Meteora swap: wrap\u2192swap\u2192unwrap \u2705 81,964 CU",
+        "Receipt before money moves, $0"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Hard boundaries",
+      "items": [
+        "Never signs, never broadcasts",
+        "Builder + signer are compose partners",
+        "Control plane only \u2014 no payloads stored"
+      ]
+    }
+  ]
+}
