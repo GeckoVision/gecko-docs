@@ -16,9 +16,17 @@ npx @geckovision/gecko serve <spec>        # 4. your agent uses it over MCP
 Or install once:
 
 ```bash
-uv tool install "gecko-surf[serve]"        # or: pip install "gecko-surf[serve]"
+npm install -g @geckovision/gecko          # prebuilt binary — no Python needed
+uv tool install "gecko-surf[serve]"        # or pip, if you want the Python package
+
 gecko add <spec-or-docs>
 ```
+
+<Note>
+`npm install -g` ships a prebuilt binary for macOS and Linux, so the CLI works with no
+Python toolchain at all. Install the PyPI package instead when you want to import
+`gecko` in your own code (`from gecko import AgentApiClient`).
+</Note>
 
 <Note>
 **Handing these docs to a coding agent?** Point it at
