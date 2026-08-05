@@ -1,0 +1,95 @@
+---
+title: A production API
+description: What changed when an agent was pointed at a 43-operation stablecoin API — asked in plain Portuguese, answered on the first call, with no key.
+---
+
+[Pegana](https://api.pegana.xyz) is Brazilian stablecoin infrastructure on Solana: peg
+state, depeg simulation, loop exposure, webhook keys — **43 operations across 39 paths**,
+in production, used by real money.
+
+It is also a *good* API. Run through our agent-readiness scorecard it grades **A
+(99/100)** — first-call-correct 100, security 100, hygiene 98, agent-friendliness 98.
+
+That matters for everything below. What follows is not a list of things Pegana got wrong.
+It is a list of things **no specification can carry, at any version, at any quality** —
+which is exactly why a good API is the honest place to show them.
+
+<Note>
+Every number on this page is measured from a real run against the live API. The
+scorecard, the compression figure, and the cross-API join were all produced by the
+commands in [quickstart](/quickstart) — nothing is estimated.
+</Note>
+
+---
+
+## The question is the interface
+
+**Before.** An agent that wants a stablecoin's peg state has to know Pegana exists, work
+out which of 43 operations answers that question, find that the path is
+`/v1/assets/{mint}/state`, and handle authentication. Each of those is a separate chance
+to guess wrong, and every wrong guess costs a round trip and a slice of the context
+window.
+
+**After.** The question *is* the interface. Asked in plain Portuguese —
+
+```
+qual o peg state do USDC?
+```
+
+it resolved to `GET /v1/assets/USDC/state` and came back:
+
+```
+USDC PEGGED   $0.99975
+```
+
+First call, live, **no API key** — the operation is public, and Gecko knows which ones
+are because auth is resolved per operation at call time rather than assumed for the whole
+surface. The agent never sees a credential either way.
+
+## The join lives between two APIs
+
+**Before.** "Is the stablecoin in this headline still pegged, and what is it trading at?"
+is one question that spans three surfaces — a news feed, Pegana, and a price source. The
+fact that joins them is a token mint. No specification can declare a relationship to a
+specification it has never heard of, so the join has to live somewhere else.
+
+**After.** The mint join across **Pegana ↔ Birdeye ↔ Jupiter** is declared once, confirmed
+against real responses, and then the composed chain plans correctly — offline, keyless,
+$0, before a single live call is made.
+
+That is the difference between a list of tools and a graph: the agent doesn't rediscover
+the connection on every task, and it doesn't invent one that isn't there.
+
+## The context bill
+
+**Before.** Pointing an agent at a 43-operation API means the raw surface competes with
+the actual task for the context window. The agent spends budget reading about the API
+instead of using it.
+
+**After.** **78.4% compression** on this spec — measured, not estimated.
+
+The number is the least interesting part. Shrinking a spec is easy if you're willing to
+drop things; the constraint that makes it worth anything is that **first-call-correctness
+is held while you do it**. Compression that starts producing wrong calls has not saved
+you tokens, it has moved the cost somewhere harder to see.
+
+---
+
+## What actually changed
+
+Not the model. Not the agent. Not Pegana's API — which grades A.
+
+**What the call was built from.**
+
+<CardGroup cols={2}>
+<Card title="Try the live surface" icon="terminal">
+```bash
+npx @geckovision/gecko report https://api.pegana.xyz/openapi.json
+```
+</Card>
+<Card title="Or connect the hosted one" icon="plug" href="/mcp-surface">
+```
+mcp.geckovision.tech/pegana/mcp
+```
+</Card>
+</CardGroup>
