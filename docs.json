@@ -2,7 +2,7 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Gecko",
-  "description": "The knowledge graph for APIs your agent can trust. Open-source, runs on your machine. One command maps any API — even the messy, paywalled, or on-chain ones — into a verified graph your agent traverses instead of guessing. Every action can be simulated to a receipt before money moves.",
+  "description": "The knowledge graph for APIs your agent can trust. Open-source, runs on your machine. One command maps any API \u2014 even the messy, paywalled, or on-chain ones \u2014 into a verified graph your agent traverses instead of guessing. Every action can be simulated to a receipt before money moves.",
   "colors": {
     "primary": "#9945FF",
     "light": "#C77DFF",
@@ -41,6 +41,7 @@
           {
             "group": "On-chain",
             "pages": [
+              "use-cases",
               "program-surface",
               "receipt"
             ]

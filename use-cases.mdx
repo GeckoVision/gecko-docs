@@ -1,0 +1,132 @@
+---
+title: Four programs
+description: What happened when an agent tried to call four live Solana programs on its own — and what changed once it could check first.
+---
+
+Four programs on Solana mainnet: **Pump.fun**, **Meteora DLMM**, **ORE**, and **MetaDAO**.
+Each one published a machine-readable surface. Each one is used in production every day.
+We pointed an agent at all four and asked the same question: *can it make this call?*
+
+Nobody's API was wrong. Every one of them was **incomplete in a way the agent could not
+see** — and the agent had only one way to find out.
+
+<Note>
+Every number below came from a run against a live surfpool mainnet fork — no signature,
+no broadcast, $0. A fork is not mainnet, and compute units vary per run. The commands to
+reproduce each one are in [proofs](https://github.com/GeckoVision/gecko-surf/blob/main/docs/proofs.md).
+</Note>
+
+---
+
+## Pump.fun — the account that exists only in prose
+
+**Before.** An agent reads the IDL, assembles the sixteen accounts it names, and submits
+a buy. The transaction reverts: `AccountNotInitialized (3012)`. The buyer has never held
+this token, so their token account doesn't exist yet — and nothing in the schema says it
+must. The agent had no way to know, and only one way to find out.
+
+A sell is worse. It reverts with `InvalidBondingCurveV2 (6074)` **after** transferring the
+tokens. The account it's missing, `bonding_curve_v2`, is required — but it appears nowhere
+in the IDL's account list. It's mentioned once, in a sentence, in a doc comment.
+
+**After.** Gecko recovers that account's derivation and reads the buyer's state to decide
+whether the token account needs creating. It also reads a boolean at byte 82 of the bonding
+curve to know whether this is a cashback coin — which changes the account count from 16 to
+17. The plan is handed to the builder, simulated, and comes back:
+
+```
+buy   ✓ PASS   86,670 CU
+sell  ✓ PASS   50,783 CU
+```
+
+## Meteora DLMM — the pool that couldn't be found
+
+**Before.** The agent asks the builder to derive `lb_pair`, the pool account every swap
+starts from. The answer: **"no PDA seeds."** Not a wrong address — no address at all. The
+seed recipe uses a helper function, and Anchor's IDL format has no slot for that
+([issue #4057](https://github.com/solana-foundation/anchor/issues/4057), confirmed by a
+maintainer). Nothing downstream can be derived, so nothing can be built.
+
+There was a second, quieter problem. The pool derivation gained a fourth seed in 2024.
+A tool using the old three-seed recipe doesn't error — **it derives a different pool, silently.**
+
+**After.** Gecko recovers the seed recipe from the SDK source, including the fourth seed,
+and derives the pool that actually holds the liquidity. Then it reads the pool's liquidity
+bitmap to select which bin arrays the swap will cross — the obvious guess (the active bin
+and its neighbours) points at accounts that don't exist. Wrap, swap, unwrap:
+
+```
+swap  ✓ PASS   81,964 CU
+```
+
+## ORE — when the published spec disagrees with the program
+
+**Before.** ORE is built with Steel, not Anchor, so there is no generated IDL. The project
+publishes one by hand, and the builder serves it. An agent following it produces a
+transaction that transfers the tokens and then dies: **`writable privilege escalated`.**
+
+The published spec marks the `board` account read-only. The deployed program writes to it.
+We checked the last 193 mainnet instructions of one kind: **193 of 193** carried two
+accounts the spec doesn't list. An argument is missing entirely. A struct is 208 bytes off.
+
+This is the sharpest version of the problem, because nothing here is fixable by reading
+more carefully. **A valid document can disagree with reality, and only reality settles it.**
+
+**After.** Gecko takes the account roles from the deployed program's source, corrects the
+metadata the spec got wrong, and refuses to plan a claim for an authority the program will
+reject rather than hand back something that looks fine and isn't:
+
+```
+claim  ✓ PASS   41,023 CU
+```
+
+## MetaDAO — nothing to derive at all
+
+**Before.** The builder's PDA finder returns **zero** accounts for this program. Not partial
+— none. The published IDL carries no seed recipes, so an agent cannot construct the call in
+the first place. There's no revert to debug, because there's no transaction to submit.
+
+**After.** Gecko recovers all three account derivations from the deployed program's source
+and assembles the full account set.
+
+Then something honest happened: **the naive path also lands here.** Once the accounts are
+filled in, the raw instruction succeeds — this funder already held the token account, and
+the program creates its own funding record. MetaDAO's gap isn't a missing prelude. It's that
+you cannot derive the accounts at all.
+
+```
+fund  ✓ PASS   44,476 CU        (and the naive path lands too, once the accounts exist)
+```
+
+We keep that in the set because the true story per program is whatever is true. Three of
+these four reverted. One didn't. Pretending otherwise would make the other three less
+believable.
+
+---
+
+## What actually changed
+
+Not the model. Not the agent. Not anyone's API.
+
+**The information the call was built from — and the chance to try it before it counted.**
+
+| | Before | After |
+|---|---|---|
+| Pump.fun | reverts (3012 / 6074) | ✓ 86,670 CU · 50,783 CU |
+| Meteora | pool cannot be derived | ✓ 81,964 CU |
+| ORE | writable privilege escalated | ✓ 41,023 CU |
+| MetaDAO | nothing to derive | ✓ 44,476 CU |
+
+Every account in those plans carries where it came from — `extracted` from the published
+surface, `recovered` from program source, or `flagged` when we genuinely don't know. A
+flagged account is never guessed.
+
+**Gecko comprehends the call. [Orquestra](https://github.com/berkayoztunc/orquestra) builds
+the transaction. A vault signs it.** We never hold a key, never sign, and never broadcast —
+the simulation runs on an unsigned transaction, which is the whole point.
+
+<Card title="Try it" icon="terminal" href="/quickstart">
+```bash
+uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program pumpfun --stdio
+```
+</Card>
