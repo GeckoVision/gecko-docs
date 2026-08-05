@@ -1,0 +1,310 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "Gecko \u2014 Context Engineering",
+    "subtitle": "The memory substrate under other people's agents \u2014 semantic, procedural, episodic, working",
+    "output": "gecko-context.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "semantic-path",
+        "label": "Semantic memory",
+        "focus": [
+          "surfaces",
+          "comprehend",
+          "knowledge",
+          "catalog"
+        ],
+        "note": "Untrusted surfaces become provenance-tagged knowledge; retrieval is lexical and deterministic \u2014 no vectors by evidence-gated choice."
+      },
+      {
+        "id": "procedural",
+        "label": "Procedural memory",
+        "focus": [
+          "tooldefs",
+          "plans",
+          "working"
+        ],
+        "note": "Tools and plans are typed, executable data \u2014 not prose an LLM re-reads."
+      },
+      {
+        "id": "episodic-loop",
+        "label": "Episodic loop",
+        "focus": [
+          "working",
+          "corpus",
+          "drift",
+          "knowledge"
+        ],
+        "note": "Outcomes are stored as categories only, and Gecko generates its own episodes by re-simulating \u2014 the drift series feeds knowledge back."
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "surfaces",
+      "type": "external",
+      "label": "Untrusted Surfaces",
+      "sublabel": "OpenAPI \u00b7 IDL \u00b7 source",
+      "pos": [
+        40,
+        300
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "comprehend",
+      "type": "backend",
+      "label": "Comprehension",
+      "sublabel": "ingest \u00b7 pda_extract",
+      "pos": [
+        260,
+        300
+      ],
+      "size": [
+        140,
+        64
+      ],
+      "tag": "semantic"
+    },
+    {
+      "id": "knowledge",
+      "type": "database",
+      "label": "Provenance Graphs",
+      "sublabel": "surface \u00b7 program \u00b7 joins",
+      "pos": [
+        480,
+        300
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "semantic"
+    },
+    {
+      "id": "catalog",
+      "type": "database",
+      "label": "Lexical Catalog",
+      "sublabel": "BM25-shaped, no vectors",
+      "pos": [
+        710,
+        300
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "semantic"
+    },
+    {
+      "id": "working",
+      "type": "backend",
+      "label": "Working Projection",
+      "sublabel": "just-in-time \u00b7 \u221277/\u221289% tokens",
+      "pos": [
+        940,
+        300
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "agent",
+      "type": "external",
+      "label": "The Agent",
+      "sublabel": "Claude Code \u00b7 Bankr \u00b7 MCP",
+      "pos": [
+        1220,
+        300
+      ],
+      "size": [
+        140,
+        64
+      ]
+    },
+    {
+      "id": "tooldefs",
+      "type": "backend",
+      "label": "Tool Defs",
+      "sublabel": "question-shaped, auth hidden",
+      "pos": [
+        710,
+        130
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "procedural"
+    },
+    {
+      "id": "plans",
+      "type": "backend",
+      "label": "Typed Plans",
+      "sublabel": "landing_plan \u00b7 derive order",
+      "pos": [
+        940,
+        130
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "procedural"
+    },
+    {
+      "id": "corpus",
+      "type": "database",
+      "label": "Categorical Corpus",
+      "sublabel": "closed vocab, no payloads",
+      "pos": [
+        940,
+        480
+      ],
+      "size": [
+        160,
+        64
+      ],
+      "tag": "episodic"
+    },
+    {
+      "id": "drift",
+      "type": "backend",
+      "label": "Drift Series",
+      "sublabel": "N-confirmed re-simulation",
+      "pos": [
+        710,
+        480
+      ],
+      "size": [
+        150,
+        64
+      ],
+      "tag": "episodic"
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "Gecko \u2014 the substrate (control plane only)",
+      "wraps": [
+        "comprehend",
+        "knowledge",
+        "catalog",
+        "working",
+        "tooldefs",
+        "plans",
+        "corpus",
+        "drift"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "sanitize-ingest",
+      "from": "surfaces",
+      "to": "comprehend",
+      "label": "sanitize first",
+      "variant": "security"
+    },
+    {
+      "id": "comprehend-to-knowledge",
+      "from": "comprehend",
+      "to": "knowledge",
+      "variant": "emphasis"
+    },
+    {
+      "id": "knowledge-indexed",
+      "from": "knowledge",
+      "to": "catalog",
+      "variant": "emphasis"
+    },
+    {
+      "id": "topk-slice",
+      "from": "catalog",
+      "to": "working",
+      "label": "top-k slice",
+      "variant": "emphasis"
+    },
+    {
+      "id": "context-loop",
+      "from": "working",
+      "to": "agent",
+      "label": "context",
+      "variant": "emphasis"
+    },
+    {
+      "id": "tools-project",
+      "from": "tooldefs",
+      "to": "working",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "plans-project",
+      "from": "plans",
+      "to": "working",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top"
+    },
+    {
+      "id": "outcomes-down",
+      "from": "working",
+      "to": "corpus",
+      "label": "outcomes",
+      "variant": "dashed",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 40
+    },
+    {
+      "id": "corpus-to-drift",
+      "from": "corpus",
+      "to": "drift"
+    },
+    {
+      "id": "drift-feedback",
+      "from": "drift",
+      "to": "knowledge",
+      "label": "what changed",
+      "variant": "dashed",
+      "fromSide": "left",
+      "toSide": "bottom"
+    }
+  ],
+  "cards": [
+    {
+      "dot": "cyan",
+      "title": "Semantic \u2014 deterministic",
+      "items": [
+        "Lexical retrieval, never approximate",
+        "Vector tier evidence-gated OFF"
+      ]
+    },
+    {
+      "dot": "emerald",
+      "title": "Procedural \u2014 typed",
+      "items": [
+        "Plans are executable JSON",
+        "Text loses the join; ours doesn't"
+      ]
+    },
+    {
+      "dot": "rose",
+      "title": "Episodic \u2014 categorical",
+      "items": [
+        "Categories only, never payloads",
+        "Self-generated by re-simulation"
+      ]
+    }
+  ]
+}

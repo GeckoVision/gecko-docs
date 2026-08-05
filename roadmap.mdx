@@ -1,55 +1,88 @@
 ---
 title: Roadmap
-description: What's live, what's coming, and what we'll never build. We label everything — no vaporware on this page.
+description: Live, building, exploring — and what we'll never build. Everything is labeled; the full honest split lives on Status.
 ---
 
-We label everything. **Live** = run it today. **Building** = designed and in progress.
-**Exploring** = we want your input before we commit. No vaporware on this page.
+We label everything. **Live** = run it today. **Building** = in progress, and we say so
+in the present tense, not the past. **Exploring** = we want your input before we commit.
+No vaporware on this page.
 
-## Live today — V1, comprehension
+The exhaustive, honest split — including everything **not** built — is on
+[Status](/status). This page is the direction.
 
-- **Ingest any OpenAPI → first-call-correct MCP tools** (`gecko <url>`). Run it now.
-- **`gecko from-docs`** — an API with no OpenAPI? Point it at the doc site → a draft spec → agent tools. See [From docs](/from-docs).
-- **Invisible auth** — the credential is injected at call time, never in the tool defs, never seen by the agent.
-- **`$0` recorded mode** — falsify every call offline, from the schema, before you spend a token.
+## Live today
+
+- **Any surface → a verified graph.** OpenAPI, human docs, `llms.txt`, Anchor IDLs, raw
+  program source. One command: `gecko add <spec-or-docs>`.
+- **Provenance on every edge** — `extracted` / `recovered` / `flagged` on-chain;
+  `EXTRACTED` → `DECLARED` → `INFERRED` → `CLAIMED` → `VERIFIED` / `REFUTED` on HTTP.
+- **`find_start`** — intent → the right starting point, with a dependency-ordered derive
+  plan and an honest no-start below the retrieval floor. See [find_start](/find-start).
+- **simulate → Receipt** — a $0 fork simulation before money moves, live-proven twice.
+  See [The Receipt](/receipt).
+- **Invisible auth** — the credential lives in your OS keychain and is injected at call
+  time. Never in a tool def, never in `mcp.json`, never in the model's context.
+- **`$0` recorded mode** — falsify every call offline, from the schema, before you spend
+  a token.
+- **The Scorecard** — `gecko report <spec>`: a grade plus the specific findings.
+- **Correctness in CI** — `gecko test <spec>`.
+- **Seven fail-closed security layers**, including an AST-enforced never-sign boundary.
+- **The categorical corpus + an N-confirmed drift detector** — `gecko drift <series>`.
 - **Hosted MCP** — one-click add to Claude Code / Cursor / VS Code.
-- **Control-plane correctness corpus + replay** — call-outcome *metadata* (never payloads) that proves first-call-correctness.
-- **The Program Surface** — comprehend Solana programs on-chain, recovering the PDA seeds an IDL drops; proven on four mainnet programs. See [Program Surface](/program-surface).
 
-## Building — V2, continuous correctness
+## Building
 
-<Note>Designed, in progress. The primitives ship today; the scheduled pieces are being built.</Note>
+<Note>In progress. The primitives ship today; the scheduled pieces are being built.</Note>
 
-- **Stay-correct watcher** — notice when an API drifts, diff what moved, regenerate the tool defs, and tell you — *before* your agent breaks in prod. See [Stay correct](/stay-correct).
-- **Multi-API correlations + the feedback path** — joining surfaces so an agent can chain calls across APIs, and capturing call outcomes (control-plane metadata only) to prove first-call-correctness as a spec drifts. An honest frontier, not a data moat.
-- **Poisoning / tampering monitoring** — we treat every ingested spec and doc as **untrusted**. When a stable surface silently shifts — a moved auth location, a changed host, a dropped required field — we quarantine it and alert, instead of letting the agent fire a poisoned call.
-- **Vectorized semantic catalog · multi-API scale.**
+- **The drift scheduler.** The detector works and the series reads back; we are building
+  the cadence that re-simulates on a schedule so the series accrues without you running
+  anything. Until then it accrues only when runs happen.
+- **Catalog breadth.** 4,500 projects are listed and 4 are wired deep; we are widening
+  the auto-comprehend path so more of the catalog resolves without hand-authoring.
+  Non-Anchor generalization is proven once.
+- **Binding the signing gate to the simulated message hash.** Today's gate is
+  verdict-based. We are building `evaluate_tx` so the gate proves the thing being signed
+  is the exact thing that was simulated.
+- **Hosted point-and-simulate**, and hosted program surfaces beyond the first.
 
-## Exploring — V3, trust + Cloud
+## Exploring
 
-<Note>Unbuilt. If one of these is the reason you'd adopt, tell us below — it moves up.</Note>
+<Note>Unbuilt. If one of these is the reason you'd adopt, tell us — it moves up.</Note>
 
-- **Trust & verification** — *"is this the **right** call, is this response **sane**?"*
-- **Cloud** — hosted always-on watcher jobs, drift + poisoning alerts, and team entitlements. Cross-API correctness signal is an explored V2 direction, not a delivered capability.
-
-## Free vs Cloud
-
-The **`gecko-surf` engine is free and open-source, forever** — ingest, comprehend, first-call-correct
-tools, recorded mode, run it yourself. **Cloud** (hosted) adds what you don't want to operate: the
-always-on stay-correct watcher, drift + poisoning alerts, team entitlements, and the Agent-Readiness Scorecard + drift-watch. Who pays, in one sentence: **the engine is free forever for builders; API
-providers pay a flat per-API subscription for hosted, drift-watched, agent-ready surfaces** — and
-nobody ever pays us a cut of an API call ([For API providers](/for-providers)).
+- **A semantic/vector retrieval tier.** Deliberately OFF behind an evidence gate. It
+  flips only on **measured** lexical recall failure, not fashion — and one measured
+  negative result on embeddings is already on record.
+- **Cross-customer episodic pooling.** Tenancy is local-only until a consent and egress
+  layer exists that we'd be willing to defend.
+- **Response-level trust.** *"Is this response sane?"* — deliberately downstream of
+  comprehension and verification.
 
 ## What we'll never build
 
 So the labels above stay credible:
 
-- **No browsable provider marketplace.** Point us at the OpenAPI URL — the flow is identical for every API.
-- **No payment rail, no custody** of your funds or your provider keys. We compose x402 / pay.sh; the provider charges you directly.
-- **No storage of your API responses, request values, or secrets.** The correctness corpus is metadata-only *by construction* — a fail-closed allowlist, not a policy you have to trust.
+- **No signing, no broadcasting, no custody.** Gecko simulates and hands a verdict to
+  someone else. Unsigned assembly for simulation is the one documented carve-out, and it
+  is AST-enforced at the sign/send boundary.
+- **No payment rail, no marketplace.** We compose on MCP, x402, and payment catalogs;
+  the provider charges you directly.
+- **No storage of your API responses, request values, or secrets.** The corpus is
+  categorical *by construction* — a fail-closed allowlist, not a policy you have to
+  trust.
+- **No browsable provider marketplace.** Point us at the surface — the flow is identical
+  for every API.
+
+## Who pays
+
+The **`gecko-surf` engine is free and open-source, forever** — Apache-2.0, complete,
+self-hostable. Ingest, comprehend, verify, run it yourself.
+
+**Developers never pay.** The hosted layer is what an API provider buys: a flat price per
+API, no cut of an API call, no funds held. See [For API providers](/for-providers).
 
 ## Tell us what to comprehend next
 
 <Card title="What painful API broke your agent?" icon="github" href="https://github.com/GeckoVision/gecko-surf/issues/new">
-The Nth painful, paywalled, poorly-documented API — the one your agent *can't* one-shot. Open an issue and tell us. Public 👍s rank what we comprehend next.
+The Nth painful, paywalled, poorly-documented API — the one your agent *can't* one-shot.
+Open an issue and tell us. Public 👍s rank what we comprehend next.
 </Card>

@@ -1,11 +1,24 @@
 ---
 title: Quickstart
-description: Point Gecko at any API and your agent calls it right the first time. One command to add it, $0 recorded mode to prove every call offline first.
+description: doctor → add → report → serve. Map any API into a verified graph your agent traverses — $0, offline, no key. Going live is a separate, deliberate step.
 ---
 
-Point Gecko at an API — even a messy, paywalled one with no published spec. It reads the
-API's *surface*, turns every endpoint into a question-shaped, first-call-correct tool, and
-wires it into your agent. No client code, no key in a config file.
+Four commands. No install, no clone, no Python. Nothing here reaches a real API until
+you decide it should.
+
+```bash
+npx @geckovision/gecko doctor              # 1. check your environment
+npx @geckovision/gecko add <spec-or-docs>  # 2. comprehend it — $0, no live call
+npx @geckovision/gecko report <spec>       # 3. get the scorecard — grade + findings
+npx @geckovision/gecko serve <spec>        # 4. your agent uses it over MCP
+```
+
+Or install once:
+
+```bash
+uv tool install "gecko-surf[serve]"        # or: pip install "gecko-surf[serve]"
+gecko add <spec-or-docs>
+```
 
 <Note>
 **Handing these docs to a coding agent?** Point it at
@@ -13,77 +26,144 @@ wires it into your agent. No client code, no key in a config file.
 this site — or append `.md` to any page URL for raw markdown (e.g. `/quickstart.md`).
 </Note>
 
-## Add any API to your agent
+## The four steps
 
 <Steps>
-  <Step title="Comprehend and wire it in — one command">
-    Straight from `npx`, no clone, no Python. It comprehends the API, seals your key in
-    the OS keychain, and wires it into Claude Code over stdio.
+  <Step title="doctor — read-only, no side effects">
+    ```bash
+    npx @geckovision/gecko doctor
+    ```
 
+    Reports your setup and the exact next command. It changes nothing and calls nothing.
+  </Step>
+
+  <Step title="add — comprehend the surface, $0">
     ```bash
     npx @geckovision/gecko add https://api.provider.com/openapi.json
     ```
 
-    It prompts once (hidden) for the key and injects it **live** at call time — the agent
-    never sees it. Keyless APIs (e.g. Jupiter) skip the prompt.
-
-    **No `openapi.json`?** That's the normal case for a painful API — `add` takes whatever
-    you have:
+    **No `openapi.json`?** That's the normal case for a painful API — `add` takes
+    whatever you have:
 
     ```bash
-    npx @geckovision/gecko add https://docs.someapi.com   # recovers a spec from the docs
+    npx @geckovision/gecko add https://docs.someapi.com   # recovers a draft spec from the docs
     npx @geckovision/gecko add ./openapi.json             # a file you already have
-    npx @geckovision/gecko add api.stripe.com             # a bare domain — Gecko finds it
+    npx @geckovision/gecko add api.stripe.com             # a bare domain — Gecko finds the spec
     ```
+
+    Everything ingested is treated as **untrusted input**: sanitized, quarantine-checked,
+    SSRF-guarded. No live call to the API is made.
   </Step>
 
-  <Step title="Ask your agent — it calls it right">
-    ```
-    You:   search the API for X
-    Agent: ✓ called GET /v1/search?q=X  →  200, first try
-    ```
-
-    No integration code, no docs-diving, no key in sight. That's the whole loop.
-  </Step>
-
-  <Step title="Prove it offline first — $0 recorded mode">
-    Every path has a **recorded mode** that runs the *same code* but synthesizes the
-    response from the API's own schema — no network, no key, no spend. Falsify the calls
-    before going live, then flip one flag (`--mode live`) for real data.
-
+  <Step title="report — the scorecard">
     ```bash
-    uv run python -m gecko.demo    # goal → discover → correct call → data (recorded, $0)
+    npx @geckovision/gecko report https://api.provider.com/openapi.json
     ```
+
+    A grade plus the specific, fixable findings — what an agent would get wrong on this
+    surface, and why. This is the artifact to hand a provider.
+  </Step>
+
+  <Step title="serve — your agent uses it over MCP">
+    ```bash
+    npx @geckovision/gecko serve https://api.provider.com/openapi.json
+    ```
+
+    Serves the comprehended surface over Streamable-HTTP MCP and prints one-click add
+    strings. Defaults to **recorded** mode — nothing reaches the real API.
   </Step>
 </Steps>
 
-<Note>
-**Gecko never holds your keys.** A provider's key is yours — sealed in *your* OS keychain,
-resolved only at call time. Control plane only: Gecko stores the API surface, never keys or
-response data. This whole path is **local** — it never touches Gecko's servers.
-</Note>
+## Plug it into your agent
 
-## Try it in 10 seconds — no install
+```bash
+# Claude Code
+claude mcp add my-api -- npx -y @geckovision/gecko serve <spec> --stdio
+```
 
-Give your agent a live, Gecko-comprehended surface and watch it call correctly — no `pip`,
-no spec, no key:
+```jsonc
+// Cursor / VS Code / any MCP client — mcp.json
+{
+  "mcpServers": {
+    "my-api": {
+      "command": "npx",
+      "args": ["-y", "@geckovision/gecko", "serve", "<spec>", "--stdio"]
+    }
+  }
+}
+```
+
+Then your agent asks **questions**, not endpoints:
+
+```
+Which fixtures kick off in the next hour, and what are the current odds?
+What is the peg state of USDC right now?
+Plan a swap of SOL for USDC on Meteora, bin_step 4.
+```
+
+## Going live is a separate, deliberate step
+
+```bash
+gecko auth set <provider>
+```
+
+The key goes to **your OS keychain** — never into `mcp.json`, never into a tool
+definition, never into the model's context. Gecko resolves it at call time and sends it
+only to the API's own host (out-of-band host anchoring). Keyless APIs skip this
+entirely.
+
+<Warning>
+Nothing in the first four commands calls a real API or spends anything. `serve` and the
+SDK default to **recorded**; live requires both a credential you set explicitly and an
+explicit `--mode live`.
+</Warning>
+
+## Prove it offline first — $0 recorded mode
+
+Every path has a **recorded mode** that runs the *same code* but synthesizes the response
+from the API's own schema — no network, no key, no spend. Falsify the calls before going
+live.
+
+```bash
+uv run python -m gecko.demo    # goal → discover → correct call → data (recorded, $0)
+```
+
+The two modes differ **only at the transport edge**. See [Recorded mode](/recorded-mode).
+
+## Try a live surface in 10 seconds
+
+Give your agent a hosted, Gecko-comprehended surface — no `pip`, no spec, no key:
 
 ```bash
 claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
 ```
 
-That's **TxODDS TxLINE** — 18 first-call-correct tools over a World Cup API with a two-token
-on-chain paywall a coding agent does *not* one-shot. Served **recorded** ($0/offline), so you
-explore the real surface without a subscription.
+That's **TxODDS TxLINE** — 18 first-call-correct tools over a World Cup API with a
+two-token on-chain paywall a coding agent does *not* one-shot. Served **recorded**
+($0/offline), so you explore the real surface without a subscription.
 
 <Note>
-`claude mcp add` is Claude-Code-only. In **Cursor**, **VS Code**, or any MCP client, add the
-same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025-11-25`), not SSE:
+`claude mcp add` is Claude-Code-only. In **Cursor**, **VS Code**, or any MCP client, add
+the same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP**
+(`2025-11-25`), not SSE:
 
 ```jsonc
 { "mcpServers": { "gecko-txline": { "type": "http", "url": "https://mcp.geckovision.tech/txline/mcp" } } }
 ```
 </Note>
+
+## On-chain, in one command
+
+```bash
+uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program pumpfun --stdio
+```
+
+Gecko recovers the seeds the IDL drops, plans the full instruction, an external builder
+builds it, and a [Receipt](/receipt) says whether it lands — **before any signature**.
+
+```bash
+gecko orquestra find-start "buy token X on pump"   # intent → the right start point
+```
 
 ## Other ways in
 
@@ -95,13 +175,6 @@ same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025
     /plugin marketplace add GeckoVision/gecko-surf
     /plugin install gecko-surf@geckovision
     /make-agent-ready https://api.example.com/openapi.json
-    ```
-  </Card>
-  <Card title="Serve over MCP" icon="server">
-    Prints the MCP URL + one-click add strings, then serves the API.
-
-    ```bash
-    uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json
     ```
   </Card>
   <Card title="Embed the SDK" icon="code">
@@ -118,10 +191,17 @@ same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025
     Recover a draft spec from the docs, then comprehend it.
 
     ```bash
-    uv run gecko from-docs https://api.example.com/docs
+    gecko from-docs https://api.example.com/docs
     ```
 
     Review the draft (especially auth) before trusting it live.
+  </Card>
+  <Card title="Correctness in CI" icon="circle-check">
+    First-call-correctness suites you can fail a build on.
+
+    ```bash
+    gecko test <spec>
+    ```
   </Card>
 </CardGroup>
 
@@ -132,15 +212,15 @@ same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025
     Nothing here pipes a remote script into a shell. Run in order and you never take an
     unchecked step:
 
-    1. **Check (no side effects):** `npx @geckovision/gecko doctor` — read-only; reports your
-       setup and the exact next step.
-    2. **Dry-run ($0):** `gecko serve <url>` defaults to **recorded** — no request reaches the
-       real API, nothing is billed.
-    3. **Live:** add `--mode live` (and `gecko auth set` first for a keyed API).
+    1. **Check (no side effects):** `npx @geckovision/gecko doctor` — read-only; reports
+       your setup and the exact next step.
+    2. **Dry-run ($0):** `gecko serve <url>` defaults to **recorded** — no request
+       reaches the real API, nothing is billed.
+    3. **Live:** add `--mode live` (and `gecko auth set <provider>` first for a keyed API).
 
-    Gecko is open-source (Apache-2.0), installed from a public registry **with a live SLSA
-    provenance attestation** tracing the package to its CI build — verifiable, not an opaque
-    script. Control-plane only: it never stores your responses or your keys.
+    Gecko is open-source (Apache-2.0), installed from a public registry **with a live
+    SLSA provenance attestation** tracing the package to its CI build — verifiable, not
+    an opaque script. Control-plane only: it never stores your responses or your keys.
   </Accordion>
 
   <Accordion title="Spec served off-host? (e.g. Colosseum Copilot)">
@@ -153,13 +233,13 @@ same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025
       --base-url https://copilot.colosseum.com/api/v1 --mode live
     ```
 
-    `add` prompts once for your PAT, seals it, pins the host, and connects in live mode. Drop
-    `--mode live` to falsify the calls offline first.
+    `add` prompts once for your PAT, seals it, pins the host, and connects in live mode.
+    Drop `--mode live` to falsify the calls offline first.
   </Accordion>
 
   <Accordion title="Which platforms get the npx binary?">
-    Linux (x64 + arm64) and Apple Silicon Macs — one command, no Python. On an Intel Mac or
-    Windows, use the Python path (same CLI, your system's own certificates):
+    Linux (x64 + arm64) and Apple Silicon Macs — one command, no Python. On an Intel Mac
+    or Windows, use the Python path (same CLI, your system's own certificates):
 
     ```bash
     uvx gecko-surf add api.stripe.com                    # no install, needs Python/uv
@@ -171,16 +251,10 @@ same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP** (`2025
     Serve behind an HTTPS tunnel with `--public-url https://<tunnel>` (trusted for the
     Host/Origin guard). Gecko also runs a hosted surface at `mcp.geckovision.tech`.
   </Accordion>
-
-  <Accordion title="Still V2 (designed, not built)">
-    A vectorized semantic index (today's catalog is lexical). **Drift-watch** — re-scoring
-    a surface when its spec changes — is shipped; a fully-automatic
-    re-comprehend-on-new-version job remains V2. See [Stay correct](/stay-correct).
-  </Accordion>
 </AccordionGroup>
 
 <CardGroup cols={3}>
-  <Card title="How it works" icon="gears" href="/comprehension" />
-  <Card title="For API providers" icon="building" href="/for-providers" />
-  <Card title="Prove it's correct" icon="circle-check" href="/recorded-mode" />
+  <Card title="Architecture" icon="diagram-project" href="/architecture" />
+  <Card title="The Receipt" icon="receipt" href="/receipt" />
+  <Card title="Status" icon="list-check" href="/status" />
 </CardGroup>

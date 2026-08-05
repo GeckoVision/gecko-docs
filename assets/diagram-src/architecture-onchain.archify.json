@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "diagram_type": "sequence",
+  "meta": {
+    "title": "Gecko \u2014 The Proven On-Chain Loop",
+    "subtitle": "Pump.fun buy, live on a mainnet fork: naive path \u274c 3012 \u00b7 Gecko landing bundle \u2705 86,669 CU",
+    "output": "gecko-onchain.html",
+    "viewBox": [
+      900,
+      820
+    ],
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "comprehend-plan",
+        "label": "Comprehend + plan",
+        "focus": [
+          "agent",
+          "gecko",
+          "fork"
+        ],
+        "note": "Gecko derives the full account set \u2014 including accounts the IDL hides \u2014 and reads live state for sane args."
+      },
+      {
+        "id": "build-verify",
+        "label": "Build + verify",
+        "focus": [
+          "gecko",
+          "builder",
+          "fork"
+        ],
+        "note": "The external builder assembles the instruction; Gecko wraps unsigned preludes and simulates to a Receipt \u2014 never signs."
+      },
+      {
+        "id": "receipt-sign",
+        "label": "Receipt \u2192 sign",
+        "focus": [
+          "fork",
+          "gecko",
+          "agent",
+          "signer"
+        ],
+        "note": "Only a passing receipt reaches the signer; the naive path's 3012 revert is caught for $0."
+      }
+    ]
+  },
+  "participants": [
+    {
+      "id": "agent",
+      "type": "external",
+      "label": "Agent",
+      "sublabel": "intent holder"
+    },
+    {
+      "id": "gecko",
+      "type": "backend",
+      "label": "Gecko",
+      "sublabel": "comprehend + verify"
+    },
+    {
+      "id": "builder",
+      "type": "external",
+      "label": "Orquestra",
+      "sublabel": "/build (external)"
+    },
+    {
+      "id": "fork",
+      "type": "database",
+      "label": "Mainnet Fork",
+      "sublabel": "surfpool \u00b7 $0"
+    },
+    {
+      "id": "signer",
+      "type": "security",
+      "label": "Signer",
+      "sublabel": "wallet / TEE \u2014 external"
+    }
+  ],
+  "segments": [
+    {
+      "from": 150,
+      "to": 330,
+      "label": "Comprehend + plan"
+    },
+    {
+      "from": 350,
+      "to": 560,
+      "label": "Build + simulate"
+    },
+    {
+      "from": 580,
+      "to": 760,
+      "label": "Receipt \u2192 sign"
+    }
+  ],
+  "messages": [
+    {
+      "id": "intent",
+      "from": "agent",
+      "to": "gecko",
+      "y": 185,
+      "label": "buy token X on pump",
+      "variant": "emphasis"
+    },
+    {
+      "id": "state-read",
+      "from": "gecko",
+      "to": "fork",
+      "y": 275,
+      "label": "derive full account set + read curve reserves",
+      "variant": "default"
+    },
+    {
+      "id": "state-back",
+      "from": "fork",
+      "to": "gecko",
+      "y": 312,
+      "label": "max_sol_cost quoted",
+      "variant": "return"
+    },
+    {
+      "id": "declared-plan",
+      "from": "gecko",
+      "to": "builder",
+      "y": 385,
+      "label": "declared plan",
+      "variant": "emphasis"
+    },
+    {
+      "id": "built-ix",
+      "from": "builder",
+      "to": "gecko",
+      "y": 425,
+      "label": "built instruction",
+      "variant": "return"
+    },
+    {
+      "id": "hidden-read",
+      "from": "gecko",
+      "to": "fork",
+      "y": 462,
+      "label": "read Global \u2192 recover hidden accounts",
+      "variant": "default"
+    },
+    {
+      "id": "simulate",
+      "from": "gecko",
+      "to": "fork",
+      "y": 512,
+      "label": "unsigned bundle (ATA\u00b7CU preludes) \u2192 simulate",
+      "variant": "emphasis"
+    },
+    {
+      "id": "receipt",
+      "from": "fork",
+      "to": "gecko",
+      "y": 552,
+      "label": "\u2705 pass \u00b7 86,669 CU (naive: \u274c 3012)",
+      "variant": "return"
+    },
+    {
+      "id": "receipt-out",
+      "from": "gecko",
+      "to": "agent",
+      "y": 615,
+      "label": "receipt + landing plan",
+      "variant": "emphasis"
+    },
+    {
+      "id": "sign-req",
+      "from": "agent",
+      "to": "signer",
+      "y": 668,
+      "label": "sign (passing receipt only)",
+      "variant": "security"
+    }
+  ],
+  "activations": [
+    {
+      "participant": "gecko",
+      "from": 185,
+      "to": 730,
+      "type": "backend"
+    },
+    {
+      "participant": "builder",
+      "from": 380,
+      "to": 430,
+      "type": "external"
+    },
+    {
+      "participant": "fork",
+      "from": 270,
+      "to": 557,
+      "type": "database"
+    },
+    {
+      "participant": "signer",
+      "from": 663,
+      "to": 700,
+      "type": "security"
+    }
+  ]
+}

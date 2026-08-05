@@ -1,44 +1,79 @@
 # Gecko
 
-> Gecko is where agents and APIs finally speak the same language. Point it at an
-> API's surface (an OpenAPI spec, or one recovered from a docs page) and it generates
-> question-shaped, first-call-correct agent tools, keeps keys hidden and injected
-> only at call time, screens the surface for poisoning, and lets the agent call the
-> real API directly for data. It is a control plane — it stores the API surface, the tool
-> defs, and correctness metadata, and never response payloads, user data, or secrets.
-> It composes on top of payment rails (x402) and protocols (MCP); it is not itself a
-> rail or a marketplace.
+> The knowledge graph for APIs your agent can trust. Open-source, runs on your machine.
+> One command maps any API — even the messy, paywalled, or on-chain ones — into a
+> verified graph your agent traverses instead of guessing. Every action can be simulated
+> to a receipt before money moves, and every failure shows exactly why. Built for the
+> calls your agent must not get wrong.
 
-Gecko's engine is the open-source `Gecko` package — the brand is Gecko; the Python
-package, repo (`GeckoVision/gecko-surf`), and CLI you'll see in code samples are named
-`Gecko`.
+Gecko is NOT the agent and NOT an orchestrator. It is the memory-and-context substrate
+under other people's agents: it comprehends external surfaces (REST APIs and Solana
+programs), projects them as first-call-correct tools over MCP, verifies actions by
+simulation before execution, and never signs, never broadcasts, never stores payloads
+(control-plane invariant: surfaces + correctness metadata only).
 
-When an agent should reach for Gecko: you have a goal that needs an external API,
-you don't have hand-written integration code, and you can't tell whether you'd be
-calling the API correctly — especially for long-tail, messy, or paywalled APIs.
-Gecko turns "I want X" into the right endpoint and a well-formed first call.
+The brand is Gecko; the PyPI package is `gecko-surf`, the import is `gecko`, the CLI is
+`gecko`, and the repo is `GeckoVision/gecko-surf` (Apache-2.0).
 
-Honest scope: V1 (comprehension) is live end-to-end — ingest → first-call-correct tools
-→ paid access handshake → real data — on the TxODDS World Cup API (Solana mainnet, 857
-tests), with a $0 recorded mode that runs offline. Comprehension into first-call-correct
-tools is additionally proven on Stripe (587 tools, 99.8% first-call-correct), Twilio
-(100%), Jupiter (100%), Colosseum, Jito, and more. Ingest is OpenAPI 3.x, or a spec
-recovered from a docs page; Gecko does not verify the data an API returns.
+## When an agent should reach for Gecko
+
+Two axes — either one qualifies:
+
+- A **messy surface**: paywalled, drifting, undocumented, or on-chain. The Nth painful
+  API a coding agent does not one-shot.
+- A **high-stakes action**: the agent runs unattended, holding credentials or moving
+  money.
+
+A clean API with a human reviewing the diff may not need Gecko. That is a real answer,
+not a hedge.
 
 ## Use Gecko now (agents start here)
 
-You don't need to read these docs to call an API — Gecko turns the API into
-first-call-correct tools you call over MCP. To use it:
+```
+npx @geckovision/gecko doctor              # read-only environment check
+npx @geckovision/gecko add <spec-or-docs>  # comprehend it — $0, no live call
+npx @geckovision/gecko report <spec>       # the scorecard — grade + findings
+npx @geckovision/gecko serve <spec>        # serve it over MCP
+```
 
-1. Comprehend any OpenAPI and serve it over MCP ($0, offline, no keys):
-   `uvx --from "gecko-surf[serve]" gecko https://api.example.com/openapi.json`
-2. Add the printed Streamable-HTTP endpoint to your host — e.g. Claude Code:
-   `claude mcp add --transport http your-api http://127.0.0.1:8000/mcp`
-3. From your agent, go intent → call:
-   `search_capabilities("<what you want to do>")` → pick the ranked tool → call it.
+Then, from the agent: `search_capabilities("<what you want>")` → pick the ranked tool →
+call it. Gecko builds the correct request and injects auth at call time; you never handle
+a key. Going live is a separate, deliberate step: `gecko auth set <provider>` (the key
+goes to your OS keychain, never into `mcp.json`).
 
-Gecko builds the correct request and injects auth at call time — you never handle a key.
-See [The MCP surface](https://docs.geckovision.tech/mcp-surface) and [Agent discoverability](https://docs.geckovision.tech/discoverability).
+On-chain: `gecko orquestra find-start "<intent>"` routes an intent to the right (program,
+instruction) with a provenance-tagged derive plan; `gecko orquestra --program <name>
+--stdio` serves the program surface.
+
+## The four frames
+
+- **Provenance on every edge** — extracted / recovered / flagged. Never fabricated;
+  below the retrieval floor Gecko returns an honest no-start.
+- **The receipt** — simulate on a $0 mainnet fork before money moves: status, a
+  categorical revert class, compute units. A fork result is not mainnet, and a receipt
+  never predicts price.
+- **Drift** — a categorical, values-free corpus plus an N-confirmed drift detector, so
+  you learn a provider broke you before production does.
+- **Auth invisible to the agent** — credentials resolve from the OS keychain at call
+  time and go only to the API's own host.
+
+## Honest status
+
+Proven: comprehension of 14+ real specs with 0 exposed auth headers; PDA seed recovery
+from IDLs and from program source; auto-comprehend differential-proven on 4 mainnet
+programs with measured overlays; the simulate→Receipt engine live-proven twice on a
+surfpool mainnet fork (Pump.fun buy: naive reverts with AccountNotInitialized 3012,
+Gecko passes at 86,669 CU; Meteora DLMM swap: wrap → swap → unwrap at 81,964 CU — CU
+numbers measured per run, not mainnet); Meteora's 4-seed pool derivation
+differential-proven against the stale 3-seed scheme; −77%/−89% measured context cuts on
+two real specs; 2,400+ tests.
+
+NOT built: the drift scheduler, hosted point-and-simulate, signing-gate binding to the
+simulated message hash, the TEE credential backend, catalog breadth beyond 4 wired
+programs, the semantic/vector retrieval tier (evidence-gated OFF), cross-customer
+pooling, live x402 billing. Full split: https://docs.geckovision.tech/status
+
+Gecko does not verify that the data an API returns is true.
 
 ## Agent integration
 
@@ -51,15 +86,24 @@ See [The MCP surface](https://docs.geckovision.tech/mcp-surface) and [Agent disc
 
 ## Start here
 
-- [Introduction](https://docs.geckovision.tech/introduction): what Gecko is, the three verbs (APIs get USED), and the one-path overview.
-- [Quickstart](https://docs.geckovision.tech/quickstart): run the $0 recorded demo and the programmatic client — no keys, no spend.
-- [Concepts](https://docs.geckovision.tech/concepts): surface, operation, question-shaped tool, session, recorded vs live, first-call-correct.
+- [Introduction](https://docs.geckovision.tech/introduction): the positioning, the four frames, who it's for, and the proof table.
+- [Quickstart](https://docs.geckovision.tech/quickstart): doctor → add → report → serve, then the deliberate live step.
+- [Concepts](https://docs.geckovision.tech/concepts): surface, graph, provenance, overlay, receipt, corpus and drift, plan, session, the two modes.
+- [Status](https://docs.geckovision.tech/status): the exhaustive works vs not-built split.
 
 ## How it works
 
-- [How comprehension works](https://docs.geckovision.tech/comprehension): ingest → catalog → question-shaped tools → correct request, tied to the engine.
-- [Recorded mode](https://docs.geckovision.tech/recorded-mode): one code path, two modes; deterministic schema → sample; $0 offline falsification.
-- [Access & auth](https://docs.geckovision.tech/access-and-auth): the `Session.auth_headers()` seam, no-auth gating, and the two-token handshake.
+- [How comprehension works](https://docs.geckovision.tech/comprehension): ingest → catalog → question-shaped tools → correct request.
+- [find_start](https://docs.geckovision.tech/find-start): intent → the right starting point, with the provenance-tagged derive plan and the honesty floor.
+- [From docs](https://docs.geckovision.tech/from-docs): recovering a draft spec from a human docs page.
+- [Recorded mode](https://docs.geckovision.tech/recorded-mode): one code path, two modes; $0 offline falsification.
+- [Access & auth](https://docs.geckovision.tech/access-and-auth): the `Session.auth_headers()` seam and keychain-resolved credentials.
+- [Stay correct](https://docs.geckovision.tech/stay-correct): content-addressed surfaces, the categorical corpus, the N-confirmed drift detector.
+
+## On-chain
+
+- [The Program Surface](https://docs.geckovision.tech/program-surface): recovering the PDA seeds an IDL drops, proven on four mainnet programs.
+- [The Receipt](https://docs.geckovision.tech/receipt): what a Receipt asserts and what it deliberately does NOT.
 
 ## For AI agents
 
@@ -68,11 +112,10 @@ See [The MCP surface](https://docs.geckovision.tech/mcp-surface) and [Agent disc
 
 ## For API providers
 
-- [For API providers](https://docs.geckovision.tech/for-providers): agents mis-call you, can't find you, and your changes break integrators — how your API becomes the one agents call right, and who pays (flat per-API; never a cut).
-- [Cloud](https://docs.geckovision.tech/cloud): the hosted, drift-watched provider plane — what's free forever vs what providers pay for.
-- [Roadmap](https://docs.geckovision.tech/roadmap): Live / Building / Exploring, honestly labeled, and what we'll never build.
+- [For API providers](https://docs.geckovision.tech/for-providers): what a Gecko-comprehended surface gets you, and who pays (flat per-API; never a cut).
+- [Cloud](https://docs.geckovision.tech/cloud): the hosted, drift-watched provider plane.
+- [Roadmap](https://docs.geckovision.tech/roadmap): live / building / exploring, and what we'll never build.
 
 ## Reference
 
-- [Architecture](https://docs.geckovision.tech/architecture): control plane vs data plane, the invariants, the module map, the one API-agnostic seam.
-- [Status](https://docs.geckovision.tech/status): what is live, what is early, what is deliberately deferred (V1 / V2 / V3).
+- [Architecture](https://docs.geckovision.tech/architecture): the three views (context engineering, the full pipeline, the proven on-chain loop), the invariants, the module map, the one API-agnostic seam.
