@@ -39,9 +39,15 @@
             ]
           },
           {
-            "group": "On-chain",
+            "group": "Use cases",
             "pages": [
               "use-cases",
+              "pegana"
+            ]
+          },
+          {
+            "group": "On-chain",
+            "pages": [
               "program-surface",
               "receipt"
             ]
