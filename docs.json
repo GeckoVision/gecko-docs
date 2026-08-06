@@ -41,6 +41,7 @@
           {
             "group": "Use cases",
             "pages": [
+              "mainnet",
               "use-cases",
               "pegana"
             ]
