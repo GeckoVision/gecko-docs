@@ -1,0 +1,94 @@
+---
+title: A real transaction
+description: An agent bought a bottle of water for 0.1 USDC on Solana mainnet. Gecko verified the call before it was signed — and the chain agreed.
+---
+
+Every other page here ends at a simulation. This one ends on chain.
+
+On 2026-08-06 an agentic wallet bought a bottle of water at a bar that takes crypto —
+0.1 USDC, Solana mainnet, a real store, a real product. Before it was signed, Gecko
+planned the call, simulated it against live mainnet, and bound the receipt to the exact
+message. Then a wallet signed it and it landed.
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="/assets/mainnet-receipt.mp4"
+></video>
+
+## Check it yourself
+
+```
+5cjBs5VE8WVVctG2EoUkYiRkW92sXkoT4YsNxszWC9CE3sK7triTJ5vnY6TrcQ2BRPYUtWsd3LtTnyieUfn8Hw2Y
+```
+
+| | |
+|---|---|
+| slot | 437633643 |
+| error | none |
+| compute | 36,508 units |
+| USDC | buyer −0.1 · bar +0.1 |
+
+That signature is public. Nothing on this page requires taking our word for it — paste it
+into any explorer, or `getTransaction` it yourself.
+
+## Three things had to agree
+
+Gecko answered **will this work** — simulated, bound, PASS. The wallet answered **who
+signs it**. The wallet's policy answered **are you allowed to spend this** — a single-
+transaction limit, enforced independently.
+
+Those are different guarantees, and none substitutes for another. A policy that approves
+your spending limit cannot tell you the transaction reverts; a simulation that says it
+lands cannot tell you whether you were allowed to make it.
+
+**Gecko held no key and broadcast nothing.** It never does.
+
+## The part that didn't go to plan
+
+The video re-runs the pre-flight live, and the numbers don't match:
+
+```
+the chain charged   36,508 CU
+a pre-flight NOW    36,399 CU
+```
+
+109 units apart — because *this very purchase* wrote a record into the store's receipts
+account, so the program does slightly different work now.
+
+That's not a defect, and hiding it would have cost the more useful lesson:
+
+<Note>
+**A receipt is true for the state it was taken against.** Take it at the moment you sign
+— not the day before. It's the same reason a receipt's strongest binding expires with its
+blockhash, about a minute.
+</Note>
+
+For the record, the pre-flight run immediately *before* the send did predict 36,508
+exactly. We don't show that on camera, because it can't be re-derived now that the state
+has moved — and a demo that can't reproduce its own claim shouldn't make it.
+
+## Do it yourself
+
+The same pre-flight runs against any wired program:
+
+```bash
+npx @geckovision/gecko prove "route a swap out of hyUSD" \
+  --bind input_mint=… --bind output_mint=… --bind amount=… --bind user=…
+```
+
+You get the call it chose, what it rejected, every account with where it came from, and a
+receipt — before anything is signed or spent.
+
+<CardGroup cols={2}>
+<Card title="How the receipt works" icon="receipt" href="/receipt">
+  Status, compute units, categorical failure class — and what it does not claim.
+</Card>
+<Card title="The program surface" icon="cube" href="/program-surface">
+  Seed recovery, provenance per account, and the gaps we flag instead of guessing.
+</Card>
+</CardGroup>
