@@ -3,7 +3,9 @@ title: A real transaction
 description: An agent bought a bottle of water for 0.1 USDC on Solana mainnet. Gecko verified the call before it was signed — and the chain agreed.
 ---
 
-Every other page here ends at a simulation. This one ends on chain.
+Every other page here ends at a simulation. This one ends on chain — and the point is
+simple enough to say in one line: **before the money moved, Gecko said exactly what would
+happen, and that is exactly what happened.**
 
 On 2026-08-06 an agentic wallet bought a bottle of water at a bar that takes crypto —
 0.1 USDC, Solana mainnet, a real store, a real product. Before it was signed, Gecko
@@ -28,10 +30,10 @@ message. Then a wallet signed it and it landed.
 
 | | |
 |---|---|
+| what moved | 10 cents — buyer −0.1 USDC, bar +0.1 USDC |
+| did it work | yes, no error |
 | slot | 437633643 |
-| error | none |
-| compute | 36,508 units |
-| USDC | buyer −0.1 · bar +0.1 |
+| compute | 36,508 units — the network's measure of work, matched to the unit |
 
 That signature is public. Nothing on this page requires taking our word for it — paste it
 into any explorer, or `getTransaction` it yourself.
