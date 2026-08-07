@@ -1,268 +1,160 @@
 ---
 title: Gecko 101
-description: What Gecko is, why it exists, and how to make your first real call in about a minute — no install, no key, no spend.
+description: Your agent tries the call before it makes it. One URL, no install, no key — and a receipt before anything is signed.
 ---
 
 ## The problem
 
-Your agent's first call to an API is the real one. There is no rehearsal.
+Your agent's first call is the real one. There is no rehearsal.
 
-Most of the time a wrong call errors, and you find out. That is the cheap failure.
+A wrong call that errors is the cheap failure. You find out.
 
-The expensive one is quiet. The call is well-formed. The API accepts it. Nothing throws.
-And the world is now wrong — the wrong pool, the wrong account, a charge posted, money
-gone. Nobody gets an alert for a call that worked and was wrong.
+The expensive one is quiet. Well-formed, accepted, nothing throws — and the world is now
+wrong. Nobody gets an alert for a call that worked and was wrong.
 
-That is the failure Gecko is built for.
+## Watch it run
+
+Ten questions, four programs, one landed transaction. Every command real, one take.
+
+<video
+  autoPlay
+  muted
+  loop
+  playsInline
+  controls
+  className="w-full aspect-video rounded-xl"
+  src="/assets/gecko-101.mp4"
+></video>
 
 ## What Gecko is
 
 Gecko reads an API — its spec, its docs, or for a Solana program its IDL and source — and
-turns it into tools your agent can call correctly the first time, with every fact tagged
-by where it came from.
+turns it into tools your agent calls correctly the first time, every fact tagged with
+where it came from.
 
-For actions that cost something, it runs the call somewhere that doesn't count first, and
-hands back a **receipt** of what will happen. Then someone else signs.
-
-<Note>
-Gecko is not the agent. It holds no key, signs nothing, and broadcasts nothing.
-</Note>
-
-## "I already have an OpenAPI spec and an MCP server"
-
-Good. Keep both — Gecko reads the spec and speaks MCP.
-
-Here is the honest answer. **A specification tells you what a call looks like. It cannot
-tell you whether it will work.** That is structural. It is just as true of a perfect spec
-as a bad one, so "our docs are good" does not close the gap. Six things neither a spec nor
-an MCP server can do:
-
-### What a specification cannot tell you
-
-**1. That the endpoint still answers.** A spec is a claim until something calls it. Two
-directions, both real:
-
-- A popular docs source served us `POST /v1/auth/email/login` for a wallet API, with full
-  request and response schemas. That endpoint returns **404**. It was never real.
-- The same product serves `POST /api/v1/passwordless/init` on another host — **not 404**,
-  and absent from all three documentation sources we checked. Complete spec, incomplete
-  API.
-
-`gecko verify-docs --live` replays each operation and marks it VERIFIED, REFUTED, or
-honestly UNVERIFIED. A schema-correct call can still 404: `/v1/assets/{symbol}/state`
-with `symbol` = `"string"` is exactly what the spec permits, and it is a 404.
-
-**2. Facts that are not facts about your API.** Jupiter's route surface declares
-**9 accounts**. The instruction that actually lands carries **25** and an address lookup
-table. The other 16 are the legs of whichever route the aggregator chose a second ago.
-No IDL can carry them — not a deficient one, *any* one. They are facts about a different
-surface. Gecko tags each account `extracted`, `recovered`, or `cross_surface`, so you can
-see which ones your spec could never have held.
-
-**3. A join to a spec it has never heard of.** "Is this stablecoin still pegged, and what
-can I exit it at?" spans three APIs. The fact that connects them is a token mint, named
-differently in each — and declared by none of the three. We checked: no `x-gecko` entity
-in any of them. Gecko carries that join across surfaces, and refuses to infer one that
-was never declared.
-
-**4. How to be an interface.** A spec is a description; an MCP server hands your agent the
-description as tools and lets it pick. On a real 43-operation production API that raw
-surface is **113,072 bytes** competing with the actual task in the same context window,
-every turn. Gecko projects it into question-shaped tools with auth stripped — **23,382
-bytes, 79.3% smaller** (measured 2026-08-06) — with first-call-correctness held.
-Shrinking a spec is easy if you're willing to drop things; holding correctness while you
-do it is the part worth anything.
-
-**5. A dry run.** Neither a spec nor an MCP server has one. Gecko builds the call, runs it
-against real state where it doesn't count, and returns a **receipt**: does it land, what
-does it cost, and if not, which class of failure — before anything is signed.
-
-**6. When it stopped being true.** A spec is a snapshot with no expiry. Gecko records
-outcomes categorically and flags when a call that worked starts failing.
-
-### And one thing an MCP server does that you probably don't want
-
-It leaves your key in `mcp.json` or `.env` — inside the agent's context, in your shell
-history, in your repo if you blink. Gecko puts it in your OS keychain and injects it at
-call time. The tool definitions never contain it. The model never sees it.
+For anything that costs money, it runs the call somewhere that doesn't count first and
+hands back a **receipt**. Then someone else signs.
 
 <Note>
-Numbers here were measured against live surfaces on 6 August 2026, not estimated. The
-43-operation API is [Pegana](/pegana), which grades **A (100/100)** on our own
-agent-readiness scorecard. We use a *good* API on purpose: every point above is still
-true of it. Verifying Pegana live found **no dead endpoint** — that is the expected
-result for a well-run API, and it does not shrink the list.
+Gecko is not the agent. It holds no key, signs nothing, broadcasts nothing.
 </Note>
 
 ## Your first call
 
-One command. Nothing to install, no account, no key, no spend.
+No install, no account, no key, no spend.
 
 ```bash
 claude mcp add --transport http gecko https://mcp.geckovision.tech/pegana/mcp
 ```
 
-Then ask, in plain words:
+Ask, in plain words:
 
 ```
 Is USDC still pegged right now?
 ```
 
-You get back something like:
-
 ```
 USDC   PEGGED   $0.9998   confidence: high
 ```
 
-That is a live answer from a real production API. Your agent picked the right tool out of
-28, filled the parameter, and called it — first try.
+Live answer, real production API. Your agent picked the right tool out of 28 and filled
+the parameter — first try.
 
 <Note>
-**Not using Claude Code?** Paste this into your client's `mcp.json`:
-
-```jsonc
-{
-  "mcpServers": {
-    "gecko": {
-      "type": "http",
-      "url": "https://mcp.geckovision.tech/pegana/mcp"
-    }
-  }
-}
-```
-
-If your client only speaks SSE, use `https://mcp.geckovision.tech/pegana/sse` instead.
-Same tools, older transport.
+**Another client?** Put the same URL in your `mcp.json` under `mcpServers`. If it only
+speaks SSE, use `/pegana/sse` — same tools, older transport.
 </Note>
 
-### What an MCP server is, in one line
-
-A standard socket that lets a chat client hand your agent a set of tools. Adding the URL
-above plugs that socket in. Nothing runs on your machine.
-
-### What just happened
-
-You did not read a spec. You did not write a client. You did not pick an endpoint.
-
-The API is [Pegana](/pegana) — 43 operations of Solana stablecoin infrastructure, in
-production, moving real money. Gecko read it once and projected it as **questions**. Your
-agent answered a question; Gecko turned that into the correct call.
-
-No key was involved, because that operation is public — and Gecko resolves auth per
-operation, not per API. Where a key *is* needed, it lives in your OS keychain and is
-injected at call time. It never enters `mcp.json`, a tool definition, or the model's
-context.
-
-### Three more surfaces, same shape
+Three more, same shape:
 
 ```
-https://mcp.geckovision.tech/jupiter/mcp      quotes and swap routes    (6 tools, live)
-https://mcp.geckovision.tech/orquestra/mcp    Solana programs, by intent (3 tools)
-https://mcp.geckovision.tech/gecko/mcp        point it at your own API   (1 tool)
+/orquestra/mcp   route an intent to a Solana instruction
+/jupiter/mcp     quotes and swaps
+/gecko/mcp       point it at your own API
 ```
 
-Pick one. Add it the same way.
+## "I already have an OpenAPI spec and an MCP server"
+
+Good — keep both. Gecko reads the spec and speaks MCP.
+
+**A specification tells you what a call looks like. It cannot tell you whether it will
+work.** That is structural, and just as true of a perfect spec as a bad one.
+
+| a spec cannot tell you | what that costs |
+|---|---|
+| **that the endpoint still answers** | a documented endpoint we were served returns 404. It was never real. |
+| **facts that aren't about your API** | Jupiter's route surface declares 9 accounts. The call carries 25. The other 16 belong to a route chosen a second ago. |
+| **a join to a spec it never heard of** | "is it pegged, and what can I exit at" spans three APIs. None declares the mint that connects them. |
+| **how to be an interface** | 113,072 bytes of surface competing with your task, every turn. Gecko projects 23,382 — 79.3% less, correctness held. |
+| **a dry run** | neither a spec nor an MCP server has one. |
+| **when it stopped being true** | a spec is a snapshot with no expiry. |
+
+And one thing an MCP server *does*: it leaves your key in `mcp.json` or `.env`, inside the
+agent's context. Gecko keeps it in your OS keychain and injects it at call time. The model
+never sees it.
 
 ## The model underneath
 
-Five steps. The first three run for free.
-
 <Steps>
   <Step title="Comprehend">
-    Read the surface — OpenAPI, human docs, an Anchor IDL, or program source. Tag every
-    fact with where it came from: `extracted` from the surface, `recovered` from source,
-    or `flagged` as genuinely unknown. Never invented. Below the retrieval floor Gecko
-    says "no start found" rather than guess.
+    Read the surface. Tag every fact `extracted`, `recovered`, or `flagged` as genuinely
+    unknown. Never invented — below the retrieval floor it says "no start found" instead
+    of guessing.
   </Step>
-
   <Step title="Plan">
-    Turn an intent into one specific call, with every input and every account it needs —
-    including the ones the surface does not carry. A Solana program derives addresses from
-    seeds (a **PDA**); the recipe for those seeds is frequently missing from the IDL, and
-    an agent that guesses gets a valid-looking address for the wrong thing.
+    Turn an intent into one specific call, including the accounts the surface does not
+    carry. Solana programs derive addresses from seeds; those recipes are often missing
+    from the IDL, and a guess gives you a valid-looking address for the wrong thing.
   </Step>
-
   <Step title="Simulate">
-    Run the built transaction against a mainnet-backed snapshot. Real state, $0, unsigned,
-    nothing broadcast.
+    Run it against real chain state. $0, unsigned, nothing broadcast.
   </Step>
-
   <Step title="Receipt">
-    Get a verdict before you commit: does it land, what does it cost, and if it fails,
-    which class of failure. See [The Receipt](/receipt).
+    Does it land, what does it cost, and if not — which class of failure.
+    See [The Receipt](/receipt).
   </Step>
-
   <Step title="Someone else signs">
-    Gecko hands the plan and the receipt back. A wallet decides whether to sign. Those are
-    different jobs and we do exactly one of them.
+    Gecko hands back the plan and the receipt. A wallet decides. Different jobs, and we do
+    exactly one of them.
   </Step>
 </Steps>
 
 ## The proof
 
-On 6 August 2026 an agent bought a bottle of water for 0.1 USDC on Solana mainnet — a real
-bar, a real product.
+Eleven real mainnet purchases across two days. Every receipt predicted the compute units
+exactly, and the chain charged exactly that.
 
-Before it was signed, Gecko said the transaction would consume **36,508 compute units**.
-The chain consumed **36,508**.
-
-```
-5cjBs5VE8WVVctG2EoUkYiRkW92sXkoT4YsNxszWC9CE3sK7triTJ5vnY6TrcQ2BRPYUtWsd3LtTnyieUfn8Hw2Y
-```
-
-Compute units are the network's own measure of work. Matching to the unit means the
-simulation ran the identical execution, not an approximation of it.
-
-The signature is public. Paste it into any explorer. Do not take our word for it —
-[the full story is here](/mainnet).
+All eleven are public and linked on [A real transaction](/mainnet) — open any of them.
 
 ## What is not built yet
 
-Read this part. An honest list is worth more to you than a good one.
-
-- **The receipt is not bound to the exact signed bytes.** The signing gate checks the
-  verdict. Binding it to the hash of the precise message that gets signed is not built.
-- **A receipt is true for the state it was taken against.** Take it at the moment you
-  sign, not the day before.
-- **Nothing re-checks on a schedule.** Drift is detected across runs you make. There is no
-  cron watching your API for you.
-- **Five Solana programs are wired deep** — Pump.fun, Meteora, Jupiter, ORE, MetaDAO. The
-  catalog lists thousands. Those are very different numbers, and we will not blur them.
-- **Simulation happens locally, not on the hosted surfaces.** The hosted servers give you
-  tools and plans. Receipts need an RPC you point at.
-- **Gecko does not check whether an API's answer is true.** It checks that the call is the
-  right call, and on-chain, that the transaction lands.
+- **The receipt is not bound to the signed bytes' hash.** The gate checks the verdict.
+- **A receipt is true for the state it was taken against.** Take it when you sign.
+- **Nothing re-checks on a schedule.** Drift is detected across runs you make.
+- **Five Solana programs are wired deep.** The catalog lists thousands. Different numbers.
+- **Simulation is local.** The hosted surfaces give tools and plans; receipts need an RPC.
+- **Gecko does not check whether an answer is true** — only that the call is right, and
+  on-chain, that the transaction lands.
 
 ## One next step
 
 <CardGroup cols={2}>
   <Card title="Evaluating — see it decide" icon="magnifying-glass">
-    Watch it route an intent, score what it rejected, and mark every account with where
-    that fact came from.
-
     ```bash
     npx @geckovision/gecko@latest prove "buy a token on pump.fun"
     ```
-
-    No key, no spend, nothing signed. It prints the whole candidate field, not just the
-    winner — including the two accounts it honestly flags instead of guessing.
+    The whole candidate field, not just the winner — including the accounts it flags
+    instead of guessing.
   </Card>
-
   <Card title="Building — point it at your API" icon="wrench">
-    Comprehend your own surface and serve it to your agent.
-
     ```bash
     npx @geckovision/gecko@latest add https://your-api.com/openapi.json
     ```
-
-    No OpenAPI? Give it the docs URL instead. Then
-    [Quickstart](/quickstart) has the four commands, and
-    [Access &amp; auth](/access-and-auth) covers keys.
+    No OpenAPI? Give it the docs URL. Then [Quickstart](/quickstart).
   </Card>
 </CardGroup>
 
 <Note>
-`prove` routes and shows provenance with no setup. Producing a **receipt** additionally
-needs an RPC to simulate against — pass `--rpc-url`, and see [The Receipt](/receipt) for
-the fork setup.
+`prove` routes and shows provenance with no setup. A **receipt** additionally needs an RPC
+— pass `--rpc-url`, or see [The Receipt](/receipt).
 </Note>
