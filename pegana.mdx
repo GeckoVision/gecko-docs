@@ -8,11 +8,17 @@ state, depeg simulation, loop exposure, webhook keys — **43 operations across 
 in production, used by real money.
 
 It is also a *good* API. Run through our agent-readiness scorecard it grades **A
-(99/100)** — first-call-correct 100, security 100, hygiene 98, agent-friendliness 98.
+(100/100)** — first-call-correct 100, hygiene 100, agent-friendliness 100, security 100
+(re-measured against the live spec on 2026-08-06; it scored 99 in July and improved).
 
-That matters for everything below. What follows is not a list of things Pegana got wrong.
-It is a list of things **no specification can carry, at any version, at any quality** —
-which is exactly why a good API is the honest place to show them.
+That matters for everything below. A specification tells you what a call looks like. It
+cannot tell you whether it will work — and that is structural, not a defect anyone can
+fix by writing better docs. What follows is not a list of things Pegana got wrong. It is
+a list of things **no specification can carry, at any version, at any quality** — which is
+exactly why a good API is the honest place to show them.
+
+Concretely: `GET /v1/assets/{symbol}/state` with `symbol` = `"string"` is precisely what
+the spec permits. Live, it is a 404. The spec is right and the call still fails.
 
 <Note>
 Every number on this page is measured from a real run against the live API. The
@@ -66,7 +72,8 @@ the connection on every task, and it doesn't invent one that isn't there.
 the actual task for the context window. The agent spends budget reading about the API
 instead of using it.
 
-**After.** **78.4% compression** on this spec — measured, not estimated.
+**After.** **79.3% compression** on this spec — 113,072 B of raw OpenAPI down to 23,382 B
+of agent surface. Measured 2026-08-06, not estimated.
 
 The number is the least interesting part. Shrinking a spec is easy if you're willing to
 drop things; the constraint that makes it worth anything is that **first-call-correctness

@@ -1,0 +1,86 @@
+---
+title: Code assistants
+description: Your code assistant writes the call it can read. The calls that cost you money are the ones nothing wrote down.
+---
+
+## Start here: often you don't need us
+
+Your code assistant is good at this. Point it at an OpenAPI spec and it will write you a
+working client, usually on the first try.
+
+For one API, with you reading the diff, that is the right tool. Use it.
+
+This page is about the second API. And the one that spends money.
+
+## 1. It writes the call it can read
+
+A code assistant works from what is written down. That is its whole method.
+
+So it cannot know what is missing. And on the surfaces that matter, a lot is missing —
+not because someone was careless, but because the fact does not belong in a document at
+all.
+
+| what the surface says | what the call needs |
+|---|---|
+| Jupiter's route surface declares **9 accounts** | the call needs **25** |
+| Pump.fun's `bonding_curve_v2` appears in **one prose comment**, in no account list | required, or the buy reverts |
+| Meteora's root address seed is **absent from the IDL** | every other account derives from it |
+
+Those 16 extra Jupiter accounts are the legs of whichever route the aggregator picked a
+second earlier. They are not in the specification and **cannot be** — they are not facts
+about the program.
+
+Given that surface, an assistant writes confident, well-formed, wrong code. Nothing in
+its input tells it so.
+
+## 2. Its debugging loop needs an error
+
+Write, run, read the error, fix. That loop is exactly why a code assistant is good.
+
+It has two limits.
+
+On a paid API, every turn of the loop is billed. On a transaction that spends, the loop
+does not exist — the first attempt is the real one.
+
+<Note>
+And the failure that costs the most produces no error at all. The call is well-formed,
+the API accepts it, nothing throws — the wrong pool, the wrong account, a charge posted.
+The loop terminates **successfully**, on a wrong outcome.
+</Note>
+
+## 3. It pays for the surface on every task
+
+A 43-operation API is a lot of tokens. Reading it competes with the actual task, in the
+same context window, every time.
+
+Gecko hands over the one call instead. On a real production API that measured **79.3%
+less context** (113,072 B of OpenAPI → 23,382 B of agent surface, 43 operations, measured
+2026-08-06) — with first-call-correctness held, which is the only version of that number
+worth quoting.
+
+## 4. Its natural output puts your key in a file
+
+Ask an assistant to wire up an API and you get a credential in `.env` or `mcp.json` —
+inside the agent's context, in your shell history, in your repo if you blink.
+
+Gecko injects credentials at call time. The agent describes intent. It never sees a key.
+
+## The difference in one line
+
+A code assistant gives you **integration code** — an artifact you now own and maintain,
+correct on the day it was written.
+
+Gecko gives your agent **the call** — derived fresh, every fact tagged with where it came
+from, and for anything that spends, simulated to a receipt before it counts.
+
+They are not competing. Most teams should have both.
+
+<CardGroup cols={2}>
+  <Card title="See it decide" icon="magnifying-glass" href="/gecko-101">
+    Watch it route an intent, show what it rejected, and mark every account with its
+    origin — including the ones it flags instead of guessing.
+  </Card>
+  <Card title="The receipt" icon="receipt" href="/receipt">
+    What a simulation proves before you sign, and what it does not.
+  </Card>
+</CardGroup>

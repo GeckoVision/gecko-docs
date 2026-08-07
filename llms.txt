@@ -1,10 +1,11 @@
 # Gecko
 
 > The knowledge graph for APIs your agent can trust. Open-source, runs on your machine.
-> One command maps any API — even the messy, paywalled, or on-chain ones — into a
-> verified graph your agent traverses instead of guessing. Every action can be simulated
-> to a receipt before money moves, and every failure shows exactly why. Built for the
-> calls your agent must not get wrong.
+> A specification tells you what a call looks like; it cannot tell you whether it will
+> work. One command maps any API — HTTP, paywalled, or on-chain — into a verified graph
+> your agent traverses instead of guessing. Every action can be simulated to a receipt
+> before money moves, and every failure shows exactly why. Built for the calls your agent
+> must not get wrong.
 
 Gecko is NOT the agent and NOT an orchestrator. It is the memory-and-context substrate
 under other people's agents: it comprehends external surfaces (REST APIs and Solana
@@ -17,15 +18,17 @@ The brand is Gecko; the PyPI package is `gecko-surf`, the import is `gecko`, the
 
 ## When an agent should reach for Gecko
 
-Two axes — either one qualifies:
+Not "when the API is badly documented". The gap Gecko closes is in every specification: a
+spec states what a call looks like, never whether it will work. Reach for Gecko when
+being wrong costs something:
 
-- A **messy surface**: paywalled, drifting, undocumented, or on-chain. The Nth painful
-  API a coding agent does not one-shot.
-- A **high-stakes action**: the agent runs unattended, holding credentials or moving
-  money.
+- The call **spends or commits** — no retry loop exists when the first attempt is real.
+- The agent runs **unattended** — nobody reviews the diff.
+- You are on your **Nth surface** — the cost is per-API and compounds.
+- The task **crosses APIs** — no spec can declare a join to a spec it has never heard of.
 
-A clean API with a human reviewing the diff may not need Gecko. That is a real answer,
-not a hedge.
+One API with a human reviewing every diff is a one-week job either way. Gecko is real
+value there and still probably not worth adopting. That is a real answer, not a hedge.
 
 ## Use Gecko now (agents start here)
 

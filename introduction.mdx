@@ -43,14 +43,21 @@ The brand is **Gecko**. The CLI is **`gecko`** — install it with
 
 ## Why a description isn't enough
 
-An OpenAPI says what exists. An IDL says what a program looks like. **Neither runs
-anything** — and that is the gap, not a shortcoming of either:
+A specification tells you what a call **looks like**. It cannot tell you whether it will
+**work**. That is structural, not a quality defect — it is just as true of a perfect spec:
 
-- **Docs drift.** Working integrations broke twice in 2026 from silent layout changes.
-- **IDLs drop facts.** A required Pump.fun account never appears in the IDL at all.
-- **Agents guess.** A wrong guess posts a charge, reverts a transaction, burns fees.
+- **Nothing in a spec runs.** `/v1/assets/{symbol}/state` is schema-correct with
+  `symbol` = `"string"`. Live, that call is a 404. Only running it tells you.
+- **Some facts can't be in a spec.** Jupiter's route surface declares **9 accounts**; the
+  instruction that lands carries **25**. The other 16 are legs of a route computed a
+  second ago — facts about a different surface.
+- **A spec can't declare a join to a spec it's never heard of.** The mint that connects
+  three Solana APIs is named differently in each and declared by none.
+- **A spec is a snapshot.** Nothing in it says when it stopped being true.
 
-Gecko replaces the guess with a rehearsal.
+Gecko replaces the guess with a rehearsal. The full answer to *"I already have an OpenAPI
+spec and an MCP server"*, with the measured numbers, is in
+[Gecko 101](/gecko-101#what-a-specification-cannot-tell-you).
 
 <CardGroup cols={2}>
   <Card title="Provenance on every edge" icon="fingerprint">
@@ -74,15 +81,17 @@ Gecko replaces the guess with a rehearsal.
 
 ## Who this is for
 
-Two axes — **either one qualifies**:
+Not "teams with bad APIs." The gap above is in every spec. What changes is what a wrong
+call costs you:
 
-- **A messy surface** — paywalled, drifting, undocumented, or on-chain. The Nth painful
-  API your coding agent does not one-shot.
-- **A high-stakes action** — your agent runs unattended, holding credentials or moving
-  money.
+- **The call spends or commits something.** There is no retry loop when the first attempt
+  is the real one.
+- **The agent runs unattended.** Nobody reads the diff before it happens.
+- **You are on your Nth surface.** The cost is per-API and it compounds.
 
-**Clean API, and a human reviewing the diff? You may not need us — and that's fine.**
-Gecko earns its place where a wrong call costs something.
+One API, and a human reviewing every diff? The value is real but it is smaller than the
+cost of adopting anything — a one-week job either way. That is an honest no. Gecko earns
+its place where a wrong call costs something.
 
 ## Proof, not promises
 
