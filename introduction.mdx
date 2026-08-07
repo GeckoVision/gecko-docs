@@ -1,20 +1,33 @@
 ---
 title: Introduction
-description: The knowledge graph for APIs your agent can trust. Open-source, runs on your machine — one command maps any API into a verified graph your agent traverses instead of guessing.
+description: Your agent's first try is the real one. Gecko puts a rehearsal in between — it runs the call somewhere that doesn't count, shows you what will happen, and only then lets it count.
 ---
 
-**The knowledge graph for APIs your agent can trust.**
+**Today, an agent's first attempt at your API is already the real one.**
 
-Open-source. Runs on your machine. One command maps any API — even the messy,
-paywalled, or on-chain ones — into a verified graph your agent **traverses instead of
-guessing**. Every action can be simulated to a **receipt** before money moves. Built
-for the calls your agent must not get wrong.
+And when it goes wrong it usually goes wrong quietly: the call is well-formed, the API
+accepts it, nothing errors — and the world is now wrong.
+
+**Gecko puts a rehearsal in between.** It works out which call to make, fills in what the
+documentation cannot carry, runs it somewhere that doesn't count, and hands back a
+**receipt** of what will happen. Then — and only then — it counts.
+
+<Note>
+On 2026-08-06 an agent bought a bottle of water for 10 cents on Solana mainnet. **Before
+paying, Gecko said exactly what the transaction would do — and that is exactly what
+happened.** [See it](/mainnet); the signature is public, so you can check rather than
+trust us.
+
+*For the technically minded: the receipt predicted 36,508 compute units and the
+transaction consumed 36,508. Compute units are the network's measure of work — matching
+to the unit means we simulated the identical execution, not an approximation of it.*
+</Note>
 
 ```bash
-npx @geckovision/gecko doctor              # 1. check your environment
-npx @geckovision/gecko add <spec-or-docs>  # 2. comprehend it — $0, no live call
-npx @geckovision/gecko report <spec>       # 3. get the scorecard — grade + findings
-npx @geckovision/gecko serve <spec>        # 4. your agent uses it over MCP
+npx @geckovision/gecko prove "<what you want>"   # the rehearsal: which call, and will it work
+npx @geckovision/gecko add <spec-or-docs>       # comprehend any API — $0, no live call
+npx @geckovision/gecko watch <plan.json>        # keep it true: re-run it as CI
+npx @geckovision/gecko serve <spec>             # your agent uses it over MCP
 ```
 
 <Frame caption="Untrusted surfaces → a provenance knowledge graph → verified action: simulate to a receipt, then hand off to an external signer.">
@@ -28,16 +41,16 @@ The brand is **Gecko**. The CLI is **`gecko`** — install it with
 **`gecko`** (`from gecko import …`).
 </Note>
 
-## Why a graph and not a wrapper
+## Why a description isn't enough
 
-An OpenAPI says what exists. An IDL says what a program looks like. Neither is enough
-to act:
+An OpenAPI says what exists. An IDL says what a program looks like. **Neither runs
+anything** — and that is the gap, not a shortcoming of either:
 
 - **Docs drift.** Working integrations broke twice in 2026 from silent layout changes.
 - **IDLs drop facts.** A required Pump.fun account never appears in the IDL at all.
 - **Agents guess.** A wrong guess posts a charge, reverts a transaction, burns fees.
 
-Gecko replaces the guess with a graph.
+Gecko replaces the guess with a rehearsal.
 
 <CardGroup cols={2}>
   <Card title="Provenance on every edge" icon="fingerprint">
