@@ -3,9 +3,10 @@ title: From docs
 description: No OpenAPI? Point `gecko from-docs` at an API's doc site and it recovers a draft OpenAPI, then comprehends it into agent tools — with honest review notes for anything it couldn't pin down.
 ---
 
-Not every painful API ships a spec. The long-tail, paywalled, human-documented ones — the
-exact APIs an agent *can't* one-shot — often have **only a doc site**. `gecko from-docs` is
-the on-ramp: it reads the docs and hands the comprehension engine a *draft* OpenAPI.
+Plenty of good APIs never publish an OpenAPI file. The docs are fine; the machine-readable
+artifact just doesn't exist, so there is nothing for a tool generator to read.
+`gecko from-docs` is the on-ramp: it reads the doc site and hands the comprehension engine
+a *draft* OpenAPI.
 
 ```bash
 gecko from-docs https://docs.some-api.com
@@ -59,6 +60,7 @@ which renders the JS nav before extracting.
 
 ## Why this matters
 
-This is the painful-API wedge, made concrete. A coding agent can one-shot a popular,
-well-specified API — it can't one-shot the **Nth painful one** with no OpenAPI. `from-docs`
-turns that API's docs into agent-usable tools without you hand-writing a client or a spec.
+Every other page here starts from a spec. This is the step before that. An API with no
+OpenAPI file isn't a worse API — it just has nothing an agent can read mechanically.
+`from-docs` produces that artifact, marks what it could not pin down, and never invents
+an endpoint to fill a gap. From there the rest of the pipeline is identical.

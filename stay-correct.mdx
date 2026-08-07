@@ -8,9 +8,10 @@ field, moved a path, tightened an enum, and your hand-written client knew none o
 keeps sending the old shape; the API keeps returning 422; the agent keeps confidently
 retrying a call that can no longer succeed.
 
-A hand-written client is a **frozen snapshot of an API that doesn't hold still.** Every
-rename is a manual diff a human has to notice, read, and re-code. Multiply by the Nth
-painful API and "keep the integrations correct" becomes a standing on-call burden.
+A hand-written client is a **frozen snapshot of an API that doesn't hold still.** So is
+the spec it was written from — nothing in a specification says when it stopped being true.
+Every rename is a manual diff a human has to notice, read, and re-code. Multiply by the
+Nth API and "keep the integrations correct" becomes a standing on-call burden.
 
 ## Why the generated-tool model changes the failure mode
 

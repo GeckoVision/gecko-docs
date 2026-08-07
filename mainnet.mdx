@@ -24,6 +24,9 @@ message. Then a wallet signed it and it landed.
 
 ## Check it yourself
 
+[**Open this transaction on Solscan
+↗**](https://solscan.io/tx/5cjBs5VE8WVVctG2EoUkYiRkW92sXkoT4YsNxszWC9CE3sK7triTJ5vnY6TrcQ2BRPYUtWsd3LtTnyieUfn8Hw2Y)
+
 ```
 5cjBs5VE8WVVctG2EoUkYiRkW92sXkoT4YsNxszWC9CE3sK7triTJ5vnY6TrcQ2BRPYUtWsd3LtTnyieUfn8Hw2Y
 ```
@@ -35,8 +38,52 @@ message. Then a wallet signed it and it landed.
 | slot | 437633643 |
 | compute | 36,508 units — the network's measure of work, matched to the unit |
 
-That signature is public. Nothing on this page requires taking our word for it — paste it
-into any explorer, or `getTransaction` it yourself.
+Nothing on this page requires taking our word for it. Open the link, or ask a node
+directly:
+
+```bash
+curl -s https://api.mainnet-beta.solana.com -X POST \
+  -H 'content-type: application/json' \
+  -d '{"jsonrpc":"2.0","id":1,"method":"getTransaction","params":
+       ["5cjBs5VE8WVVctG2EoUkYiRkW92sXkoT4YsNxszWC9CE3sK7triTJ5vnY6TrcQ2BRPYUtWsd3LtTnyieUfn8Hw2Y",
+        {"maxSupportedTransactionVersion":0}]}' | jq '.result.meta.computeUnitsConsumed'
+```
+
+## Then we did it ten more times
+
+One exact match can be luck. On 7 August 2026 the same agent bought ten more bottles,
+0.1 USDC each, each one planned and simulated against live mainnet before it was signed.
+
+**Every receipt predicted 36,399 compute units. The chain charged 36,399. Ten times out
+of ten.**
+
+| # | transaction | slot | consumed |
+|---|---|---|---|
+| 1 | [`4yBoPqPc…srsv`](https://solscan.io/tx/4yBoPqPc6YqPQjEeC7RGXtgCH9XG9zyx7CXYQ4WdTijbrLWDvE8Yo4eKFU4JAannDtcZJY4BdJN9J1J6mnmrsrsv) | 437721653 | 36,399 |
+| 2 | [`3GvCjqxu…wi5R`](https://solscan.io/tx/3GvCjqxuy5KBuyLRL4f9SKpJrETMNhM6FP4fXBpTzzQJVDW6tXvpfAovy4zFn3j4fSMh2VeJ8VAdxWVuak5Jwi5R) | 437721889 | 36,399 |
+| 3 | [`3MM7QMLz…cHwb`](https://solscan.io/tx/3MM7QMLzpoZNcN2JSnBcSxDiWeDWJgbMHe7pHNcGfw6EAKXLTz5kEuAwg6pbxCnVgTzjBFfcEFFo1BQs2RVGcHwb) | 437722129 | 36,399 |
+| 4 | [`zXsDSEQt…F5C8`](https://solscan.io/tx/zXsDSEQtZt24FkT4eeNpiu4aCB1HXUKPKCeEG291CdHPj6NnfhZzu1zkvvunrCBu7ei2uhoRtmytMDMD9kXF5C8) | 437722295 | 36,399 |
+| 5 | [`o6Da6NZQ…FSi9`](https://solscan.io/tx/o6Da6NZQe4DFag8VNEGHqCY3zuYocfdWT7n7Z7tqNbAJFBg69pNsCSiN51HeDuouW6T6XQeHicVZaWrpsdRFSi9) | 437722451 | 36,399 |
+| 6 | [`3VrHHuzi…Di2u`](https://solscan.io/tx/3VrHHuzi2gC5QjnXBdWRAb5nhDkEPowVuZBnMNCqac8Ty2NeuykAQm7GA44qXfUt5TzCL5yQH4Ussi6nvKqpDi2u) | 437722629 | 36,399 |
+| 7 | [`4QBnD6Yc…8iRj`](https://solscan.io/tx/4QBnD6Yc6sGYzeCVmbi9CpJoZdRfjBEtwMRt8XWVdjpeXwBrM2ApQmHKUACTvX2t3FNxyDqErZNDTY3ifuwE8iRj) | 437722762 | 36,399 |
+| 8 | [`2NBodoD8…5a1B`](https://solscan.io/tx/2NBodoD8VNg1wqUXaxNQJUKTpZ9gkmM445d9NZFXLygaYuxtDyDQsH2MSp8Mdd3BYHci9Q6EPMaCJBGBQWaP5a1B) | 437722902 | 36,399 |
+| 9 | [`33NkTQ5u…WLW1`](https://solscan.io/tx/33NkTQ5uJL85AtpsLMbWJu9L1PT9dKA4jEm5bFW9b2TpKcP7pb3br2up1KiZWmrzBzyPHvWS98rEwpKv7ac3WLW1) | 437722993 | 36,399 |
+| 10 | [`3i92aBEY…AMrs`](https://solscan.io/tx/3i92aBEYsbHBotKcpaB8SxWDWEULp2SuQcqyeShY8sDCzFWQq4MLaN6URreG4QdBF3qRGR3eSYpqQR72kD2wAMrs) | 437723077 | 36,399 |
+
+The books balance to the unit: 1.0 USDC spent, and exactly 50,000 lamports of fees —
+ten transactions at Solana's 5,000-lamport base fee.
+
+<Note>
+**36,399, not 36,508.** The first purchase wrote a record into the store's account, so
+the program does slightly different work now. Both numbers are correct for the state they
+were measured against — which is the whole point, and why a receipt is taken at the moment
+you sign rather than the day before.
+</Note>
+
+**What this shows:** the same instruction, predicted exactly, eleven times across two days
+and two different account states. **What it does not show:** breadth. This is one program.
+[The program surface](/program-surface) is where that claim is made and measured
+separately.
 
 ## Three things had to agree
 
