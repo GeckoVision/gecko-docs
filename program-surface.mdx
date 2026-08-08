@@ -39,6 +39,11 @@ Every derivation is verified against real mainnet accounts on a local `surfpool`
 | ORE | a cross-program account the IDL mis-owns |
 | MetaDAO | an IDL that declares no PDA seeds at all |
 
+Jupiter is the fifth wired surface and is not in this table, because its gap is a
+different kind. Its missing accounts are not derivable from *any* IDL — they are the legs
+of a route an HTTP surface computed a second earlier, so they arrive tagged
+`cross_surface` rather than recovered from seeds. Same plan, different mechanism.
+
 ## Serve one
 
 ```bash
