@@ -70,7 +70,7 @@ agent runs unattended, when you are on your Nth surface, or when the task crosse
 
 ## Make a call that spends money
 
-- [A real transaction](https://docs.geckovision.tech/mainnet): Open eleven public mainnet signatures and check for yourself that every receipt predicted the compute units the chain then charged.
+- [A real transaction](https://docs.geckovision.tech/mainnet): Open thirteen public mainnet signatures and check for yourself that every receipt predicted the compute units the chain then charged — the last two signed inside a hardware enclave, with no key on the machine that planned them.
 - [The Receipt](https://docs.geckovision.tech/receipt): Learn exactly what a simulation proves before you sign — and, in detail, what it does not.
 - [The Program Surface](https://docs.geckovision.tech/program-surface): Recover the PDA seeds an IDL drops, and see which accounts Gecko flags instead of guessing.
 - [find_start](https://docs.geckovision.tech/find-start): Turn a plain intent into one specific instruction with a provenance-tagged derive plan — or get an honest "no start found".

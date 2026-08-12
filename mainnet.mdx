@@ -80,10 +80,48 @@ were measured against — which is the whole point, and why a receipt is taken a
 you sign rather than the day before.
 </Note>
 
-**What this shows:** the same instruction, predicted exactly, eleven times across two days
-and two different account states. **What it does not show:** breadth. This is one program.
-[The program surface](/program-surface) is where that claim is made and measured
-separately.
+## Then the agent did it without us
+
+Every transaction above was signed by a key on a laptop. On 12 August 2026 that stopped
+being true.
+
+**The key moved into a hardware enclave and never came back.** Gecko asked a Privy server
+wallet to sign; the private key has never existed on the machine that planned the
+transaction, and nothing in Gecko can acquire one. The whole path — comprehend, plan,
+simulate, bind, check the spend policy, sign, broadcast — ran in **one call, with no human
+in the loop.**
+
+| # | transaction | slot | consumed | signed by |
+|---|---|---|---|---|
+| 12 | [`3kcngvKS…W5wR`](https://solscan.io/tx/3kcngvKSkfRze7UPc6v1MeeZvxZAR6VG8evoyoA2VGF1eG9MKGzg41838BCGRHqqQBDwQ4FpC8R6qSa18FRTW5wR) | 438850988 | 36,399 | an enclave |
+| 13 | [`zqSHUEoT…fT6p`](https://solscan.io/tx/zqSHUEoTAD9W7KdNHV6bRZfXr6qzAjdqu2LNYfMarvg1JciDgwsNHU4WH7G273Keua6beEV76aDku7JiS3sfT6p) | 438887385 | 36,399 | an enclave |
+
+**Thirteen transactions. Thirteen exact predictions.**
+
+<Note>
+**The first attempt was refused, and by the right party.** The enclave's own policy engine
+rejected it: `policy_violation`. Wallet policies there are deny-by-default *per method*,
+and the policy attached to that wallet only described a method we deliberately do not
+use — the one that signs **and broadcasts** in a single step. Gecko asks for a signature
+and submits the bytes itself, so that the signed message can be re-checked against the
+receipt *before* anything reaches the chain. A vendor that broadcasts for you turns that
+check into a post-mortem.
+
+Fixing it meant adding a rule for the method we do use, restricted to the exact programs
+this purchase touches. Which means the program allowlist now exists **on both sides**: in
+Gecko, and inside the enclave, where we cannot switch it off either.
+</Note>
+
+**What this shows:** the same instruction, predicted exactly, thirteen times across three
+days and several account states — the last two with no key on the planning machine.
+**What it does not show:** breadth. This is one program. [The program
+surface](/program-surface) is where that claim is made and measured separately.
+
+**And one thing it does not show that we would rather say out loud:** three of the four
+spending caps in that run are real controls, but the rolling velocity counter is a file
+the same process can write. A compromised agent could reset its own budget. Moving those
+caps into the enclave — where the program allowlist already lives — is the next piece of
+work, not a finished one.
 
 ## Three things had to agree
 
