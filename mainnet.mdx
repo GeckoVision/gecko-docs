@@ -95,8 +95,21 @@ in the loop.**
 |---|---|---|---|---|
 | 12 | [`3kcngvKS…W5wR`](https://solscan.io/tx/3kcngvKSkfRze7UPc6v1MeeZvxZAR6VG8evoyoA2VGF1eG9MKGzg41838BCGRHqqQBDwQ4FpC8R6qSa18FRTW5wR) | 438850988 | 36,399 | an enclave |
 | 13 | [`zqSHUEoT…fT6p`](https://solscan.io/tx/zqSHUEoTAD9W7KdNHV6bRZfXr6qzAjdqu2LNYfMarvg1JciDgwsNHU4WH7G273Keua6beEV76aDku7JiS3sfT6p) | 438887385 | 36,399 | an enclave |
+| 14 | [`5FLvBcQw…u8UQ`](https://solscan.io/tx/5FLvBcQweiGDNuXxJ3VDxsvwzkyXB6YJame2fB4C6yWCfDMsyEskvuZNxTkspK7aDk5h8y7x8GkSp7sfpHw8u8UQ) | 438888470 | **22,527** | an enclave |
+| 15 | [`4zhgdny6…oLi1`](https://solscan.io/tx/4zhgdny6Wh93XJ9M8hFBsky7oEVAWyv5ddg4h68XzHX2GnDr2c8zQnL4WyUXYVJ3LnS7TyWqEfv55M62bLgDoLi1) | 438920685 | 36,399 | an enclave |
 
-**Thirteen transactions. Thirteen exact predictions.**
+**Fifteen transactions. Fifteen exact predictions.**
+
+<Note>
+**#14 is the interesting one: 22,527 CU, not 36,399 — and predicted exactly anyway.** It
+bought from a *different* storefront (`geckocoffee`), one that was not on any wired list.
+The agent derived the store's address from its name, read the store's own account off the
+chain, decoded the merchant and the menu out of it — Espresso, 0.1 USDC — and walked the
+same verify-then-sign path. Different store, different account state, different work,
+different number. The receipt predicted that number to the unit, which is the property
+this page exists to demonstrate: the prediction tracks the *state*, not a memorised
+constant.
+</Note>
 
 <Note>
 **The first attempt was refused, and by the right party.** The enclave's own policy engine
@@ -112,8 +125,9 @@ this purchase touches. Which means the program allowlist now exists **on both si
 Gecko, and inside the enclave, where we cannot switch it off either.
 </Note>
 
-**What this shows:** the same instruction, predicted exactly, thirteen times across three
-days and several account states — the last two with no key on the planning machine.
+**What this shows:** one instruction, predicted exactly, fifteen times across three days,
+two storefronts and several account states — the last four with no key on the planning
+machine.
 **What it does not show:** breadth. This is one program. [The program
 surface](/program-surface) is where that claim is made and measured separately.
 
