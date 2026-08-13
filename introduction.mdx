@@ -15,12 +15,15 @@ documentation cannot carry, runs it somewhere that doesn't count, and hands back
 <Note>
 On 2026-08-06 an agent bought a bottle of water for 10 cents on Solana mainnet. **Before
 paying, Gecko said exactly what the transaction would do — and that is exactly what
-happened.** [See it](/mainnet); the signature is public, so you can check rather than
-trust us.
+happened.** Since then it has happened **fifteen times out of fifteen** — across two
+storefronts and several account states, the last four signed inside a hardware enclave
+with no key on the machine that planned them. [See every signature](/mainnet); they are
+public, so you can check rather than trust us.
 
-*For the technically minded: the receipt predicted 36,508 compute units and the
-transaction consumed 36,508. Compute units are the network's measure of work — matching
-to the unit means we simulated the identical execution, not an approximation of it.*
+*For the technically minded: each receipt predicted the exact compute units the chain
+then charged — 36,508, then 36,399, then 22,527 for a different store — matching to the
+unit, because the simulation runs the identical execution against the state it will land
+on, not an approximation of it.*
 </Note>
 
 ```bash
