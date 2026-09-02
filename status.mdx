@@ -1,6 +1,6 @@
 ---
 title: Status
-description: The honest split — what works today and is proven, and what is not built yet. Nothing on the "not built" list is claimed anywhere else on this site.
+description: The honest split. What works today and is proven, and what is not built yet. Nothing on the "not built" list is claimed anywhere else on this site.
 ---
 
 Two lists. Everything claimed elsewhere on this site is on the first one.
@@ -14,7 +14,7 @@ Two lists. Everything claimed elsewhere on this site is on the first one.
 - A draft spec recovered from a human docs page, with claims marked `VERIFIED` /
   `REFUTED` against reality rather than trusted.
 - PDA seed recovery from Anchor IDLs **and** from program source (proven on a
-  no-IDL/Steel program) — including recipes the IDL structurally drops or hides in
+  no-IDL/Steel program), including recipes the IDL structurally drops or hides in
   accounts that travel only as remaining accounts.
 - Auto-comprehend-on-pick: point at a project → a generated program config,
   **differential-proven equal** to hand-authored ground truth on 4 programs, plus an
@@ -39,7 +39,7 @@ Two lists. Everything claimed elsewhere on this site is on the first one.
   recovered per tool on demand).
 - Measured context cuts of **−77% / −89%** on two real specs, with
   first-call-correctness held. Bytes measured; tokens estimated.
-- `find_start` — intent → the right (program, instruction) start point, ranked, with a
+- `find_start`: intent → the right (program, instruction) start point, ranked, with a
   dependency-ordered derive plan, provenance on every account, declared preludes, and an
   honest no-start below the retrieval floor. See [find_start](/find-start).
 - The Scorecard (`gecko report`) and the Playground.
@@ -47,17 +47,26 @@ Two lists. Everything claimed elsewhere on this site is on the first one.
 **Verify**
 
 - The simulate→**Receipt** engine, live-proven twice on a **surfpool mainnet fork** (a
-  mainnet-backed snapshot — **not mainnet**), simulation only, $0, nothing signed or
+  mainnet-backed snapshot, **not mainnet**), simulation only, $0, nothing signed or
   broadcast:
 
   | Case | Naive path | Gecko |
   |---|---|---|
-  | Pump.fun `buy` | ❌ reverts — `AccountNotInitialized (3012)` | ✅ passes — 86,669 CU |
-  | Meteora DLMM `swap` | ❌ reverts — derive-only, no ATA/wrap/bin-array preludes | ✅ wrap → swap → unwrap — 81,964 CU |
+  | Pump.fun `buy` | ❌ reverts, `AccountNotInitialized (3012)` | ✅ passes, 86,669 CU |
+  | Meteora DLMM `swap` | ❌ reverts, derive-only, no ATA/wrap/bin-array preludes | ✅ wrap → swap → unwrap, 81,964 CU |
   | Meteora pool derivation | ❌ stale 3-seed scheme → the wrong pool, silently | ✅ correct 4-seed derivation, differential-proven |
 
   CU numbers are measured per run and vary slightly with on-chain state; the stable
   claim is the side-by-side verdict. See [The Receipt](/receipt).
+- On mainnet: the engine repo's ledger (`docs/mainnet-ledger.jsonl`) holds 50 landed
+  transactions as of 2026-09-01. Every row that records both a prediction and a charge
+  matches to the compute unit. See [A real transaction](/mainnet).
+- The binding. `prepare_purchase`, `prepare_instruction` and `plan_swap` on the hosted
+  surface return the unsigned bytes, a receipt, and a `binding` over those exact bytes
+  (`binding_strength: exact`, which covers the blockhash). `verify_signed_transaction`
+  checks signed bytes against it. `submit_transaction` re-verifies at exact strength,
+  refuses without a binding, and rebroadcasts the same bytes until they confirm or the
+  blockhash expires.
 
 **Memory**
 
@@ -65,43 +74,47 @@ Two lists. Everything claimed elsewhere on this site is on the first one.
   an N-confirmed drift detector. Values-free by construction, and audited.
 - The `simulated` tier is wired end to end: the landing orchestrators and the `simulate`
   tool take an explicit `record_to` opt-in (**default: record nothing**), and
-  `gecko drift` reads the series back — categorical rows only, never a pubkey, amount,
+  `gecko drift` reads the series back: categorical rows only, never a pubkey, amount,
   or log.
 
 **Security**
 
 - Seven fail-closed layers: spec sanitizer · per-tool quarantine · image Skill Guard
   (rendered-pixel payloads, encoded-content rescan) · SSRF netguard · out-of-band
-  auth-host anchoring · verdict signing gate · an **AST-enforced** boundary that proves
-  the landing layer contains no sign or send path.
+  auth-host anchoring · the signing gate that checks signed bytes against the receipt's
+  binding · an **AST-enforced** boundary that proves the landing layer contains no sign
+  or send path.
 
-**Scale of the test surface:** 2,400+ tests passing · 4 mainnet programs
-derivation-proven · 2 live receipt pairs · a 4,500-project catalog listed.
+**Scale of the test surface:** 4,800+ tests passing (4,843 offline, measured 2026-09-02)
+· 4 mainnet programs derivation-proven · 2 live receipt pairs on a fork · 50 landed
+mainnet transactions in the ledger · a 4,500-project catalog listed.
 
 ## NOT built yet (honest)
 
 Nothing below is claimed anywhere else on this site.
 
-- **The drift scheduler** — re-simulation on a cadence. Today the series accrues only
+- **The drift scheduler**: re-simulation on a cadence. Today the series accrues only
   when runs happen.
-- **Hosted point-and-simulate**, and hosted program surfaces beyond the first.
-- **Signing-gate binding to the exact simulated message hash** (`evaluate_tx`), and the
-  TEE credential backend. Today's gate is verdict-based; the diagrams label it that way.
-- **Catalog breadth** — 4,500 projects listed, 5 wired deep. Non-Anchor generalization
+- **The TEE credential backend.**
+- **Catalog breadth**: 4,500 projects listed, seven program configs shipped (Pump.fun,
+  Meteora, Jupiter, ORE, MetaDAO, Orca Whirlpool, let_me_buy). Non-Anchor generalization
   is proven once; wider coverage is open.
 - **Pump.fun sell round-trip**, ORE claim, MetaDAO fund executable intents.
-- **The semantic/vector retrieval tier** — deliberately OFF behind an evidence gate. It
+- **The semantic/vector retrieval tier**: deliberately OFF behind an evidence gate. It
   flips only on measured lexical recall failure, not fashion. One measured negative
   result on embeddings is on record.
-- **Cross-customer episodic pooling** — tenancy is local-only until a consent/egress
+- **Cross-customer episodic pooling**: tenancy is local-only until a consent/egress
   layer exists.
-- **Live x402 billing** — stub by design.
+- **Live x402 billing**: stub by design.
 
 ## What Gecko is not
 
-Gecko is **not the agent** and **not an orchestrator**. It never signs, never broadcasts,
-never builds the production transaction, and never proxies the data plane. It is not a
-payment rail and not a marketplace — it **composes on** MCP, x402, and payment catalogs.
+Gecko is **not the agent** and **not an orchestrator**. It never signs and never holds a
+key. It does not build the transaction; an external builder does. It never proxies the
+data plane. The one thing it sends to a chain is signed bytes that verify at exact
+strength against a binding it issued (`submit_transaction`); without that binding it
+refuses. It is not a payment rail and not a marketplace. It **composes on** MCP, x402,
+and payment catalogs.
 
 It does not verify that the data an API returns is *true*. It verifies that the call is
 the right call and, on-chain, that the transaction would land.

@@ -1,13 +1,13 @@
 ---
 title: A real transaction
-description: An agent bought a bottle of water for 0.1 USDC on Solana mainnet. Gecko verified the call before it was signed — and the chain agreed.
+description: An agent bought a bottle of water for 0.1 USDC on Solana mainnet. Gecko verified the call before it was signed, and the chain agreed.
 ---
 
-Every other page here ends at a simulation. This one ends on chain — and the point is
+Every other page here ends at a simulation. This one ends on chain, and the point is
 simple enough to say in one line: **before the money moved, Gecko said exactly what would
 happen, and that is exactly what happened.**
 
-On 2026-08-06 an agentic wallet bought a bottle of water at a bar that takes crypto —
+On 2026-08-06 an agentic wallet bought a bottle of water at a bar that takes crypto:
 0.1 USDC, Solana mainnet, a real store, a real product. Before it was signed, Gecko
 planned the call, simulated it against live mainnet, and bound the receipt to the exact
 message. Then a wallet signed it and it landed.
@@ -33,10 +33,10 @@ message. Then a wallet signed it and it landed.
 
 | | |
 |---|---|
-| what moved | 10 cents — buyer −0.1 USDC, bar +0.1 USDC |
+| what moved | 10 cents: buyer −0.1 USDC, bar +0.1 USDC |
 | did it work | yes, no error |
 | slot | 437633643 |
-| compute | 36,508 units — the network's measure of work, matched to the unit |
+| compute | 36,508 units, the network's measure of work, matched to the unit |
 
 Nothing on this page requires taking our word for it. Open the link, or ask a node
 directly:
@@ -70,13 +70,13 @@ of ten.**
 | 9 | [`33NkTQ5u…WLW1`](https://solscan.io/tx/33NkTQ5uJL85AtpsLMbWJu9L1PT9dKA4jEm5bFW9b2TpKcP7pb3br2up1KiZWmrzBzyPHvWS98rEwpKv7ac3WLW1) | 437722993 | 36,399 |
 | 10 | [`3i92aBEY…AMrs`](https://solscan.io/tx/3i92aBEYsbHBotKcpaB8SxWDWEULp2SuQcqyeShY8sDCzFWQq4MLaN6URreG4QdBF3qRGR3eSYpqQR72kD2wAMrs) | 437723077 | 36,399 |
 
-The books balance to the unit: 1.0 USDC spent, and exactly 50,000 lamports of fees —
-ten transactions at Solana's 5,000-lamport base fee.
+The books balance to the unit: 1.0 USDC spent, and exactly 50,000 lamports of fees, ten
+transactions at Solana's 5,000-lamport base fee.
 
 <Note>
 **36,399, not 36,508.** The first purchase wrote a record into the store's account, so
 the program does slightly different work now. Both numbers are correct for the state they
-were measured against — which is the whole point, and why a receipt is taken at the moment
+were measured against, which is the whole point, and why a receipt is taken at the moment
 you sign rather than the day before.
 </Note>
 
@@ -87,8 +87,8 @@ being true.
 
 **The key moved into a hardware enclave and never came back.** Gecko asked a Privy server
 wallet to sign; the private key has never existed on the machine that planned the
-transaction, and nothing in Gecko can acquire one. The whole path — comprehend, plan,
-simulate, bind, check the spend policy, sign, broadcast — ran in **one call, with no human
+transaction, and nothing in Gecko can acquire one. The whole path (comprehend, plan,
+simulate, bind, check the spend policy, sign, broadcast) ran in **one call, with no human
 in the loop.**
 
 | # | transaction | slot | consumed | signed by |
@@ -102,10 +102,10 @@ in the loop.**
 **Sixteen transactions. Sixteen exact predictions.**
 
 <Note>
-**#14 is the interesting one: 22,527 CU, not 36,399 — and predicted exactly anyway.** It
+**#14 is the interesting one: 22,527 CU, not 36,399, and predicted exactly anyway.** It
 bought from a *different* storefront (`geckocoffee`), one that was not on any wired list.
 The agent derived the store's address from its name, read the store's own account off the
-chain, decoded the merchant and the menu out of it — Espresso, 0.1 USDC — and walked the
+chain, decoded the merchant and the menu out of it (Espresso, 0.1 USDC) and walked the
 same verify-then-sign path. Different store, different account state, different work,
 different number. The receipt predicted that number to the unit, which is the property
 this page exists to demonstrate: the prediction tracks the *state*, not a memorised
@@ -116,7 +116,7 @@ constant.
 **The first attempt was refused, and by the right party.** The enclave's own policy engine
 rejected it: `policy_violation`. Wallet policies there are deny-by-default *per method*,
 and the policy attached to that wallet only described a method we deliberately do not
-use — the one that signs **and broadcasts** in a single step. Gecko asks for a signature
+use, the one that signs **and broadcasts** in a single step. Gecko asks for a signature
 and submits the bytes itself, so that the signed message can be re-checked against the
 receipt *before* anything reaches the chain. A vendor that broadcasts for you turns that
 check into a post-mortem.
@@ -127,7 +127,7 @@ Gecko, and inside the enclave, where we cannot switch it off either.
 </Note>
 
 **What this shows:** one instruction, predicted exactly, sixteen times across three days,
-two storefronts and several account states — the last five with no key on the planning
+two storefronts and several account states, the last five with no key on the planning
 machine.
 **What it does not show:** breadth. This is one program. [The program
 surface](/program-surface) is where that claim is made and measured separately.
@@ -135,20 +135,111 @@ surface](/program-surface) is where that claim is made and measured separately.
 **And one thing it does not show that we would rather say out loud:** three of the four
 spending caps in that run are real controls, but the rolling velocity counter is a file
 the same process can write. A compromised agent could reset its own budget. Moving those
-caps into the enclave — where the program allowlist already lives — is the next piece of
+caps into the enclave, where the program allowlist already lives, is the next piece of
 work, not a finished one.
+
+## A second program, and a token the store won't take
+
+The section above says this shows one program. On 26–27 August 2026 it stopped being one.
+
+A wallet held **USDG**. The espresso is priced in **USDC**, and `let_me_buy` pins classic
+SPL Token in its IDL, so a Token-2022 mint has no path through it at all. Not a preference,
+a structural fact about the program. Five transactions closed that gap end to end.
+
+| # | signature | slot | predicted | charged | what it added |
+|---|---|---|---|---|---|
+| 1 | [`unFg5wYW…Aswj`](https://solscan.io/tx/unFg5wYW6n7v9iKa7t7NvzAJS2rjME2EBwnRb8tdsSRTr1gCpCjWo3kqNracWSe5wNR8SBvEvtdVvyQGSoCAswj) | 441,778,607 | 41,615 | 41,615 | the first DeFi swap, and the first mainnet transaction from an **auto-comprehended** program |
+| 2 | [`3szbhgFo…Qq19`](https://solscan.io/tx/3szbhgFoFJ4NiNoziSt6ZsnWwwq9GxBF8TpDDN9C8FKYJXGw2ySaFBoB3Jm8UkADPoZEuxYpRUUumKjt5Dd3Qq19) | 441,797,280 | 41,607 | 41,607 | spent the remaining USDC, so "holds only USDG" became a fact on chain, not a framing |
+| 3 | [`5c9KuuXj…ccFU`](https://solscan.io/tx/5c9KuuXjH2xVCwRitGV2oQJotRtaoU8WDG74CNpQXYt7MB3CDFkHKWgcvqzqrMHMbHMtrikBAiBdMTpe5KUZccFU) | 441,798,061 | 44,584 | 44,584 | USDG → USDC, the direction that had never landed |
+| 4 | [`47bt1wUS…ft6kS`](https://solscan.io/tx/47bt1wUSw9RTqym5WRoPqM7zz4jb3gMgtgFbGvXjtkMdgCKNnfmZZxdmQ7vQwtqzYSKy5v4jGPQF6yvVnVzft6kS) | 442,020,951 | 44,827 | 44,827 | the same swap from a separate buyer: 250,000 USDG → 101,011 USDC |
+| 5 | [`2d62xnim…17i4`](https://solscan.io/tx/2d62xnim4YqozhCQQCFcmidywvBWG5gyNtvA6n3ZFzspeeeFpi4rNGxDgpyTL8AssRyhgi3kiZitQrMMhuqo17i4) | 442,021,012 | 48,280 | 48,280 | **the espresso** |
+
+**The venue was derived, not chosen, and it proves itself.** Given the pair of mints, the
+pool is found by matching the Whirlpool account discriminator and the two mint fields at
+offsets computed from the IDL, and then **each candidate's address is re-derived from its
+own configuration, mints and tick spacing**. A pool that cannot reproduce its own address is
+dropped. The search proposes; the seed recipe disposes. That is what makes a wrong field
+offset refute itself instead of quietly returning a plausible wrong pool.
+
+<Note>
+**Four well-formed wrong answers were waiting on the first of these**, and comparison caught
+each one, not inspection.
+
+The **pool address**: the surface first derived the fifth seed as a lookup on an adaptive
+fee tier, which makes the pool underivable. It is a caller-supplied tick spacing, and the
+wrong tier yields a real, valid, **wrong** pool.
+
+The **tick arrays**: seeded with an ASCII *decimal string*, which the surface encoded as a
+32-bit integer because that is how the IDL declares the argument. An argument's declared
+type does not determine its seed encoding.
+
+The **direction**: b→a walks ticks up and a→b walks down. Only the array holding the current
+tick is shared between them.
+
+The **USDG account**: derived under Token-2022, where our helper had been defaulting to
+classic SPL, including in the agent-facing tool. One instruction, two different token
+programs.
+</Note>
+
+**And the trap that cost three transactions.** The wallet first funded with USDG *was* the
+store's own authority, so the buyer's token account and the store's are one address, and
+the payment would credit the account it debits. The plan check refuses that, correctly. But
+by then the swaps funding that wallet had been paid for. The lesson is about *ordering*: a
+structural refusal has to run **before** a route is quoted, or you pay for a route to a place
+you were never able to reach. The check now runs first.
+
+**What these five did not show at the time.** Every one was settled by a script run by
+hand, and nothing shipped could yet look inside a wallet to answer *"buy an espresso, I
+only have USDG"* with the conversion instead of the storefront. The section below is what
+changed.
+
+<Note>
+**On the predictions in this table.** The charged figures are read back from the chain and
+re-checked by `scripts/mainnet_ledger.py --verify`. The predictions were recorded in the
+running session's notes at the time and the receipt output was not kept, so they are
+transcribed rather than captured: accurate against the chain, but a weaker record than the
+earlier runs, where the prediction was written down before the transaction settled.
+`docs/mainnet-swap-chain.md` in the engine repo states that distinction in full. We would
+rather publish the difference than average it away.
+</Note>
+
+## Since then: the hosted path, signed headless
+
+By 2026-09-01 the same loop ran through the **hosted MCP surface**
+(`mcp.geckovision.tech/orquestra/mcp`) with no script and no shell. The surface gained
+`plan_payment` and `plan_swap`, so "I only have USDG" is now answered with a checked
+route. `prepare_purchase` and `prepare_instruction` return unsigned bytes, a receipt, and
+a `binding` at `exact` strength. A hosted signer signed them headless. The three
+transactions below are the last three rows of the engine repo's ledger
+(`docs/mainnet-ledger.jsonl`), which holds 50 landed mainnet transactions in total.
+
+| # | signature | program | predicted | how |
+|---|---|---|---|---|
+| 24 | [`5T8sRyYY…ANJL`](https://solscan.io/tx/5T8sRyYYB93F5FAd1c14cD5BEYyvxEEdL2vJK7tV9spxZXqUx8gjfgWhABh2R9HPXd9kqZE5FMsvwRRysyMANJL) | let_me_buy purchase | 48,578 | hosted `prepare_purchase` receipt, signed headless via the PayBox SDK |
+| 25 | [`3bUd6dF1…Rfy9g`](https://solscan.io/tx/3bUd6dF1RQ8Hfhw3PZBTyXQMFVkVtJ4W7hgdRd786eeBZUHnAjouUthorvGFMd434Lwp2QBvYetvoX7AECMRfy9g) | Orca Whirlpool swap | not recorded | hosted `plan_swap` + `prepare_instruction`, binding exact, signed headless |
+| 26 | [`3gZbFhUz…7xPZ`](https://solscan.io/tx/3gZbFhUzZC6RQvunBYDE8NhW1VLGV8rz3RQzKCnwWEZvp3tKJw6E1fS6WhjXcRBdoGJzskaRkia8N8SdApTm7xPZ) | Orca Whirlpool swap, USDG → USDC | not recorded | hosted `plan_swap` + `prepare_instruction`, binding exact, signed headless |
+
+Two honest notes. The ledger records no compute prediction for #25 and #26, so they
+count as landed with an exact binding, not as exact predictions. And #24's first send
+expired unlanded on the public RPC; the identical signed bytes, rebroadcast every ~1.5
+seconds, landed in seconds. That measurement is why `submit_transaction` exists: it
+verifies the signed bytes against the binding, sends, and rebroadcasts the same bytes
+until they confirm or the blockhash budget is spent. Same bytes, same signature, so the
+loop cannot double-spend.
 
 ## Three things had to agree
 
-Gecko answered **will this work** — simulated, bound, PASS. The wallet answered **who
-signs it**. The wallet's policy answered **are you allowed to spend this** — a single-
+Gecko answered **will this work**: simulated, bound, PASS. The wallet answered **who
+signs it**. The wallet's policy answered **are you allowed to spend this**, a single-
 transaction limit, enforced independently.
 
 Those are different guarantees, and none substitutes for another. A policy that approves
 your spending limit cannot tell you the transaction reverts; a simulation that says it
 lands cannot tell you whether you were allowed to make it.
 
-**Gecko held no key and broadcast nothing.** It never does.
+**Gecko held no key and signed nothing.** It never does. What it relayed to the chain was
+signed bytes that had been re-checked against the receipt's binding first, and that is the
+only thing it ever relays.
 
 ## The part that didn't go to plan
 
@@ -159,20 +250,20 @@ the chain charged   36,508 CU
 a pre-flight NOW    36,399 CU
 ```
 
-109 units apart — because *this very purchase* wrote a record into the store's receipts
+109 units apart, because *this very purchase* wrote a record into the store's receipts
 account, so the program does slightly different work now.
 
 That's not a defect, and hiding it would have cost the more useful lesson:
 
 <Note>
-**A receipt is true for the state it was taken against.** Take it at the moment you sign
-— not the day before. It's the same reason a receipt's strongest binding expires with its
+**A receipt is true for the state it was taken against.** Take it at the moment you sign,
+not the day before. It's the same reason a receipt's strongest binding expires with its
 blockhash, about a minute.
 </Note>
 
 For the record, the pre-flight run immediately *before* the send did predict 36,508
 exactly. We don't show that on camera, because it can't be re-derived now that the state
-has moved — and a demo that can't reproduce its own claim shouldn't make it.
+has moved, and a demo that can't reproduce its own claim shouldn't make it.
 
 ## Do it yourself
 
@@ -184,11 +275,12 @@ npx @geckovision/gecko prove "route a swap out of hyUSD" \
 ```
 
 You get the call it chose, what it rejected, every account with where it came from, and a
-receipt — before anything is signed or spent.
+receipt, before anything is signed or spent. To run the hosted loop instead, follow
+[`agents.md`](https://www.geckovision.tech/agents.md).
 
 <CardGroup cols={2}>
 <Card title="How the receipt works" icon="receipt" href="/receipt">
-  Status, compute units, categorical failure class — and what it does not claim.
+  Status, compute units, categorical failure class, the binding, and what it does not claim.
 </Card>
 <Card title="The program surface" icon="cube" href="/program-surface">
   Seed recovery, provenance per account, and the gaps we flag instead of guessing.

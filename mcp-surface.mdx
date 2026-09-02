@@ -1,22 +1,30 @@
 ---
 title: The MCP surface
-description: What an agent installs — a framework-agnostic MCP surface over any ingested API, plus a synthetic search_capabilities tool for intent-to-endpoint discovery.
+description: What an agent installs. A framework-agnostic MCP surface over any ingested API, plus a synthetic search_capabilities tool for intent-to-endpoint discovery.
 ---
 
 Gecko exposes an ingested API to an agent through the **Model Context Protocol
 (MCP)**. The surface is framework-agnostic and fully testable: it's a thin view over
-the client with two methods — `list_tools` and `call_tool`.
+the client with two methods, `list_tools` and `call_tool`.
 
 A Solana [Program Surface](/program-surface) is served the same way, via
 `gecko-orquestra --program <name>`.
 
 <Tip>
-Want to see it without installing anything? Add a live, hosted surface to your agent:
+Want to see it without installing anything? The flagship hosted surface is one line in
+Claude Code:
+```bash
+claude mcp add --transport http gecko https://mcp.geckovision.tech/orquestra/mcp
+```
+That's 16 tools over Solana storefronts, Orca Whirlpool swaps, `find_start` and program
+graphs. Every other client's wiring is in
+[`mcp-config.json`](https://www.geckovision.tech/mcp-config.json), and the runbook is
+[`agents.md`](https://www.geckovision.tech/agents.md). For a hosted HTTP API instead:
 ```bash
 claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
 ```
 That's the TxODDS TxLINE World Cup API (18 first-call-correct tools, served recorded/$0).
-In Claude Code you can instead `/plugin install gecko-surf@geckovision` — it wires that
+In Claude Code you can instead `/plugin install gecko-surf@geckovision`, which wires that
 surface **and** the make-agent-ready workflow. See the [Quickstart](/quickstart).
 </Tip>
 
@@ -39,12 +47,12 @@ Add it to an agent (one step):
   VS Code:      vscode:mcp/install?…
 ```
 
-- **Claude Code** — paste the printed `claude mcp add …` line.
-- **Cursor / VS Code** — open the printed deeplink (click it, or paste it into the address bar).
+- **Claude Code**: paste the printed `claude mcp add …` line.
+- **Cursor / VS Code**: open the printed deeplink (click it, or paste it into the address bar).
 
 Serving to a *remote* agent? Add `--public-url https://<tunnel>` so the add strings and
 the DNS-rebinding `Host`/`Origin` guard use your public URL. (For an embedded, in-process
-server there's also a stdio variant — see [Using it in code](#using-it-in-code) below.)
+server there's also a stdio variant; see [Using it in code](#using-it-in-code) below.)
 
 ## What the agent sees
 
@@ -66,7 +74,7 @@ right endpoint and then call it.
 }
 ```
 
-Each real tool is listed with only `name`, `description`, and `inputSchema` — auth
+Each real tool is listed with only `name`, `description`, and `inputSchema`. Auth
 plumbing and invocation metadata stay internal. Operations the current
 [session](/access-and-auth) can't satisfy are not listed at all.
 
