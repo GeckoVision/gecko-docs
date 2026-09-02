@@ -2,42 +2,62 @@
 
 Check the call before it counts.
 
-Gecko reads an API — an OpenAPI spec, a docs site, or a Solana program's IDL and source —
+Gecko reads an API (an OpenAPI spec, a docs site, or a Solana program's IDL and source)
 and hands your agent the one call to make, every fact tagged with where it came from. For
-anything that spends, it simulates the call first and returns a receipt. It holds no key,
-signs nothing, broadcasts nothing, and stores no response payload.
+anything that spends, it simulates the exact bytes first and returns a receipt with a
+binding to those bytes. It holds no key, signs nothing, and stores no response payload.
+The only thing it ever sends to a chain is signed bytes that verify against a binding it
+issued.
 
-## Make a call right now — agents, read this section first
+## Make a call right now. Agents, read this section first
 
-Answer a live question against a real production API. No install, no account, no key.
+The executable runbook is https://www.geckovision.tech/agents.md. Every client's exact
+wiring is https://www.geckovision.tech/mcp-config.json. Start from those, not from
+hand-typed URLs.
 
-    claude mcp add --transport http gecko https://mcp.geckovision.tech/pegana/mcp
+    claude mcp add --transport http gecko https://mcp.geckovision.tech/orquestra/mcp
 
-Then, over MCP, in this order:
+That is the flagship surface: 16 tools for Solana commerce and programs. Browse real
+storefronts (`list_stores`), route a plain intent to an instruction (`find_start`), read
+a program's graph, prepare a simulation-checked unsigned purchase (`prepare_purchase`)
+or an Orca Whirlpool swap (`plan_swap`), prove the signed bytes are the checked ones
+(`verify_signed_transaction`), and relay them (`submit_transaction`). No account, no key.
+A keyless `prepare_purchase` call confirms the order and names the signers that reach
+your client; it starts no clock.
+
+A keyless HTTP API, same shape:
+
+    claude mcp add --transport http pegana https://mcp.geckovision.tech/pegana/mcp
 
     search_capabilities(query="is USDC pegged right now")   -> ranked tool names
     state(symbol="USDC")                                    -> {"state":"PEGGED", ...}
 
-The parameter is `query` (or `intent`) — no other name works. A wrong name is rejected
+The parameter is `query` (or `intent`). No other name works. A wrong name is rejected
 with the argument you passed named back at you; against an older deployment it returns the
 whole unranked catalog instead, so if your first results are `root`, `live`, `ready`, that
 is what happened. Every other tool takes exactly the parameters in the `inputSchema` that
 `search_capabilities` returns; use those, do not invent names.
 
-Same shape, other hosted surfaces:
+The host serves ten surfaces. The list is at
+https://mcp.geckovision.tech/.well-known/gecko.json and each one is described at
+https://www.geckovision.tech/catalog.md. The host root, https://mcp.geckovision.tech/mcp,
+serves two tools: `comprehend_api` (point it at any OpenAPI URL) and `list_surfaces`.
 
-    https://mcp.geckovision.tech/orquestra/mcp   route an intent to a Solana instruction
-    https://mcp.geckovision.tech/jupiter/mcp     quotes and swaps
-    https://mcp.geckovision.tech/gecko/mcp       point it at your own API
+Seven skills install with one command:
+
+    npx skills add GeckoVision/gecko-surf
+
+They are gecko-setup, use-any-api, api-agent-ready, x402-payai-setup, anti-poisoning,
+skill-guard, and read-js-docs.
 
 On your own machine, with no setup and no key:
 
     npx @geckovision/gecko@latest prove "buy a token on pump.fun"  # watch it route, with provenance
-    npx @geckovision/gecko@latest add <spec-or-docs-url>           # comprehend any API — $0, no live call
+    npx @geckovision/gecko@latest add <spec-or-docs-url>           # comprehend any API, $0, no live call
     npx @geckovision/gecko@latest serve <spec>                     # serve it to your agent over MCP
 
 `prove` routes and shows provenance with no flags at all. A *receipt* additionally needs a
-Solana RPC (`--rpc-url`) and the instruction's bindings — `prove` names the missing ones.
+Solana RPC (`--rpc-url`) and the instruction's bindings; `prove` names the missing ones.
 
 The brand is Gecko. The CLI is `gecko`, the PyPI package is `gecko-surf`, the import is
 `gecko`, the repo is GeckoVision/gecko-surf (Apache-2.0).
@@ -46,7 +66,7 @@ The brand is Gecko. The CLI is `gecko`, the PyPI package is `gecko-surf`, the im
 
 - [Gecko 101](https://docs.geckovision.tech/gecko-101): Watch ten questions hit four programs and land one transaction in a single take, then make your first call from one URL.
 - [Introduction](https://docs.geckovision.tech/introduction): Understand what no specification can tell you, and judge whether that gap costs you enough to close.
-- [Code assistants](https://docs.geckovision.tech/code-assistants): Decide whether your coding assistant already covers this — for one API it usually does, and this page says exactly where it stops.
+- [Code assistants](https://docs.geckovision.tech/code-assistants): Decide whether your coding assistant already covers this. For one API it usually does, and this page says exactly where it stops.
 - [Status](https://docs.geckovision.tech/status): Check what is proven and what is not built before you depend on anything claimed here.
 
 Do not adopt Gecko for one well-documented API with a human reading every diff. That is a
@@ -55,7 +75,7 @@ agent runs unattended, when you are on your Nth surface, or when the task crosse
 
 ## Get your first call working
 
-- [Quickstart](https://docs.geckovision.tech/quickstart): Go from a spec URL to your agent making the call — doctor, add, report, serve — without a key and without spending.
+- [Quickstart](https://docs.geckovision.tech/quickstart): Go from a spec URL to your agent making the call (doctor, add, report, serve) without a key and without spending.
 - [A production API](https://docs.geckovision.tech/pegana): See what an agent got right on the first try against a 43-operation stablecoin API, asked in plain Portuguese.
 - [The MCP surface](https://docs.geckovision.tech/mcp-surface): Learn which tools your client will see, what `search_capabilities` returns, and how to run it over stdio.
 - [Access & auth](https://docs.geckovision.tech/access-and-auth): Set up a paid or keyed API so the credential stays in your OS keychain and never enters `mcp.json` or the model's context.
@@ -66,19 +86,19 @@ agent runs unattended, when you are on your Nth surface, or when the task crosse
 - [From docs](https://docs.geckovision.tech/from-docs): Recover a draft spec from a docs site when the API publishes no OpenAPI, and see which claims came back marked unverified.
 - [How comprehension works](https://docs.geckovision.tech/comprehension): Follow one spec through ingest, catalog, and tool generation so you can predict what your own API will produce.
 - [Recorded mode](https://docs.geckovision.tech/recorded-mode): Falsify every generated call offline for $0 before you let one reach the real API.
-- [Stay correct](https://docs.geckovision.tech/stay-correct): Find out that a provider changed something before production does — and see why nothing re-checks on a schedule yet.
+- [Stay correct](https://docs.geckovision.tech/stay-correct): Find out that a provider changed something before production does, and see why nothing re-checks on a schedule yet.
 
 ## Make a call that spends money
 
-- [A real transaction](https://docs.geckovision.tech/mainnet): Open sixteen public mainnet signatures and check for yourself that every receipt predicted the compute units the chain then charged — the last five signed inside a hardware enclave, with no key on the machine that planned them.
-- [The Receipt](https://docs.geckovision.tech/receipt): Learn exactly what a simulation proves before you sign — and, in detail, what it does not.
+- [A real transaction](https://docs.geckovision.tech/mainnet): Open public mainnet signatures and check for yourself that each receipt predicted the compute units the chain then charged. The engine repo's ledger (`docs/mainnet-ledger.jsonl`) holds 50 landed transactions as of 2026-09-01; the latest three, a storefront purchase and two Orca Whirlpool swaps, were prepared by the hosted MCP and signed headless by a hosted signer against an exact binding.
+- [The Receipt](https://docs.geckovision.tech/receipt): Learn exactly what a simulation proves before you sign, what the binding covers, and in detail what it does not.
 - [The Program Surface](https://docs.geckovision.tech/program-surface): Recover the PDA seeds an IDL drops, and see which accounts Gecko flags instead of guessing.
-- [find_start](https://docs.geckovision.tech/find-start): Turn a plain intent into one specific instruction with a provenance-tagged derive plan — or get an honest "no start found".
+- [find_start](https://docs.geckovision.tech/find-start): Turn a plain intent into one specific instruction with a provenance-tagged derive plan, or get an honest "no start found".
 - [Four programs](https://docs.geckovision.tech/use-cases): Compare what an agent did to four live Solana programs on its own against what changed once it could check first.
 
 ## Reference and background
 
-- [Concepts](https://docs.geckovision.tech/concepts): Look up a term — surface, graph, provenance, overlay, receipt, drift, plan, session, the two modes.
+- [Concepts](https://docs.geckovision.tech/concepts): Look up a term: surface, graph, provenance, overlay, receipt, drift, plan, session, the two modes.
 - [Architecture](https://docs.geckovision.tech/architecture): Find the module you need to change, the invariants you must not break, and the single API-agnostic seam.
 - [Example: TxLINE trading agent](https://docs.geckovision.tech/txline-trading-agent): Copy a full working agent that comprehends a paywalled odds API and settles a market on-chain, runnable offline for $0.
 - [Roadmap](https://docs.geckovision.tech/roadmap): See what is live, what is being built, and what we have decided never to build.
@@ -87,32 +107,39 @@ agent runs unattended, when you are on your Nth surface, or when the task crosse
 
 ## Machine-readable surfaces
 
-- [Hosted MCP endpoint](https://mcp.geckovision.tech/mcp): Connect an MCP client to the live Gecko server over Streamable HTTP.
+- [Flagship MCP surface](https://mcp.geckovision.tech/orquestra/mcp): Streamable HTTP, 16 tools, no key. The one to wire first.
+- [Host root](https://mcp.geckovision.tech/mcp): Two tools, `comprehend_api` and `list_surfaces`.
+- [Served surfaces](https://mcp.geckovision.tech/.well-known/gecko.json): The ten mounted surfaces; each described at https://www.geckovision.tech/catalog.md.
+- [Client wiring](https://www.geckovision.tech/mcp-config.json): Every client's exact config.
+- [Agent runbook](https://www.geckovision.tech/agents.md): The executable setup and purchase runbook.
 - [llms-full.txt](https://docs.geckovision.tech/llms-full.txt): Load the entire documentation set as one Markdown file.
 - [gecko.json](https://docs.geckovision.tech/gecko.json): Read the machine-readable manifest for these docs.
 - [/.well-known/gecko.json](https://docs.geckovision.tech/.well-known/gecko.json): Discover the same manifest at the convention path.
 - [Product manifest](https://www.geckovision.tech/gecko.json): Read the source-of-truth product manifest on the landing site.
 
-Append `.md` to any page URL above for its raw Markdown.
+On this docs site (docs.geckovision.tech), append `.md` to a page URL for its raw
+Markdown. On geckovision.tech that holds only for the home page, `/catalog` and
+`/catalog/<surface>`.
 
-## What is not built — check here before you depend on something
+## What is not built. Check here before you depend on something
 
-- The receipt is **not** bound to the signed message hash. The signing gate checks the verdict only.
-- A receipt is true for the state it was taken against. Take it at the moment you sign, not before.
+- A receipt is true for the state it was taken against, and the exact binding dies with its blockhash (about 60 seconds). Prepare at the moment you sign, not before. Re-running is free.
 - Nothing re-checks on a schedule. Drift is detected across runs you make; the scheduler is not built.
-- **Five** Solana programs are wired deep (Pump.fun, Meteora, Jupiter, ORE, MetaDAO); auto-comprehend is differential-proven on **four**. The catalog lists thousands. Different numbers.
-- Simulation is local. The hosted surfaces give tools and plans; a receipt needs your own RPC.
-- Not built: hosted point-and-simulate, the TEE credential backend, semantic/vector retrieval (evidence-gated off), cross-customer pooling, live x402 billing.
-- Gecko does not check whether an answer is **true** — only that the call is right, and on-chain, that the transaction lands.
+- Program configs ship for seven programs (Pump.fun, Meteora, Jupiter, ORE, MetaDAO, Orca Whirlpool, let_me_buy); auto-comprehend is differential-proven on **four**. The catalog lists thousands. Different numbers.
+- The hosted orquestra surface simulates against a public mainnet RPC and returns a receipt with a binding. The other hosted surfaces give tools, not receipts. A fork is your own node; pass its URL.
+- Not built: the TEE credential backend, semantic/vector retrieval (evidence-gated off), cross-customer pooling, live x402 billing.
+- Gecko does not check whether an answer is **true**, only that the call is right, and on-chain, that the transaction lands.
 
 Full split: https://docs.geckovision.tech/status
 
 ## What Gecko is not
 
 Gecko is not the agent and not an orchestrator. It is the comprehension and verification
-layer under someone else's agent. It is not a payment rail and not a marketplace — it
+layer under someone else's agent. It is not a payment rail and not a marketplace. It
 composes on top of MCP, x402, and payment catalogs and consumes them as input. Building
-transactions belongs to builders; signing belongs to signers.
+transactions belongs to builders; signing belongs to signers. Gecko never holds a key.
+The one send path it ships, `submit_transaction`, relays only signed bytes that verify at
+exact strength against a binding a Gecko receipt issued.
 
 Control plane only: Gecko stores surfaces, generated tool definitions, and correctness
 metadata. It never stores response payloads, user data, or secrets.

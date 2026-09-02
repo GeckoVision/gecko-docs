@@ -1,36 +1,36 @@
 ---
 title: The Program Surface (on-chain)
-description: The on-chain twin of the Agent Surface — comprehend a Solana program, recover the PDA seeds an IDL drops, and derive the accounts first-plan-correct.
+description: The on-chain twin of the Agent Surface. Comprehend a Solana program, recover the PDA seeds an IDL drops, and derive the accounts first-plan-correct.
 ---
 
 ## The same thesis, one layer down
 
 An HTTP API has an OpenAPI spec; a Solana program has an on-chain instruction↔account↔PDA
-graph. Both are surfaces an agent must understand before it can act — and both lose
+graph. Both are surfaces an agent must understand before it can act, and both lose
 something the agent needs: an Anchor IDL (or an `llms.txt` built from one) **drops the PDA
 seed recipes**, so the agent derives the wrong accounts and the transaction fails.
 
 The **Program Surface** is Gecko's on-chain surface: it recovers those seed recipes from
-program source and derives the PDAs **first-plan-correct** — the accounts a naive IDL tool
+program source and derives the PDAs **first-plan-correct**, the accounts a naive IDL tool
 omits or gets wrong.
 
-## Gecko comprehends; the builder accesses
+## Gecko comprehends; the builder builds
 
-Gecko does the **comprehension**, not the access. It recovers the dropped seeds and derives
-the accounts. [Orquestra](https://github.com/berkayoztunc/orquestra) does the **access** —
-it builds and submits the transaction against the program. Gecko fills the derivation gap
-and hands the plan to the builder to execute. **Gecko never signs** and never replaces the
-builder.
+Gecko does the **comprehension**, not the build. It recovers the dropped seeds and derives
+the accounts. [Orquestra](https://github.com/berkayoztunc/orquestra) **builds** the
+transaction against the program. Gecko fills the derivation gap, hands the plan to the
+builder, simulates the bytes that come back, and returns them unsigned with a receipt.
+**Gecko never signs** and never replaces the builder.
 
 <Note>
 Control plane, on-chain too: Gecko derives addresses and returns a plan. It holds no keys,
-signs nothing, and moves no funds — the same invariant as the HTTP path.
+signs nothing, and moves no funds, the same invariant as the HTTP path.
 </Note>
 
 ## Proven on four mainnet programs
 
-Every derivation is verified against real mainnet accounts on a local `surfpool` fork —
-`$0`, read-only, no signing — each program with a gap a naive IDL tool gets wrong:
+Every derivation is verified against real mainnet accounts on a local `surfpool` fork,
+`$0`, read-only, no signing, each program with a gap a naive IDL tool gets wrong:
 
 | Program | The gap Gecko fills |
 |---|---|
@@ -40,9 +40,12 @@ Every derivation is verified against real mainnet accounts on a local `surfpool`
 | MetaDAO | an IDL that declares no PDA seeds at all |
 
 Jupiter is the fifth wired surface and is not in this table, because its gap is a
-different kind. Its missing accounts are not derivable from *any* IDL — they are the legs
+different kind. Its missing accounts are not derivable from *any* IDL. They are the legs
 of a route an HTTP surface computed a second earlier, so they arrive tagged
 `cross_surface` rather than recovered from seeds. Same plan, different mechanism.
+
+Orca Whirlpool and `let_me_buy` have since landed on mainnet through the same path; see
+[A real transaction](/mainnet).
 
 ## Serve one
 
@@ -50,6 +53,13 @@ of a route an HTTP surface computed a second earlier, so they arrive tagged
 npx -y @geckovision/gecko orquestra --program meteora --stdio
 # or, from PyPI:
 uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program meteora --stdio
+```
+
+Or use the hosted surface, which carries `find_start`, the program graphs, and the
+money paths:
+
+```bash
+claude mcp add --transport http gecko https://mcp.geckovision.tech/orquestra/mcp
 ```
 
 Not sure where to start? Route an intent to the right (program, instruction) first:
@@ -63,21 +73,28 @@ See [find_start](/find-start) for the provenance-tagged derive plan it returns.
 ## Simulate before you spend
 
 A derived account set is not yet a landed transaction. The plan goes to an external
-builder, Gecko assembles the unsigned preludes, simulates on a $0 mainnet fork, and
-returns a **[Receipt](/receipt)** — pass, or a categorical revert class — before any
-signature exists.
+builder, Gecko assembles the unsigned preludes, simulates, and returns a
+**[Receipt](/receipt)**, pass, or a categorical revert class, before any signature
+exists.
 
-That loop is live-proven twice: a Pump.fun buy where the naive derive-only path reverts
-with `AccountNotInitialized (3012)` and Gecko's bundle passes at 86,669 CU, and a Meteora
-DLMM swap (wrap → swap across live bins → unwrap) at 81,964 CU. Both on a surfpool
-mainnet fork — a mainnet-backed snapshot, **not mainnet** — simulation only, $0, nothing
+That loop is live-proven twice on a fork: a Pump.fun buy where the naive derive-only path
+reverts with `AccountNotInitialized (3012)` and Gecko's bundle passes at 86,669 CU, and a
+Meteora DLMM swap (wrap → swap across live bins → unwrap) at 81,964 CU. Both on a surfpool
+mainnet fork, a mainnet-backed snapshot, **not mainnet**, simulation only, $0, nothing
 signed or broadcast.
 
-## Safe to sign
+## Before the signer
 
-Gecko's anti-poisoning verdict can gate a downstream custody/signing layer: it refuses to
+Two checks sit between Gecko and a key holder, and neither one is Gecko's opinion.
+
+The anti-poisoning verdict gates a downstream custody or signing layer: it refuses to
 sign for a tool Gecko quarantined, so the key holder only ever signs what Gecko cleared.
-Gecko comprehends the call; the builder builds it; the vault signs it.
 
-The gate today is **verdict-based**. Binding it to the exact simulated message hash is
-[not built yet](/status).
+The binding proves the bytes. A passing receipt on a money path returns `binding`, a hash
+over the exact message bytes that were simulated, at `exact` strength, which covers the
+blockhash. `verify_signed_transaction` checks a signed transaction against it, and
+`submit_transaction` refuses to relay bytes that do not verify. A signer that was handed a
+substituted transaction is caught while it is still free.
+
+Gecko comprehends the call; the builder builds it; the vault signs it; the binding says
+they are all talking about the same bytes.

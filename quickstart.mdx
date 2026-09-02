@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: doctor → add → report → serve. Map any API into a verified graph your agent traverses — $0, offline, no key. Going live is a separate, deliberate step.
+description: doctor → add → report → serve. Map any API into a verified graph your agent traverses. $0, offline, no key. Going live is a separate, deliberate step.
 ---
 
 Four commands. No install, no clone, no Python. Nothing here reaches a real API until
@@ -8,15 +8,15 @@ you decide it should.
 
 ```bash
 npx @geckovision/gecko doctor              # 1. check your environment
-npx @geckovision/gecko add <spec-or-docs>  # 2. comprehend it — $0, no live call
-npx @geckovision/gecko report <spec>       # 3. get the scorecard — grade + findings
+npx @geckovision/gecko add <spec-or-docs>  # 2. comprehend it, $0, no live call
+npx @geckovision/gecko report <spec>       # 3. get the scorecard: grade + findings
 npx @geckovision/gecko serve <spec>        # 4. your agent uses it over MCP
 ```
 
 Or install once:
 
 ```bash
-npm install -g @geckovision/gecko          # prebuilt binary — no Python needed
+npm install -g @geckovision/gecko          # prebuilt binary, no Python needed
 uv tool install "gecko-surf[serve]"        # or pip, if you want the Python package
 
 gecko add <spec-or-docs>
@@ -30,14 +30,46 @@ Python toolchain at all. Install the PyPI package instead when you want to impor
 
 <Note>
 **Handing these docs to a coding agent?** Point it at
-[`/llms.txt`](https://docs.geckovision.tech/llms.txt) — a compact, agent-readable map of
-this site — or append `.md` to any page URL for raw markdown (e.g. `/quickstart.md`).
+[`/llms.txt`](https://docs.geckovision.tech/llms.txt), a compact, agent-readable map of
+this site, or append `.md` to any page URL on this docs site for raw markdown (e.g.
+`/quickstart.md`).
 </Note>
+
+## No install at all: the hosted surface
+
+The canonical setup lives on the landing site, not here:
+
+- [`agents.md`](https://www.geckovision.tech/agents.md): the executable runbook an agent
+  follows, from wiring to a verified first call.
+- [`mcp-config.json`](https://www.geckovision.tech/mcp-config.json): every client's
+  exact wiring (Claude Code, Claude web, Cursor, VS Code, any `mcp.json`).
+
+For Claude Code, the flagship surface is one line:
+
+```bash
+claude mcp add --transport http gecko https://mcp.geckovision.tech/orquestra/mcp
+```
+
+That surface carries 16 tools: real Solana storefronts (`list_stores`), Orca Whirlpool
+swaps (`plan_swap`), `find_start`, program graphs, and the money path
+(`prepare_purchase` → your wallet signs → `verify_signed_transaction` →
+`submit_transaction`). No account, no key. The host serves ten surfaces; they are listed
+at [`/.well-known/gecko.json`](https://mcp.geckovision.tech/.well-known/gecko.json) and
+described at [`catalog.md`](https://www.geckovision.tech/catalog.md).
+
+Or let a skill do the wiring and verify the first call:
+
+```bash
+npx skills add GeckoVision/gecko-surf
+```
+
+That installs seven skills: `gecko-setup`, `use-any-api`, `api-agent-ready`,
+`x402-payai-setup`, `anti-poisoning`, `skill-guard`, `read-js-docs`.
 
 ## The four steps
 
 <Steps>
-  <Step title="doctor — read-only, no side effects">
+  <Step title="doctor: read-only, no side effects">
     ```bash
     npx @geckovision/gecko doctor
     ```
@@ -45,7 +77,7 @@ this site — or append `.md` to any page URL for raw markdown (e.g. `/quickstar
     Reports your setup and the exact next command. It changes nothing and calls nothing.
   </Step>
 
-  <Step title="add — comprehend the surface, $0">
+  <Step title="add: comprehend the surface, $0">
     ```bash
     npx @geckovision/gecko add https://api.provider.com/openapi.json
     ```
@@ -56,29 +88,29 @@ this site — or append `.md` to any page URL for raw markdown (e.g. `/quickstar
     ```bash
     npx @geckovision/gecko add https://docs.someapi.com   # recovers a draft spec from the docs
     npx @geckovision/gecko add ./openapi.json             # a file you already have
-    npx @geckovision/gecko add api.stripe.com             # a bare domain — Gecko finds the spec
+    npx @geckovision/gecko add api.stripe.com             # a bare domain: Gecko finds the spec
     ```
 
     Everything ingested is treated as **untrusted input**: sanitized, quarantine-checked,
     SSRF-guarded. No live call to the API is made.
   </Step>
 
-  <Step title="report — the scorecard">
+  <Step title="report: the scorecard">
     ```bash
     npx @geckovision/gecko report https://api.provider.com/openapi.json
     ```
 
-    A grade plus the specific, fixable findings — what an agent would get wrong on this
+    A grade plus the specific, fixable findings: what an agent would get wrong on this
     surface, and why. This is the artifact to hand a provider.
   </Step>
 
-  <Step title="serve — your agent uses it over MCP">
+  <Step title="serve: your agent uses it over MCP">
     ```bash
     npx @geckovision/gecko serve https://api.provider.com/openapi.json
     ```
 
     Serves the comprehended surface over Streamable-HTTP MCP and prints one-click add
-    strings. Defaults to **recorded** mode — nothing reaches the real API.
+    strings. Defaults to **recorded** mode: nothing reaches the real API.
   </Step>
 </Steps>
 
@@ -90,7 +122,7 @@ claude mcp add my-api -- npx -y @geckovision/gecko serve <spec> --stdio
 ```
 
 ```jsonc
-// Cursor / VS Code / any MCP client — mcp.json
+// Cursor / VS Code / any MCP client: mcp.json
 {
   "mcpServers": {
     "my-api": {
@@ -115,7 +147,7 @@ Plan a swap of SOL for USDC on Meteora, bin_step 4.
 gecko auth set <provider>
 ```
 
-The key goes to **your OS keychain** — never into `mcp.json`, never into a tool
+The key goes to **your OS keychain**: never into `mcp.json`, never into a tool
 definition, never into the model's context. Gecko resolves it at call time and sends it
 only to the API's own host (out-of-band host anchoring). Keyless APIs skip this
 entirely.
@@ -126,10 +158,10 @@ SDK default to **recorded**; live requires both a credential you set explicitly 
 explicit `--mode live`.
 </Warning>
 
-## Prove it offline first — $0 recorded mode
+## Prove it offline first: $0 recorded mode
 
 Every path has a **recorded mode** that runs the *same code* but synthesizes the response
-from the API's own schema — no network, no key, no spend. Falsify the calls before going
+from the API's own schema: no network, no key, no spend. Falsify the calls before going
 live.
 
 ```bash
@@ -138,26 +170,30 @@ uv run python -m gecko.demo    # goal → discover → correct call → data (re
 
 The two modes differ **only at the transport edge**. See [Recorded mode](/recorded-mode).
 
-## Try a live surface in 10 seconds
+## Try a hosted HTTP surface in 10 seconds
 
-Give your agent a hosted, Gecko-comprehended surface — no `pip`, no spec, no key:
+Give your agent a hosted, Gecko-comprehended HTTP API: no `pip`, no spec, no key:
 
 ```bash
 claude mcp add --transport http gecko-txline https://mcp.geckovision.tech/txline/mcp
 ```
 
-That's **TxODDS TxLINE** — 18 first-call-correct tools over a World Cup API with a
+That's **TxODDS TxLINE**, 18 first-call-correct tools over a World Cup API with a
 two-token on-chain paywall a coding agent does *not* one-shot. Served **recorded**
-($0/offline), so you explore the real surface without a subscription.
+($0/offline), so you explore the real surface without a subscription. For a live keyless
+API, use `/pegana/mcp` the same way.
 
 <Note>
 `claude mcp add` is Claude-Code-only. In **Cursor**, **VS Code**, or any MCP client, add
-the same endpoint to your `mcp.json` — transport is **MCP Streamable HTTP**
+the same endpoint to your `mcp.json`. Transport is **MCP Streamable HTTP**
 (`2025-11-25`), not SSE:
 
 ```jsonc
 { "mcpServers": { "gecko-txline": { "type": "http", "url": "https://mcp.geckovision.tech/txline/mcp" } } }
 ```
+
+Every client's block for every surface is in
+[`mcp-config.json`](https://www.geckovision.tech/mcp-config.json).
 </Note>
 
 ## On-chain, in one command
@@ -167,7 +203,7 @@ uvx --from "gecko-surf[serve,solana]" gecko-orquestra --program pumpfun --stdio
 ```
 
 Gecko recovers the seeds the IDL drops, plans the full instruction, an external builder
-builds it, and a [Receipt](/receipt) says whether it lands — **before any signature**.
+builds it, and a [Receipt](/receipt) says whether it lands, **before any signature**.
 
 ```bash
 gecko orquestra find-start "buy token X on pump"   # intent → the right start point
@@ -220,14 +256,14 @@ gecko orquestra find-start "buy token X on pump"   # intent → the right start 
     Nothing here pipes a remote script into a shell. Run in order and you never take an
     unchecked step:
 
-    1. **Check (no side effects):** `npx @geckovision/gecko doctor` — read-only; reports
+    1. **Check (no side effects):** `npx @geckovision/gecko doctor`, read-only; reports
        your setup and the exact next step.
-    2. **Dry-run ($0):** `gecko serve <url>` defaults to **recorded** — no request
+    2. **Dry-run ($0):** `gecko serve <url>` defaults to **recorded**: no request
        reaches the real API, nothing is billed.
     3. **Live:** add `--mode live` (and `gecko auth set <provider>` first for a keyed API).
 
     Gecko is open-source (Apache-2.0), installed from a public registry **with a live
-    SLSA provenance attestation** tracing the package to its CI build — verifiable, not
+    SLSA provenance attestation** tracing the package to its CI build: verifiable, not
     an opaque script. Control-plane only: it never stores your responses or your keys.
   </Accordion>
 
@@ -246,7 +282,7 @@ gecko orquestra find-start "buy token X on pump"   # intent → the right start 
   </Accordion>
 
   <Accordion title="Which platforms get the npx binary?">
-    Linux (x64 + arm64) and Apple Silicon Macs — one command, no Python. On an Intel Mac
+    Linux (x64 + arm64) and Apple Silicon Macs: one command, no Python. On an Intel Mac
     or Windows, use the Python path (same CLI, your system's own certificates):
 
     ```bash
@@ -257,7 +293,9 @@ gecko orquestra find-start "buy token X on pump"   # intent → the right start 
 
   <Accordion title="Remote / hosted MCP?">
     Serve behind an HTTPS tunnel with `--public-url https://<tunnel>` (trusted for the
-    Host/Origin guard). Gecko also runs a hosted surface at `mcp.geckovision.tech`.
+    Host/Origin guard). Gecko also runs a hosted host at `mcp.geckovision.tech`; the
+    root `/mcp` serves `comprehend_api` and `list_surfaces`, and each surface lives at
+    `/<name>/mcp`.
   </Accordion>
 </AccordionGroup>
 

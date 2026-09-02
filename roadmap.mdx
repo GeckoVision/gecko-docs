@@ -1,34 +1,43 @@
 ---
 title: Roadmap
-description: Live, building, exploring — and what we'll never build. Everything is labeled; the full honest split lives on Status.
+description: Live, building, exploring, and what we'll never build. Everything is labeled; the full honest split lives on Status.
 ---
 
 We label everything. **Live** = run it today. **Building** = in progress, and we say so
 in the present tense, not the past. **Exploring** = we want your input before we commit.
 No vaporware on this page.
 
-The exhaustive, honest split — including everything **not** built — is on
+The exhaustive, honest split, including everything **not** built, is on
 [Status](/status). This page is the direction.
 
 ## Live today
 
 - **Any surface → a verified graph.** OpenAPI, human docs, `llms.txt`, Anchor IDLs, raw
   program source. One command: `gecko add <spec-or-docs>`.
-- **Provenance on every edge** — `extracted` / `recovered` / `flagged` on-chain;
+- **Provenance on every edge**: `extracted` / `recovered` / `flagged` on-chain;
   `EXTRACTED` → `DECLARED` → `INFERRED` → `CLAIMED` → `VERIFIED` / `REFUTED` on HTTP.
-- **`find_start`** — intent → the right starting point, with a dependency-ordered derive
+- **`find_start`**: intent → the right starting point, with a dependency-ordered derive
   plan and an honest no-start below the retrieval floor. See [find_start](/find-start).
-- **simulate → Receipt** — a $0 fork simulation before money moves, live-proven twice.
-  See [The Receipt](/receipt).
-- **Invisible auth** — the credential lives in your OS keychain and is injected at call
+- **simulate → Receipt**: a simulation before money moves, live-proven on a fork and on
+  mainnet. See [The Receipt](/receipt).
+- **The binding.** `prepare_purchase`, `prepare_instruction` and `plan_swap` return a
+  `binding` over the exact simulated bytes at `exact` strength. `verify_signed_transaction`
+  checks the signed bytes against it, and `submit_transaction` refuses to relay anything
+  that does not verify. 50 landed mainnet transactions in the ledger as of 2026-09-01.
+- **Hosted receipts.** The orquestra surface at `mcp.geckovision.tech/orquestra/mcp`
+  simulates against a public mainnet RPC and returns the receipt and the binding; no
+  local install.
+- **Invisible auth**: the credential lives in your OS keychain and is injected at call
   time. Never in a tool def, never in `mcp.json`, never in the model's context.
-- **`$0` recorded mode** — falsify every call offline, from the schema, before you spend
+- **`$0` recorded mode**: falsify every call offline, from the schema, before you spend
   a token.
-- **The Scorecard** — `gecko report <spec>`: a grade plus the specific findings.
-- **Correctness in CI** — `gecko test <spec>`.
-- **Seven fail-closed security layers**, including an AST-enforced never-sign boundary.
-- **The categorical corpus + an N-confirmed drift detector** — `gecko drift <series>`.
-- **Hosted MCP** — one-click add to Claude Code / Cursor / VS Code.
+- **The Scorecard**: `gecko report <spec>`, a grade plus the specific findings.
+- **Correctness in CI**: `gecko test <spec>`.
+- **Seven fail-closed security layers**, including an AST-enforced no-sign boundary on
+  the landing layer.
+- **The categorical corpus + an N-confirmed drift detector**: `gecko drift <series>`.
+- **Hosted MCP**: one-click add to Claude Code / Cursor / VS Code. Every client's wiring
+  is in [`mcp-config.json`](https://www.geckovision.tech/mcp-config.json).
 
 ## Building
 
@@ -37,44 +46,44 @@ The exhaustive, honest split — including everything **not** built — is on
 - **The drift scheduler.** The detector works and the series reads back; we are building
   the cadence that re-simulates on a schedule so the series accrues without you running
   anything. Until then it accrues only when runs happen.
-- **Catalog breadth.** 4,500 projects are listed and 5 are wired deep; we are widening
+- **Catalog breadth.** 4,500 projects are listed and seven program configs ship
+  (Pump.fun, Meteora, Jupiter, ORE, MetaDAO, Orca Whirlpool, let_me_buy); we are widening
   the auto-comprehend path so more of the catalog resolves without hand-authoring.
   Non-Anchor generalization is proven once.
-- **Binding the signing gate to the simulated message hash.** Today's gate is
-  verdict-based. We are building `evaluate_tx` so the gate proves the thing being signed
-  is the exact thing that was simulated.
-- **Hosted point-and-simulate**, and hosted program surfaces beyond the first.
+- **The TEE credential backend.**
 
 ## Exploring
 
-<Note>Unbuilt. If one of these is the reason you'd adopt, tell us — it moves up.</Note>
+<Note>Unbuilt. If one of these is the reason you'd adopt, tell us. It moves up.</Note>
 
 - **A semantic/vector retrieval tier.** Deliberately OFF behind an evidence gate. It
-  flips only on **measured** lexical recall failure, not fashion — and one measured
+  flips only on **measured** lexical recall failure, not fashion, and one measured
   negative result on embeddings is already on record.
 - **Cross-customer episodic pooling.** Tenancy is local-only until a consent and egress
   layer exists that we'd be willing to defend.
-- **Response-level trust.** *"Is this response sane?"* — deliberately downstream of
+- **Response-level trust.** *"Is this response sane?"*, deliberately downstream of
   comprehension and verification.
 
 ## What we'll never build
 
 So the labels above stay credible:
 
-- **No signing, no broadcasting, no custody.** Gecko simulates and hands a verdict to
-  someone else. Unsigned assembly for simulation is the one documented carve-out, and it
-  is AST-enforced at the sign/send boundary.
+- **No signing, no custody.** Gecko holds no key. Every money path ends in unsigned,
+  checked bytes plus a receipt with a binding; somebody else signs. The one send path,
+  `submit_transaction`, relays only signed bytes that verify against that binding.
+  Unsigned assembly for simulation is the one documented carve-out, and the landing
+  layer's no-sign boundary is AST-enforced.
 - **No payment rail, no marketplace.** We compose on MCP, x402, and payment catalogs;
   the provider charges you directly.
 - **No storage of your API responses, request values, or secrets.** The corpus is
-  categorical *by construction* — a fail-closed allowlist, not a policy you have to
+  categorical *by construction*: a fail-closed allowlist, not a policy you have to
   trust.
-- **No browsable provider marketplace.** Point us at the surface — the flow is identical
+- **No browsable provider marketplace.** Point us at the surface; the flow is identical
   for every API.
 
 ## Who pays
 
-The **`gecko-surf` engine is free and open-source, forever** — Apache-2.0, complete,
+The **`gecko-surf` engine is free and open-source, forever**: Apache-2.0, complete,
 self-hostable. Ingest, comprehend, verify, run it yourself.
 
 **Developers never pay.** The hosted layer is what an API provider buys: a flat price per
@@ -83,7 +92,7 @@ API, no cut of an API call, no funds held. See [For API providers](/for-provider
 ## Tell us what to comprehend next
 
 <Card title="Which API did your agent call wrong?" icon="github" href="https://github.com/GeckoVision/gecko-surf/issues/new">
-The call that looked right and wasn't — the one the spec described perfectly and the API
+The call that looked right and wasn't: the one the spec described perfectly and the API
 still refused, or accepted and did the wrong thing. Open an issue and tell us. Public 👍s
 rank what we comprehend next.
 </Card>
