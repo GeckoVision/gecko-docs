@@ -1,6 +1,6 @@
 # Gecko
 
-Check the call before it counts.
+Buy anything with any stablecoin.
 
 Gecko reads an API — an OpenAPI spec, a docs site, or a Solana program's IDL and source —
 and hands your agent the one call to make, every fact tagged with where it came from. For
