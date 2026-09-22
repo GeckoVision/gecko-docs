@@ -1,10 +1,10 @@
 ---
 title: Architecture
-description: The three views — context engineering, the full pipeline, and the proven on-chain loop — plus the invariants and the one API-agnostic seam.
+description: The three views (context engineering, the full pipeline, and the proven on-chain loop) plus the invariants and the one API-agnostic seam.
 ---
 
 Gecko is a **control plane, not a data plane.** It holds the API's *surface*, the
-generated tool defs, and *correctness metadata* — never the data flowing through. That
+generated tool defs, and *correctness metadata*, never the data flowing through. That
 single invariant is what makes the rest of the design coherent.
 
 Below: the same system in three views. Each has a static diagram and an interactive
@@ -12,43 +12,43 @@ version you can pan, filter, and click through.
 
 ---
 
-## View 1 — Context engineering (the memory substrate)
+## View 1: Context engineering (the memory substrate)
 
-<Frame caption="Gecko as a memory substrate: semantic, procedural, episodic, and working memory — under someone else's agent, not replacing it.">
-  <img src="/assets/architecture-context.png" alt="Gecko context engineering — semantic memory (comprehended surfaces plus a lexical catalog), procedural memory (question-shaped tool defs and typed executable plans), episodic memory (a categorical corpus and an N-confirmed drift series), and a working-memory projection that feeds the host agent over MCP." />
+<Frame caption="Gecko as a memory substrate: semantic, procedural, episodic, and working memory, under someone else's agent, not replacing it.">
+  <img src="/assets/architecture-context.png" alt="Gecko context engineering: semantic memory (comprehended surfaces plus a lexical catalog), procedural memory (question-shaped tool defs and typed executable plans), episodic memory (a categorical corpus and an N-confirmed drift series), and a working-memory projection that feeds the host agent over MCP." />
 </Frame>
 
-Gecko is **not the agent** — it is the memory-and-context substrate *under* other
+Gecko is **not the agent**. It is the memory-and-context substrate *under* other
 people's agents. Every block of the canonical agent-memory architecture exists here, and
 three of them are deliberately different from the textbook.
 
 | Block | What Gecko does | Why it differs |
 |---|---|---|
 | **Semantic memory** | comprehended surfaces + a lexical, token-overlap catalog | the graph never *approximately* remembers; BM25 and vector tiers both sit behind evidence gates that flip only on measured recall failure |
-| **Procedural memory** | question-shaped tool defs (auth stripped) + typed plans (`landing_plan`, `derivation_order`) | plans are **executable JSON** a builder can run — text loses the join, typed data can't |
+| **Procedural memory** | question-shaped tool defs (auth stripped) + typed plans (`landing_plan`, `derivation_order`) | plans are **executable JSON** a builder can run; text loses the join, typed data can't |
 | **Episodic memory** | a categorical corpus (closed vocabularies, never payloads) + an N-confirmed drift series | Gecko **generates its own episodes** by re-simulating; no dependence on your data plane |
-| **Working memory** | just-in-time projection — scale-adaptive tool listing, full defs withheld above scale and recovered per tool on demand | measured context cuts of **−77% / −89%** on two real specs (bytes measured, tokens estimated) |
+| **Working memory** | just-in-time projection: scale-adaptive tool listing, full defs withheld above scale and recovered per tool on demand | measured context cuts of **−77% / −89%** on two real specs (bytes measured, tokens estimated) |
 
 Retrieval quality is fed by a misrank-aware evaluation: a golden set plus a closed
 miss-cause vocabulary, so the lexical-vs-semantic gate gets data instead of a guess.
 
 <Note>
-  The diagram above is a render. The **interactive** version — pan, zoom, guided
-  views, PNG/SVG export — ships in the repo as a single self-contained file:
+  The diagram above is a render. The **interactive** version (pan, zoom, guided
+  views, PNG/SVG export) ships in the repo as a single self-contained file:
   [`docs/assets/architecture-context.html`](https://github.com/GeckoVision/gecko-surf/blob/main/docs/assets/architecture-context.html).
   Download it and open it locally; it needs no server and no network.
 </Note>
 
 ---
 
-## View 2 — The full pipeline (sources → knowledge → action)
+## View 2: The full pipeline (sources → knowledge → action)
 
-<Frame caption="Untrusted sources pass an anti-poison gate into comprehension, become provenance-tagged graphs, project as MCP tools, and reach action only through simulate → receipt → signing gate.">
-  <img src="/assets/architecture.png" alt="Gecko full architecture — OpenAPI, docs, Anchor IDLs, program source and a project catalog enter through sanitize/quarantine/Skill Guard, are comprehended into normalized operations, recovered PDA seed recipes and generated configs with measured overlays, form surface and program knowledge graphs with provenance on every edge, are projected over MCP and CLI, and reach action only via plan → external build → simulate → receipt → fail-closed signing gate → external signer." />
+<Frame caption="Untrusted sources pass an anti-poison gate into comprehension, become provenance-tagged graphs, project as MCP tools, and reach action only through simulate → receipt → binding.">
+  <img src="/assets/architecture.png" alt="Gecko full architecture: OpenAPI, docs, Anchor IDLs, program source and a project catalog enter through sanitize/quarantine/Skill Guard, are comprehended into normalized operations, recovered PDA seed recipes and generated configs with measured overlays, form surface and program knowledge graphs with provenance on every edge, are projected over MCP and CLI, and reach action only via plan → external build → simulate → receipt → binding → external signer." />
 </Frame>
 
 <Steps>
-  <Step title="Sources — all untrusted">
+  <Step title="Sources: all untrusted">
     OpenAPI, human docs, `llms.txt`, Anchor IDLs, raw program source (Steel and native
     too), and a 4,500-project on-chain catalog. Everything ingested is treated as
     hostile input.
@@ -63,7 +63,7 @@ miss-cause vocabulary, so the lexical-vs-semantic gate gets data instead of a gu
     emits a generated config plus a **measured overlay** of what could not be derived
     from any public surface.
   </Step>
-  <Step title="Knowledge — provenance on every edge">
+  <Step title="Knowledge: provenance on every edge">
     Surface graph: `EXTRACTED` &gt; `DECLARED` &gt; `INFERRED` &gt; `CLAIMED` → `VERIFIED` /
     `REFUTED`. Program graph: `EXTRACTED` / `RECOVERED` / `FLAGGED`. Cross-API
     correlations join on **declared** value domains first.
@@ -72,10 +72,12 @@ miss-cause vocabulary, so the lexical-vs-semantic gate gets data instead of a gu
     MCP (hosted, stdio, npx/uvx), the CLI, the Scorecard, and the Playground.
     Auth headers never appear in a tool def.
   </Step>
-  <Step title="Action — verify, never execute">
+  <Step title="Action: verify, never sign">
     `plan_*` returns the full account set plus state-read args and landing preludes → an
-    **external builder** builds → Gecko simulates → a **Receipt** → a fail-closed signing
-    gate → an **external signer** (wallet / TEE / human).
+    **external builder** builds → Gecko simulates the exact bytes → a **Receipt** with a
+    `binding` over those bytes → an **external signer** (wallet / TEE / human) signs →
+    `verify_signed_transaction` proves the signed bytes are the checked ones →
+    `submit_transaction` relays them, and refuses anything that does not verify.
   </Step>
   <Step title="Learn">
     A categorical outcome (never a payload) can be recorded on explicit opt-in, feeding
@@ -83,43 +85,49 @@ miss-cause vocabulary, so the lexical-vs-semantic gate gets data instead of a gu
   </Step>
 </Steps>
 
-**The hard boundaries:** Gecko never signs, never broadcasts, never proxies the data
-plane. Building and signing belong to compose partners — that is the design, not a gap.
+**The hard boundaries:** Gecko never signs, never holds a key, never proxies the data
+plane. Building and signing belong to compose partners. That is the design, not a gap.
+The one send path it ships relays only signed bytes that verify against its own binding.
 
 <Note>
-  The diagram above is a render. The **interactive** version — pan, zoom, guided
-  views, PNG/SVG export — ships in the repo as a single self-contained file:
+  The diagram above is a render. The **interactive** version (pan, zoom, guided
+  views, PNG/SVG export) ships in the repo as a single self-contained file:
   [`docs/assets/architecture.html`](https://github.com/GeckoVision/gecko-surf/blob/main/docs/assets/architecture.html).
   Download it and open it locally; it needs no server and no network.
 </Note>
 
 ---
 
-## View 3 — The on-chain action path (the proven loop)
+## View 3: The on-chain action path (the proven loop)
 
-<Frame caption="Intent → derive the full account set → state reads → external build → unsigned prelude assembly → simulate on a $0 fork → Receipt → only a passing receipt reaches the signer.">
-  <img src="/assets/architecture-onchain.png" alt="The proven on-chain loop — the agent states intent, Gecko derives the full account set including IDL-hidden and source-recovered accounts, reads control-plane state for sane arguments, an external builder builds the instruction, Gecko assembles unsigned preludes and simulates the transaction, and returns a receipt; only a passing receipt reaches an external signer." />
+<Frame caption="Intent → derive the full account set → state reads → external build → unsigned prelude assembly → simulate → Receipt + binding → external signer → verify → submit.">
+  <img src="/assets/architecture-onchain.png" alt="The proven on-chain loop: the agent states intent, Gecko derives the full account set including IDL-hidden and source-recovered accounts, reads control-plane state for sane arguments, an external builder builds the instruction, Gecko assembles unsigned preludes and simulates the transaction, and returns a receipt with a binding; an external signer signs, and only bytes that verify against the binding are relayed." />
 </Frame>
 
-1. **Intent** — "buy this token", "swap SOL for USDC on this pool".
-2. **Derive** the full account set — including accounts the IDL hides
+1. **Intent**: "buy this token", "swap SOL for USDC on this pool".
+2. **Derive** the full account set, including accounts the IDL hides
    (`bonding_curve_v2`) and seeds recovered from source (`base_factor`).
-3. **State reads** (control plane) for sane arguments — e.g. curve reserves →
+3. **State reads** (control plane) for sane arguments, e.g. curve reserves →
    `max_sol_cost`.
-4. **External build** — the plan goes to the builder; the builder returns the instruction.
-5. **Unsigned prelude assembly**, for simulation only — idempotent ATA creation, wSOL
-   wrap/unwrap, compute budget.
-6. **Simulate** — `simulateTransaction` with `sigVerify:false` on a $0 mainnet fork.
-7. **Receipt** — status, categorical revert class, compute units. → [The Receipt](/receipt)
-8. **Signing gate** — fail-closed. Only a passing verdict reaches an external signer.
+4. **External build**: the plan goes to the builder; the builder returns the instruction.
+5. **Unsigned prelude assembly**, for simulation only: idempotent ATA creation, wSOL
+   wrap/unwrap, compute budget. On the money paths, a fresh blockhash is patched in at
+   the offset the layout dictates, so the simulated bytes are the bytes handed back.
+6. **Simulate**: `simulateTransaction` with `sigVerify:false`, on a fork or against a
+   public mainnet RPC.
+7. **Receipt + binding**: status, categorical revert class, compute units, and a hash
+   over the exact message bytes at `exact` strength. → [The Receipt](/receipt)
+8. **External signer** signs. Then `verify_signed_transaction` checks the signed bytes
+   against the binding, and `submit_transaction` relays them only if that check passes.
 
-Gecko never signs and never broadcasts. Unsigned assembly for simulation is the one
-documented carve-out, and it is enforced at the sign/send boundary by an AST check that
-proves the landing layer contains no signing or sending path.
+Gecko never signs. Unsigned assembly for simulation is the one documented carve-out, and
+it is enforced at the landing layer by an AST check that proves that layer contains no
+signing or sending path. The one sending path, `submit_transaction`, lives outside it and
+is structurally unable to relay bytes without a binding.
 
 <Note>
-  The diagram above is a render. The **interactive** version — pan, zoom, guided
-  views, PNG/SVG export — ships in the repo as a single self-contained file:
+  The diagram above is a render. The **interactive** version (pan, zoom, guided
+  views, PNG/SVG export) ships in the repo as a single self-contained file:
   [`docs/assets/architecture-onchain.html`](https://github.com/GeckoVision/gecko-surf/blob/main/docs/assets/architecture-onchain.html).
   Download it and open it locally; it needs no server and no network.
 </Note>
@@ -130,7 +138,7 @@ proves the landing layer contains no signing or sending path.
 
 <CardGroup cols={2}>
   <Card title="Control plane, never data plane" icon="shield-halved">
-    Stores the API surface, tool defs, and correctness metadata only — never response
+    Stores the API surface, tool defs, and correctness metadata only, never response
     payloads, user data, or secrets.
   </Card>
   <Card title="The engine is API-agnostic" icon="plug">
@@ -145,8 +153,9 @@ proves the landing layer contains no signing or sending path.
     Tool defs never expose auth headers. The agent describes intent; Gecko injects
     credentials at call time from your OS keychain.
   </Card>
-  <Card title="Never sign, never broadcast" icon="ban">
-    Simulation only. No keypair, no `sendTransaction`. AST-enforced at the boundary.
+  <Card title="Never sign, never hold a key" icon="ban">
+    No keypair on any path. The landing layer has no sign or send path, AST-enforced.
+    `submit_transaction` relays only signed bytes that verify against a Gecko binding.
   </Card>
   <Card title="Never fabricate" icon="fingerprint">
     Unknown facts are `FLAGGED`, not invented. Below the retrieval floor the answer is
@@ -165,20 +174,22 @@ client, and the scripts are thin transport.
 | `gecko/catalog.py` | Lexical capability search (intent → endpoint) |
 | `gecko/tools.py` | `Operation` → question-shaped agent tool defs (**auth hidden**) |
 | `gecko/caller.py` | tool + args → correct `PreparedRequest` (stdlib `urllib`) |
-| `gecko/access.py` | `Session.auth_headers()` — the engine/adapter seam |
+| `gecko/access.py` | `Session.auth_headers()`, the engine/adapter seam |
 | `gecko/provenance.py` | the one canonical provenance vocabulary, shared by both graphs |
 | `gecko/program_graph.py`, `gecko/pda.py` | the on-chain instruction↔PDA graph and derivation order |
 | `gecko/find_start.py` | intent → the right (program, instruction) start point |
 | `gecko/simulate.py` | the simulate→**Receipt** engine |
+| `gecko/prepare_purchase.py`, `gecko/prepare_instruction.py` | plan, build once, simulate the exact bytes, return them unsigned with the binding |
+| `gecko/verify_signed.py`, `gecko/submit_transaction.py` | signed bytes against the binding; relay-and-rebroadcast, refused without a binding |
 | `gecko/corpus.py`, `gecko/drift.py` | categorical outcomes and the N-confirmed drift series |
 | `gecko/sample.py` | deterministic schema → example (powers $0 recorded mode) |
-| `gecko/client.py` | `AgentApiClient` — `search` / `list_tools` / `prepare` / `call` |
-| `gecko/mcp_server.py` | `McpSurface` — the agent-facing MCP surface |
+| `gecko/client.py` | `AgentApiClient`: `search` / `list_tools` / `prepare` / `call` |
+| `gecko/mcp_server.py` | `McpSurface`, the agent-facing MCP surface |
 
 ## The one seam that matters
 
 Adding a new API should not require touching ingest, catalog, tools, or the caller. The
-only API-specific code is, at most, an auth adapter — an object that implements:
+only API-specific code is, at most, an auth adapter, an object that implements:
 
 ```python
 def auth_headers(self) -> dict[str, str]: ...
@@ -190,17 +201,18 @@ a session that returns its tokens. See [Access &amp; auth](/access-and-auth).
 ## Security posture
 
 - Ingested spec, doc, IDL, and source content is treated as **untrusted input**.
-- URLs are validated before fetching (no SSRF — private/loopback/link-local ranges and
-  non-http schemes blocked).
+- URLs are validated before fetching (no SSRF: private/loopback/link-local ranges and
+  non-http schemes blocked). A caller-supplied `rpc_url` goes through the same guard.
 - Secrets resolve from the OS keychain at call time and are never logged or persisted;
   errors redact tokens before they're raised.
 - Seven fail-closed security layers: spec sanitizer · per-tool quarantine · image Skill
-  Guard · SSRF netguard · out-of-band auth anchoring · verdict signing gate · the
-  AST-enforced never-sign boundary.
+  Guard · SSRF netguard · out-of-band auth anchoring · the signing gate that checks
+  signed bytes against the receipt's binding · the AST-enforced no-sign boundary on the
+  landing layer.
 
 <Note>
 The agent-readable version of this page is
 [`architecture.llms.txt`](https://github.com/GeckoVision/gecko-surf/blob/main/architecture.llms.txt)
-in the engine repo — the same three views plus the honest works / not-built split. See
+in the engine repo: the same three views plus the honest works / not-built split. See
 also [Status](/status).
 </Note>

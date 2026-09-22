@@ -1,17 +1,17 @@
 ---
 title: Agent discoverability
-description: Gecko exists to make an API discoverable to agents — question-shaped tools, intent-to-endpoint search, hidden auth, and an llms.txt for the API itself.
+description: Gecko exists to make an API discoverable to agents. Question-shaped tools, intent-to-endpoint search, hidden auth, and an llms.txt for the API itself.
 ---
 
-Discoverability is how comprehension pays off for agents — once Gecko has comprehended
+Discoverability is how comprehension pays off for agents. Once Gecko has comprehended
 an API, agents need to find and install that surface. A human can read
 docs, infer the right call, and guess at parameters. An agent shouldn't have to. These
-are the mechanisms that make an ingested API discoverable. An API surface — or a Solana
-[Program Surface](/program-surface) — can be made discoverable the same way.
+are the mechanisms that make an ingested API discoverable. An API surface, or a Solana
+[Program Surface](/program-surface), can be made discoverable the same way.
 
 ## Intent, not endpoints
 
-An agent describes *what it wants* — not which path to hit. The catalog turns that
+An agent describes *what it wants*, not which path to hit. The catalog turns that
 intent into a ranked list of candidate operations, and the `search_capabilities` tool
 on the [MCP surface](/mcp-surface) exposes it directly:
 
@@ -23,25 +23,25 @@ client.search("what fixtures are coming up?")
 ## Question-shaped descriptions
 
 Every tool's description is written as the question it answers, with required and
-optional inputs called out. The agent picks the right tool from the description alone —
+optional inputs called out. The agent picks the right tool from the description alone,
 no API docs in front of it. See [How comprehension works](/comprehension).
 
 ## Auth is out of the way
 
 Auth headers never appear in the agent-facing tool input, and operations the current
 session can't authenticate are hidden entirely. The agent's surface is exactly the set
-of calls it can actually make — nothing it would only fail at. See
+of calls it can actually make, nothing it would only fail at. See
 [Access & auth](/access-and-auth).
 
 ## Only the calls that will work
 
 When a [session](/access-and-auth) can't satisfy an operation's auth, that operation is
 removed from `list_tools()` and `search()`. Discoverability means surfacing the *usable*
-surface, not the whole spec — an agent should never discover a call it can't complete.
+surface, not the whole spec. An agent should never discover a call it can't complete.
 
 ## An llms.txt for the API
 
-Gecko can emit an agent/human-readable capability map grouped by tag — the
+Gecko can emit an agent/human-readable capability map grouped by tag, the
 machine-facing equivalent of a table of contents for the API:
 
 ```python
@@ -52,57 +52,59 @@ print(client.catalog.describe())
 # - GET /api/odds/snapshot/{fixtureId} — live odds for a fixture
 ```
 
-This docs site itself ships an [`llms.txt`](/llms.txt) — a discoverability map for
+This docs site itself ships an [`llms.txt`](/llms.txt), a discoverability map for
 these docs, in the same spirit. If you're an agent, start there.
 
-## The agent-native layer — and we dogfood it
+## The agent-native layer, and we dogfood it
 
 Docs are a human handoff. An `llms.txt` or an MDX page is something an agent has to
 *read and trust*; the agent-native contract is a **structured tool it calls**. Gecko's
-job is to turn the human-shaped surface into that tool — so an agent finds and uses the
+job is to turn the human-shaped surface into that tool, so an agent finds and uses the
 right call without reading prose.
 
 Gecko projects one comprehended surface three ways, for three moments:
 
-- **`llms.txt`** — a breadcrumb for an agent that lands on the docs: the capability map
-  plus a pointer to the live MCP and `search_capabilities`. (These docs ship one —
+- **`llms.txt`**: a breadcrumb for an agent that lands on the docs: the capability map
+  plus a pointer to the live MCP and `search_capabilities`. (These docs ship one;
   [read it](/llms.txt).)
-- **OpenAPI + `x-gecko`** — the spec an OpenAPI-native tool already ingests, enriched in
+- **OpenAPI + `x-gecko`**: the spec an OpenAPI-native tool already ingests, enriched in
   place with question-shaped intents, prerequisites, and worked examples. Unknown `x-`
   keys degrade gracefully, so a non-Gecko consumer just ignores them.
-- **`/.well-known/gecko.json`** — the machine-precise manifest `search_capabilities`
+- **`/.well-known/gecko.json`**: the machine-precise manifest `search_capabilities`
   navigates: the capability graph (which call produces the id another call needs), worked
   examples, and first-call-correct stats.
 
 All three cross-link, so an agent landing on any one reaches the callable tool. This docs
-site is the reference implementation — our own surface is exposed through the same layer
+site is the reference implementation: our own surface is exposed through the same layer
 we generate for any API.
 
 ## Everything an agent can fetch
 
-This docs site publishes the same agent-native surface Gecko generates for any API —
-point your agent at any of these:
+This docs site publishes the same agent-native surface Gecko generates for any API.
+Point your agent at any of these:
 
-- [`llms.txt`](https://docs.geckovision.tech/llms.txt) — the curated index of these docs
-- [`llms-full.txt`](https://docs.geckovision.tech/llms-full.txt) — the whole docs as one Markdown file
-- [`gecko.json`](https://docs.geckovision.tech/gecko.json) — the machine-readable manifest for this site
-- [`/.well-known/gecko.json`](https://docs.geckovision.tech/.well-known/gecko.json) — the manifest at the discovery-convention path
-- **Any page as Markdown** — append `.md` to its URL (e.g. [`/discoverability.md`](https://docs.geckovision.tech/discoverability.md))
-- [Hosted MCP endpoint](https://mcp.geckovision.tech/mcp) — the live Gecko MCP (Streamable-HTTP), one-click add to Claude or Cursor
-- [Product manifest (canonical)](https://geckovision.tech/gecko.json) — the source-of-truth manifest on the landing
+- [`llms.txt`](https://docs.geckovision.tech/llms.txt): the curated index of these docs
+- [`llms-full.txt`](https://docs.geckovision.tech/llms-full.txt): the whole docs as one Markdown file
+- [`gecko.json`](https://docs.geckovision.tech/gecko.json): the machine-readable manifest for this site
+- [`/.well-known/gecko.json`](https://docs.geckovision.tech/.well-known/gecko.json): the manifest at the discovery-convention path
+- **Any page on this docs site as Markdown**: append `.md` to its URL (e.g. [`/discoverability.md`](https://docs.geckovision.tech/discoverability.md))
+- [Agent runbook](https://www.geckovision.tech/agents.md) and [client wiring](https://www.geckovision.tech/mcp-config.json): the canonical setup on the landing site
+- [Flagship MCP surface](https://mcp.geckovision.tech/orquestra/mcp): Streamable HTTP, 16 tools, no key
+- [Served surfaces](https://mcp.geckovision.tech/.well-known/gecko.json): the ten mounted surfaces, each described at [`catalog.md`](https://www.geckovision.tech/catalog.md). The host root, [`/mcp`](https://mcp.geckovision.tech/mcp), serves two tools: `comprehend_api` and `list_surfaces`
+- [Product manifest (canonical)](https://geckovision.tech/gecko.json): the source-of-truth manifest on the landing
 
 <Note>
 Shipped today: the MCP surface, `search_capabilities`, hidden auth, a usable-only
-surface, and this site's own agent-native artifacts — `llms.txt`, `gecko.json`, and
+surface, and this site's own agent-native artifacts: `llms.txt`, `gecko.json`, and
 `/.well-known/gecko.json` (discovery level). Rolling out (see [Roadmap](/roadmap)): the
 `x-gecko` OpenAPI enrichment and the richer `/.well-known/gecko.json` **capability graph**
 (which call produces the id another call needs), `search_capabilities` returning the full
-call recipe inline (prerequisites + a worked example), and access-quality measurement —
+call recipe inline (prerequisites + a worked example), and access-quality measurement:
 did the agent find and correctly use the call. We build these against our own docs first.
 </Note>
 
 ## Scope
 
 Discoverability is live today on an ingested **OpenAPI 3.x** surface. Gecko makes a
-*known* API surface agent-usable — it doesn't crawl arbitrary human-only docs, auto-discover
+*known* API surface agent-usable. It doesn't crawl arbitrary human-only docs, auto-discover
 APIs across the internet, or verify the data an API returns. See [Status](/status).
